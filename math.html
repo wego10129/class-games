@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="加減法練習">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#E3EDF2">
+<title>加減法小練習（20以內）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<style>
+/* 依《資訊課遊戲網頁：通用設計規格書》v2.4 第 10 節（貼紙風格）與第 12 節（學扶例外條款） */
+:root{
+  --paper:#E3EDF2; --grid:#D0DEE6; --ink:#1B2836; --ink-soft:#4C5D6E; --card:#FFFFFF; --wash:#F3F7FA;
+  --hl:#FFE066; --gold:#F2B400; --good:#1FA963; --bad:#E5484D; --blue:#3A9FEF; --orange:#FF8A3D; --purple:#9466EE;
+  --s-new:#FFFFFF; --s-weak:#FFB3B3; --s-learn:#FFE38A; --s-ok:#8FE0AE; --s-super:#FFC933; --s-none:#E6ECF1;
+  --f-display:'LXGW WenKai TC','PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;
+  --f-body:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
+  --f-num:'Fredoka','Noto Sans TC',sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+html{background:var(--paper)}
+body{
+  background:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+  color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.5;
+  height:100dvh; overflow:hidden; touch-action:manipulation; user-select:none; -webkit-user-select:none;
+  padding:max(10px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+}
+.wrap{height:100%;display:flex;flex-direction:column;gap:10px;max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;margin:0;line-height:1.25;text-wrap:balance}
+p{margin:0}
+button{font-family:inherit;color:var(--ink)}
+
+/* ---------- 標題列 ---------- */
+.top{flex:none;display:flex;align-items:center;gap:10px 16px;justify-content:space-between;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{font-size:26px;letter-spacing:.04em;cursor:default}
+.tagk{display:inline-block;background:var(--hl);border:3px solid var(--ink);border-radius:10px;padding:0 8px;box-shadow:3px 3px 0 var(--ink);font-family:var(--f-num);font-weight:600;font-size:20px;transform:rotate(-4deg)}
+.badge{display:inline-block;font-size:13px;font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:0 10px;background:var(--hl);white-space:nowrap}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font:700 16px var(--f-body);padding:8px 16px;border:3px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.primary{background:var(--hl)}
+.btn.sm{font-size:14px;padding:4px 12px}
+.btn:disabled{opacity:.45}
+.card{background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);padding:16px}
+
+main{flex:1;min-height:0;display:flex;flex-direction:column}
+main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+[data-screen="home"],[data-screen="result"]{overflow:auto;padding:0 6px 6px 0}
+
+/* ---------- 首頁 ---------- */
+.home{display:grid;grid-template-columns:minmax(300px,1fr) minmax(320px,1.15fr);gap:16px;align-items:start}
+.hello{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:900;font-size:18px}
+.seat{font-family:var(--f-num);font-size:22px;background:var(--wash);border:2px solid var(--ink);border-radius:10px;padding:0 10px}
+.range-name{font-size:24px}
+.lit{display:grid;gap:6px;margin:10px 0 4px}
+.lit-txt{font-weight:900;font-size:18px}
+.lit-txt b{font-family:var(--f-num);font-size:26px;margin:0 2px}
+.bar{height:18px;border:3px solid var(--ink);border-radius:999px;background:var(--wash);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--s-ok),var(--s-super));border-right:3px solid var(--ink)}
+.bar i[style*="width:0%"]{border-right:0}
+.modes{display:grid;gap:12px;margin-top:12px}
+.mode{display:flex;align-items:center;gap:14px;text-align:left;width:100%;font:900 22px var(--f-body);border:3px solid var(--ink);border-radius:16px;padding:12px 16px;box-shadow:4px 4px 0 var(--ink);cursor:pointer;background:var(--card)}
+.mode:active:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.mode .ic{flex:none;width:54px;height:54px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;font-size:28px}
+.mode small{display:block;font-size:15px;font-weight:700;color:var(--ink-soft);line-height:1.35}
+.mode.a .ic{background:#DCEEFF}
+.mode.b .ic{background:#FFF1C2}
+.mode:disabled{cursor:default;background:var(--wash)}
+.mode:disabled .ic{filter:grayscale(1);opacity:.5}
+.empty-seat{display:grid;gap:10px;justify-items:start}
+
+/* ---------- 加法表、減法表 ---------- */
+.tables{display:grid;gap:12px}
+.tbl h3{font-size:18px;margin-bottom:4px}
+.gridt{display:grid;gap:3px}
+.gridt .hd{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--ink-soft);display:grid;place-items:center}
+.cell{border:2px solid var(--ink);border-radius:6px;font-family:var(--f-num);font-weight:600;font-size:clamp(9px,1.25vw,13px);display:grid;place-items:center;min-height:26px;padding:0 1px;white-space:nowrap;background:var(--s-new);position:relative;line-height:1.1}
+.cell.none{background:var(--s-none);border-color:transparent}
+.cell.weak{background:var(--s-weak)} .cell.learn{background:var(--s-learn)} .cell.ok{background:var(--s-ok)} .cell.super{background:var(--s-super)}
+.cell.super::after{content:"★";position:absolute;top:-8px;right:-5px;font-size:12px;color:var(--ink)}
+.cell .wn{position:absolute;bottom:-7px;right:-5px;background:var(--bad);color:#fff;border:1.5px solid var(--ink);border-radius:999px;font-size:10px;padding:0 4px;line-height:14px}
+.cell.sel{outline:3px solid var(--purple);outline-offset:1px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;font-weight:700;color:var(--ink-soft)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend i{width:16px;height:16px;border:2px solid var(--ink);border-radius:4px;display:inline-block}
+
+/* ---------- 練習畫面 ---------- */
+.game{flex:1;min-height:0;display:grid;grid-template-columns:1fr minmax(280px,36%);gap:16px}
+.g-left{min-height:0;display:flex;flex-direction:column;gap:10px}
+.g-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chipm{font-weight:900;border:3px solid var(--ink);border-radius:999px;padding:0 14px;background:#DCEEFF}
+.chipm.b{background:#FFF1C2}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink);background:#fff}
+.dots i.done{background:var(--good)}
+.dots i.redo{background:var(--s-weak)}
+.dots i.now{background:var(--hl);transform:scale(1.25)}
+.qcard{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative;overflow:hidden}
+.eq{display:flex;align-items:center;justify-content:center;gap:.28em;font-family:var(--f-num);font-weight:600;font-size:clamp(46px,10.5vmin,112px);line-height:1;flex-wrap:nowrap}
+.eq .op{color:var(--ink-soft)}
+.ans{min-width:1.9em;height:1.3em;border:4px solid var(--ink);border-radius:16px;background:var(--wash);display:grid;place-items:center;padding:0 .12em}
+.ans.focus{background:#FFF8D6;box-shadow:0 0 0 6px rgba(255,224,102,.6)}
+.ans.ok{background:#D9F6E5;border-color:var(--good)}
+.ans.no{background:#FFE1E1;border-color:var(--bad);animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.ans .cur{width:4px;height:.8em;background:var(--ink-soft);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.msg{min-height:1.6em;font-weight:900;font-size:clamp(18px,3vmin,26px);text-align:center}
+.msg.good{color:var(--good)} .msg.bad{color:#B4232A}
+.fx{position:absolute;top:12px;right:14px;font-weight:900;font-size:clamp(18px,3vmin,24px);border:3px solid var(--ink);border-radius:14px;padding:2px 14px;background:var(--hl);animation:pop .3s ease-out}
+.fx.super{background:var(--s-super)} .fx.ok{background:var(--s-ok)} .fx.lit{background:#E9DDFF}
+@keyframes pop{from{transform:scale(.5);opacity:0}}
+.hint{width:100%;max-width:640px;border:3px dashed var(--ink-soft);border-radius:16px;background:#FFFBEA;padding:10px 14px;display:grid;gap:8px;justify-items:center}
+.frames{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.tf{display:grid;grid-template-columns:repeat(5,var(--c));grid-template-rows:repeat(2,var(--c));gap:3px;border:3px solid var(--ink);border-radius:8px;padding:4px;background:#fff;--c:clamp(18px,4vmin,34px)}
+.tf i{border:1.5px solid #B9C6D2;border-radius:4px;display:grid;place-items:center;position:relative}
+.tf i.a::before,.tf i.b::before,.tf i.x::before{content:"";width:72%;height:72%;border-radius:50%;border:2px solid var(--ink)}
+.tf i.a::before{background:var(--blue)}
+.tf i.b::before{background:var(--orange)}
+.tf i.x::before{background:#CBD5DE}
+.tf i.x::after{content:"";position:absolute;width:110%;height:3px;background:var(--bad);transform:rotate(-40deg)}
+.steps{display:grid;gap:2px;font-weight:900;font-size:clamp(17px,2.8vmin,24px);text-align:center}
+.steps .n{font-family:var(--f-num);font-weight:600}
+.steps .k{display:inline-block;border-radius:6px;padding:0 6px}
+.steps .ka{background:#DCEEFF} .steps .kb{background:#FFE2CC}
+.reveal{font-weight:900;font-size:clamp(18px,3vmin,24px);background:var(--hl);border:2px solid var(--ink);border-radius:10px;padding:0 12px}
+
+.pad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:10px;min-height:0}
+.pad button{font-family:var(--f-num);font-weight:600;font-size:clamp(30px,6vmin,52px);border:3px solid var(--ink);border-radius:18px;background:var(--card);box-shadow:4px 4px 0 var(--ink);cursor:pointer;min-height:56px}
+.pad button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);background:var(--hl)}
+.pad .del{font-family:var(--f-body);font-size:clamp(18px,3.2vmin,26px);font-weight:900;background:var(--wash)}
+.pad .go{font-family:var(--f-body);font-size:clamp(20px,3.6vmin,30px);font-weight:900;background:var(--hl)}
+.pad .go:disabled{opacity:.5}
+
+.toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:30;background:var(--ink);color:#fff;border:3px solid var(--hl);border-radius:16px;padding:10px 22px;font-weight:900;font-size:22px;box-shadow:0 6px 0 rgba(0,0,0,.25);animation:pop .3s ease-out;max-width:calc(100% - 32px);text-align:center}
+.cover{position:fixed;inset:0;z-index:40;background:rgba(27,40,54,.72);display:grid;place-items:center;padding:20px}
+.cover .card{max-width:520px;text-align:center;display:grid;gap:12px;justify-items:center}
+.cover .big{font-size:26px;font-weight:900}
+
+/* ---------- 結算 ---------- */
+.result{display:grid;gap:14px}
+.r-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.r-top h2{font-size:30px}
+.trend{font-weight:900;font-size:18px;border:3px solid var(--ink);border-radius:999px;padding:2px 16px;background:var(--wash)}
+.trend.best{background:var(--hl)} .trend.up{background:#DDF5E7;color:#127A45}
+.r-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.r-row>b{margin-right:4px}
+.qchip{font-family:var(--f-num);font-weight:600;font-size:18px;border:2px solid var(--ink);border-radius:10px;padding:0 10px;background:var(--wash);white-space:nowrap}
+.qchip.ok{background:var(--s-ok)} .qchip.super{background:var(--s-super)} .qchip.weak{background:var(--s-weak)} .qchip.learn{background:var(--s-learn)}
+.r-stats{display:flex;gap:10px;flex-wrap:wrap}
+.r-stats div{border:2px solid var(--ink);border-radius:10px;padding:4px 14px;background:var(--wash);font-weight:700}
+.r-stats b{font-family:var(--f-num);font-size:22px;margin-left:6px}
+.note{background:var(--hl);border:3px solid var(--ink);border-radius:12px;padding:6px 14px;font-weight:900;justify-self:start}
+.r-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;align-items:start}
+
+/* ---------- 老師設定 ---------- */
+.tp{position:fixed;inset:0;z-index:50;background:rgba(27,40,54,.6);display:grid;place-items:center;padding:16px}
+.tp-box{width:min(980px,100%);max-height:100%;overflow:auto;display:grid;gap:14px;user-select:text;-webkit-user-select:text}
+.tp-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tp-sec{display:grid;gap:8px;border-top:2px dashed var(--grid);padding-top:12px}
+.tp-sec h3{font-size:18px}
+.tp label{font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.tp input[type=text]{font:700 22px var(--f-body);width:8em;border:3px solid var(--ink);border-radius:10px;padding:2px 8px}
+.tp input[type=checkbox]{width:22px;height:22px}
+.dim{color:var(--ink-soft);font-size:14px;font-weight:700}
+.detail{min-height:1.5em;font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.top5{display:flex;gap:8px;flex-wrap:wrap}
+.tlist{max-height:360px;overflow:auto;border:2px solid var(--ink);border-radius:12px}
+.tlist table{width:100%;border-collapse:collapse;font-size:15px}
+.tlist th{position:sticky;top:0;background:var(--hl);text-align:left;padding:4px 8px;border-bottom:2px solid var(--ink);white-space:nowrap}
+.tlist td{padding:3px 8px;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums}
+.tlist .qchip{font-size:15px}
+.tp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+
+@media (max-aspect-ratio:1/1){
+  .home{grid-template-columns:1fr}
+  .game{grid-template-columns:1fr;grid-template-rows:1fr auto}
+  .pad{height:min(40vh,380px)}
+}
+@media (max-width:600px){ .brand h1{font-size:20px} body{overflow:auto;height:auto} }
+@media (prefers-reduced-motion:reduce){ *{animation:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="tagk">+−</span><h1 id="title">加減法小練習</h1><span class="badge" id="verBadge"></span></div>
+    <div class="row">
+      <button class="btn sm" id="soundBtn" type="button">聲音：開</button>
+      <button class="btn sm" id="homeBtn" type="button" hidden>回首頁</button>
+    </div>
+  </header>
+
+  <main>
+    <section data-screen="home"><div id="home"></div></section>
+
+    <section data-screen="game" hidden>
+      <div class="game">
+        <div class="g-left">
+          <div class="g-bar"><span id="gMode" class="chipm"></span><div id="gDots" class="dots"></div></div>
+          <div class="card qcard">
+            <div id="gFx" class="fx" hidden></div>
+            <div class="eq" id="gEq"></div>
+            <div id="gMsg" class="msg"></div>
+            <div id="gHint" class="hint" hidden></div>
+          </div>
+        </div>
+        <div class="pad" id="pad">
+          <button type="button" data-n="7">7</button><button type="button" data-n="8">8</button><button type="button" data-n="9">9</button>
+          <button type="button" data-n="4">4</button><button type="button" data-n="5">5</button><button type="button" data-n="6">6</button>
+          <button type="button" data-n="1">1</button><button type="button" data-n="2">2</button><button type="button" data-n="3">3</button>
+          <button type="button" class="del" data-k="del">⌫ 清除</button><button type="button" data-n="0">0</button><button type="button" class="go" data-k="go">確定</button>
+        </div>
+      </div>
+    </section>
+
+    <section data-screen="result" hidden><div id="result" class="card result"></div></section>
+  </main>
+</div>
+
+<div id="pauseCover" class="cover" hidden><div class="card"><div class="big">休息一下</div><p>離開畫面時，這一題的時間不算。</p><button class="btn primary" id="resumeBtn" type="button">點一下這裡繼續</button></div></div>
+<div id="tp" class="tp" hidden><div class="card tp-box" id="tpBox"></div></div>
+
+<script>
+/* =====================================================================
+   參數區（對應「主題設定表：20以內加減法」；改數字不用動下面的程式）
+   ===================================================================== */
+const VERSION = {id:'r20v1', name:'20以內 v1.2'};
+const RANGES = [                      /* 範圍＝內容分段，不是難度（規格書 12.5） */
+  {id:'r10', name:'10以內',          note:'總和 10 以內', ready:false},
+  {id:'r20', name:'20以內',          note:'一定要進位・退位，最大 9+9、18−9', ready:true},
+  {id:'mix', name:'混合',            note:'10以內＋20以內一起練', ready:false},
+];
+const DEFAULT_OPEN = ['r20'];         /* 這一版只開 20以內 */
+const ROUND_N = 15;                   /* 每局題數 */
+const MASTER_SEC = 5;                 /* 沒看提示、5 秒內答對＝熟練 */
+const SUPER_SEC = 3;                  /* 沒看提示、3 秒內答對＝超熟練（之後不再出題） */
+const MIX = {weak:5, fresh:5, ok:5};  /* 每局：不熟＋練習中／沒出現過／熟練 各幾題，不夠時互相補 */
+const NAME_MAX = 8;                   /* 小名最多幾個字 */
+const REINSERT_GAP = 3;               /* 答錯的題目，隔幾個位置再出一次（中間隔 2 題） */
+const GUESS_SEC = 1;                  /* 1 秒內就答錯＝可能是猜的 */
+const GUESS_STREAK = 2;               /* 連續幾題快速答錯，就提醒「先想一想」 */
+const STORE_KEY = 'mathfact1';        /* 瀏覽器儲存的鍵名（含版本） */
+
+const STATE = {
+  fresh:{name:'沒出現過', cls:'new'},
+  weak: {name:'不熟',     cls:'weak'},
+  learn:{name:'練習中',   cls:'learn'},
+  ok:   {name:'熟練',     cls:'ok'},
+  super:{name:'超熟練',   cls:'super'},
+};
+
+/* ---------- 小工具 ---------- */
+const $ = s => document.querySelector(s);
+const H = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const MINUS = '−';
+const fmt = it => `${it.x}${it.op==='+'?'+':MINUS}${it.y}`;
+
+/* ---------- 題庫 ---------- */
+function makeItems(range){
+  const L = [];
+  const add = (x,y) => L.push({id:`${x}+${y}`, op:'+', x, y, ans:x+y});
+  const sub = (x,y) => L.push({id:`${x}-${y}`, op:'-', x, y, ans:x-y});
+  if (range==='r10' || range==='mix'){
+    for (let x=1;x<=9;x++) for (let y=1;y<=9;y++) if (x+y<=10) add(x,y);
+    for (let x=2;x<=10;x++) for (let y=1;y<=9;y++) if (x-y>=1) sub(x,y);
+  }
+  if (range==='r20' || range==='mix'){
+    for (let x=1;x<=9;x++) for (let y=1;y<=9;y++) if (x+y>=11) add(x,y);            /* 一位數＋一位數，一定進位 */
+    for (let x=11;x<=18;x++) for (let y=1;y<=9;y++) if (y > x-10) sub(x,y);         /* 一定退位，差是一位數 */
+  }
+  return L;
+}
+const ITEMS = {}; RANGES.forEach(r => ITEMS[r.id] = makeItems(r.id));
+
+/* ---------- 儲存（只存在這台 iPad；不對外傳輸） ---------- */
+const store = {
+  get(){ try{ const v = localStorage.getItem(STORE_KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } },
+  set(v){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(v)); return true; }catch(e){ return false; } }
+};
+const blank = () => ({app:'mathfact', ver:1, name:null, seat:null, open:DEFAULT_OPEN.slice(), items:{}, playedA:{}, rounds:0, guess:0, lastLit:{}});
+let P = Object.assign(blank(), store.get() || {});
+const save = () => store.set(P);
+const rec = id => P.items[id] || (P.items[id] = {s:'fresh', seen:0, wrong:0, rts:[], last:null, guess:0});
+const stOf = id => (P.items[id] && P.items[id].s) || 'fresh';
+const isLit = s => s==='ok' || s==='super';
+const litCount = range => ITEMS[range].filter(it => isLit(stOf(it.id))).length;
+const openRanges = () => RANGES.filter(r => r.ready && P.open.includes(r.id));
+const who = () => P.name || (P.seat ? P.seat + ' 號' : null);   /* 顯示用：小名（舊資料沿用座號） */
+const safeFile = s => String(s).replace(/[\\/:*?"<>|\s]/g, '');
+const avg = a => a.length ? a.reduce((s,x)=>s+x,0)/a.length : null;
+
+/* ---------- 聲音 ---------- */
+const Sound = {
+  ac:null, muted:false,
+  init(){ if (!this.ac){ try{ this.ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if (this.ac && this.ac.state==='suspended') this.ac.resume(); },
+  tone(f,d,type,when,vol){
+    const ac = this.ac; if (!ac || this.muted) return;
+    const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime+(when||0);
+    o.type = type||'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(vol||.14,t); g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+d+.03);
+  },
+  tap(){ this.tone(520,.05,'sine',0,.06); },
+  good(){ this.tone(660,.12,'triangle'); this.tone(990,.2,'triangle',.08); },
+  star(){ [784,988,1319].forEach((f,i)=>this.tone(f,.16,'triangle',i*.07)); },
+  soft(){ this.tone(330,.22,'sine',0,.09); },
+  win(){ [523,659,784,1047].forEach((f,i)=>this.tone(f,.22,'triangle',i*.11)); }
+};
+$('#soundBtn').addEventListener('click', () => { Sound.init(); Sound.muted = !Sound.muted; $('#soundBtn').textContent = Sound.muted ? '聲音：關' : '聲音：開'; });
+document.addEventListener('pointerdown', () => Sound.init(), {passive:true});
+
+$('#verBadge').textContent = VERSION.name;
+
+/* ---------- 畫面切換 ---------- */
+let screen = 'home', G = null, range = 'r20';
+function show(name){
+  screen = name;
+  document.querySelectorAll('[data-screen]').forEach(s => s.hidden = s.dataset.screen!==name);
+  $('#homeBtn').hidden = name==='home';
+  if (name==='home') renderHome();
+}
+$('#homeBtn').addEventListener('click', () => { G = null; show('home'); });
+
+/* ---------- 加法表、減法表 ---------- */
+function tableHTML(rng, op, opts){
+  opts = opts || {};
+  const list = ITEMS[rng].filter(it => it.op===op);
+  const xs = [...new Set(list.map(it => it.x))].sort((a,b)=>a-b);
+  const ys = [...new Set(list.map(it => it.y))].sort((a,b)=>a-b);
+  const map = {}; list.forEach(it => map[it.x+'|'+it.y] = it);
+  let h = `<div class="gridt" style="grid-template-columns:22px repeat(${ys.length},1fr)"><span class="hd"></span>`;
+  ys.forEach(y => h += `<span class="hd">${op==='+'?'+':MINUS}${y}</span>`);
+  xs.forEach(x => {
+    h += `<span class="hd">${x}</span>`;
+    ys.forEach(y => {
+      const it = map[x+'|'+y];
+      if (!it){ h += '<span class="cell none"></span>'; return; }
+      const r = P.items[it.id], s = stOf(it.id);
+      const wn = opts.teacher && r && r.wrong ? `<span class="wn">${r.wrong}</span>` : '';
+      h += `<span class="cell ${STATE[s].cls}" data-id="${it.id}" title="${fmt(it)}">${fmt(it)}${wn}</span>`;
+    });
+  });
+  const lit = list.filter(it => isLit(stOf(it.id))).length;
+  return `<div class="tbl"><h3>${op==='+'?'加法':'減法'}　<span class="dim">點亮 ${lit}/${list.length}</span></h3>${h}</div></div>`;
+}
+const legendHTML = () => `<div class="legend">${Object.keys(STATE).map(k => `<span><i class="cell ${STATE[k].cls}" style="min-height:0"></i>${STATE[k].name}</span>`).join('')}</div>`;
+
+/* ---------- 首頁 ---------- */
+function renderHome(){
+  const el = $('#home');
+  if (!who()){
+    el.innerHTML = `<div class="card empty-seat"><h2>請老師先設定小名</h2><p>老師：連點左上角的標題「加減法小練習」5 下，打開老師設定。</p></div>`;
+    return;
+  }
+  const opens = openRanges();
+  if (!opens.length){
+    el.innerHTML = `<div class="card empty-seat"><h2>老師還沒有開放練習範圍</h2><p>老師：連點標題 5 下，在老師設定勾選範圍。</p></div>`;
+    return;
+  }
+  if (!opens.find(r => r.id===range)) range = opens[0].id;
+  const R = RANGES.find(r => r.id===range), total = ITEMS[range].length, lit = litCount(range);
+  const nWeak = ITEMS[range].filter(it => ['weak','learn'].includes(stOf(it.id))).length;
+  const nFresh = ITEMS[range].filter(it => stOf(it.id)==='fresh').length;
+  const tabs = opens.length>1 ? `<div class="row">${opens.map(r => `<button class="btn sm ${r.id===range?'primary':''}" data-range="${r.id}" type="button">${r.name}</button>`).join('')}</div>` : '';
+  el.innerHTML = `<div class="home">
+    <div class="card">
+      <div class="hello"><span class="seat">${H(who())}</span>今天也來練一練！</div>
+      ${tabs}
+      <h2 class="range-name" style="margin-top:8px">${R.name}</h2>
+      <p class="dim">${R.note}</p>
+      <div class="lit"><div class="lit-txt">${total} 格，已經點亮 <b>${lit}</b> 格</div><div class="bar"><i style="width:${Math.round(lit/total*100)}%"></i></div></div>
+      <div class="modes">
+        <button class="mode a" type="button" data-mode="go"><span class="ic">🔍</span><span>開始練習<small>找出還不熟的題目，把它們一格一格點亮！慢慢想，答錯會有提示。</small></span></button>
+        <p class="dim">還要多練 ${nWeak} 題・還沒出現 ${nFresh} 題</p>
+      </div>
+    </div>
+    <div class="card tables">${tableHTML(range,'+')}${tableHTML(range,'-')}${legendHTML()}</div>
+  </div>`;
+}
+$('#home').addEventListener('click', e => {
+  const m = e.target.closest('[data-mode]'); if (m) return startRound();
+  const r = e.target.closest('[data-range]'); if (r){ range = r.dataset.range; renderHome(); }
+});
+
+/* ---------- 出題 ---------- */
+function interleave(list){
+  /* 加法、減法交錯；同一題不相鄰 */
+  const adds = shuffle(list.filter(it => it.op==='+')), subs = shuffle(list.filter(it => it.op==='-'));
+  const out = []; let turn = Math.random()<.5 ? '+' : '-';
+  while (adds.length || subs.length){
+    const src = (turn==='+' && adds.length) || !subs.length ? adds : subs;
+    out.push(src.shift()); turn = turn==='+' ? '-' : '+';
+  }
+  return out;
+}
+function buildRound(){
+  const pool = ITEMS[range].filter(it => stOf(it.id)!=='super');
+  const by = {weak:[], fresh:[], ok:[]};
+  pool.forEach(it => { const s = stOf(it.id); (s==='weak'||s==='learn' ? by.weak : s==='fresh' ? by.fresh : by.ok).push(it); });
+  /* 不熟的排前面，答錯次數多的優先 */
+  shuffle(by.weak).sort((a,b) => (stOf(a.id)==='weak'?0:1)-(stOf(b.id)==='weak'?0:1) || rec(b.id).wrong-rec(a.id).wrong);
+  shuffle(by.fresh); shuffle(by.ok);
+  const n = Math.min(ROUND_N, pool.length), pick = [];
+  const take = (arr,k) => { while (k-- > 0 && arr.length && pick.length < n) pick.push(arr.shift()); };
+  take(by.weak, MIX.weak); take(by.fresh, MIX.fresh); take(by.ok, MIX.ok);
+  [by.weak, by.fresh, by.ok].forEach(arr => take(arr, n));
+  return interleave(pick);
+}
+
+/* ---------- 一局 ---------- */
+function startRound(){
+  const q = buildRound();
+  if (!q.length){ return toast('這個範圍全部都超熟練了，太厲害了！🌟', 3000); }
+  const snap = {}; ITEMS[range].forEach(it => snap[it.id] = stOf(it.id));
+  G = {q:q.map(it => ({it, redo:false})), i:0, snap, log:[], redone:new Set(), fastStreak:0, litBefore:litCount(range), roundsBefore:P.rounds};
+  show('game');
+  $('#gMode').textContent = '🔍 加減法練習';
+  nextQ();
+}
+function renderDots(){
+  $('#gDots').innerHTML = G.q.map((e,i) => `<i class="${i<G.i?'done':i===G.i?'now':e.redo?'redo':''}"></i>`).join('');
+}
+function renderEq(state){
+  const it = G.cur;
+  const v = G.input ? `<span>${G.input}</span>` : '<span class="cur"></span>';
+  $('#gEq').innerHTML = `<span>${it.x}</span><span class="op">${it.op==='+'?'＋':'－'}</span><span>${it.y}</span><span class="op">＝</span><span class="ans ${state||'focus'}" id="gAns">${v}</span>`;
+}
+function nextQ(){
+  if (!G) return;
+  if (G.i >= G.q.length) return endRound();
+  G.cur = G.q[G.i].it; G.input = ''; G.wrongs = 0; G.voided = false; G.lock = false; G.firstFast = null;
+  $('#gHint').hidden = true; $('#gMsg').textContent = ''; $('#gMsg').className = 'msg'; $('#gFx').hidden = true;
+  renderEq(); renderDots(); updGo();
+  G.start = performance.now();
+}
+function updGo(){ document.querySelector('.pad .go').disabled = !G || !G.input; }
+function press(k){
+  if (!G || G.lock || screen!=='game') return;
+  Sound.tap();
+  if (k==='del') G.input = '';
+  else if (k==='go') return submit();
+  else if (G.input.length < 2) G.input = (G.input==='0' ? '' : G.input) + k;
+  renderEq(); updGo();
+}
+$('#pad').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  press(b.dataset.n!=null ? b.dataset.n : b.dataset.k);
+});
+document.addEventListener('keydown', e => {
+  if (screen!=='game' || !$('#tp').hidden) return;
+  if (/^[0-9]$/.test(e.key)) press(e.key);
+  else if (e.key==='Backspace'){ e.preventDefault(); press('del'); }
+  else if (e.key==='Enter') press('go');
+});
+
+function submit(){
+  if (!G.input) return;
+  const it = G.cur, v = +G.input, rt = (performance.now() - G.start) / 1000;
+  if (v === it.ans) return correct(rt);
+  /* 答錯：不能直接跳下一題，先看提示再重答 */
+  G.wrongs++;
+  if (G.wrongs===1){
+    const fast = rt < GUESS_SEC;
+    G.firstFast = fast;
+    if (fast){
+      G.fastStreak++; P.guess++; rec(it.id).guess++;
+      if (G.fastStreak >= GUESS_STREAK){ toast('先想一想再按，慢慢來沒關係 🙂', 2200); G.fastStreak = 0; }
+    } else G.fastStreak = 0;
+  }
+  Sound.soft();
+  G.input = ''; renderEq('no');
+  $('#gMsg').className = 'msg bad';
+  $('#gMsg').textContent = G.wrongs===1 ? '再想想看，看看下面的提示' : '沒關係，照著提示再試一次';
+  showHint(it, G.wrongs >= 2);
+  updGo();
+}
+function correct(rt){
+  G.lock = true;
+  const it = G.cur, r = rec(it.id), before = r.s, prevRt = r.last;
+  if (G.wrongs===0 && G.firstFast!==true) G.fastStreak = 0;
+  r.seen++;
+  let after;
+  if (G.wrongs > 0){ r.wrong++; after = 'weak'; }                       /* 答錯過或看了提示 → 不熟 */
+  else if (G.voided){ after = (before==='ok' || before==='super') ? before : 'learn'; }  /* 中途離開：秒數不算，只記對錯 */
+  else {
+    after = rt <= SUPER_SEC ? 'super' : rt <= MASTER_SEC ? 'ok' : 'learn';
+    r.rts.push(+rt.toFixed(2)); if (r.rts.length > 5) r.rts.shift();
+    r.last = +rt.toFixed(2);
+  }
+  r.s = after; save();
+  const speedItem = (before==='learn' || before==='ok') && !G.wrongs && !G.voided;   /* 已經會算的題目才顯示速度 */
+  G.log.push({id:it.id, before, after, rt: G.wrongs||G.voided ? null : rt, prevRt, wrongs:G.wrongs, speed:speedItem});
+
+  /* 答錯過（或中途離開）的題目，隔 2 題再出一次 */
+  if ((G.wrongs>0 || G.voided) && !G.redone.has(it.id)){
+    G.redone.add(it.id);
+    G.q.splice(Math.min(G.i + REINSERT_GAP, G.q.length), 0, {it, redo:true});
+  }
+
+  renderEq('ok');
+  const m = $('#gMsg'); m.className = 'msg good';
+  const fx = $('#gFx'); fx.hidden = true;
+  if (speedItem){
+    let t = '答對了！';
+    if (prevRt!=null && rt < prevRt - 0.05) t += `比上次快 ${(prevRt-rt).toFixed(1)} 秒`;
+    m.textContent = t;
+    if (rt <= SUPER_SEC){ fx.className = 'fx super'; fx.textContent = '🌟 超熟練！'; fx.hidden = false; Sound.star(); }
+    else if (rt <= MASTER_SEC){ fx.className = 'fx ok'; fx.textContent = '⚡ 熟練！'; fx.hidden = false; Sound.good(); }
+    else Sound.good();
+  } else {
+    m.textContent = (G.wrongs || G.voided) && G.q.some((e,k) => k > G.i && e.it.id===it.id) ? '答對了！等一下會再考你一次喔' : '答對了！';
+    if (!isLit(before) && isLit(after)){ fx.className = 'fx lit'; fx.textContent = '✨ 點亮一格！'; fx.hidden = false; Sound.star(); }
+    else Sound.good();
+  }
+  const g = G;
+  setTimeout(() => { if (G===g){ G.i++; nextQ(); } }, G.wrongs ? 1300 : 900);
+}
+
+/* ---------- 提示：十格框（加法湊十、減法破十） ---------- */
+const frame = cells => `<div class="tf">${Array.from({length:10},(_,i)=>`<i class="${cells[i]||''}"></i>`).join('')}</div>`;
+const fill = (spec) => { const c = []; spec.forEach(([cls,n]) => { for (let i=0;i<n;i++) c.push(cls); }); return c; };
+function showHint(it, reveal){
+  let frames = '', steps = '';
+  const N = n => `<span class="n">${n}</span>`;
+  if (it.op==='+' && it.ans > 10){
+    const big = Math.max(it.x,it.y), small = Math.min(it.x,it.y), need = 10-big, rest = small-need;
+    frames = frame(fill([['a',big],['b',need]])) + frame(fill([['b',rest]]));
+    steps = `<div><span class="k ka">${N(big)}</span> 再 ${N(need)} 就湊成 ${N(10)}</div>
+             <div>把 <span class="k kb">${N(small)}</span> 分成 ${N(need)} 和 ${N(rest)}</div>
+             <div>${N(10)} ＋ ${N(rest)} ＝ ？</div>`;
+  } else if (it.op==='-' && it.x > 10){
+    const u = it.x-10, r = 10-it.y;
+    frames = frame(fill([['a',r],['x',it.y]])) + frame(fill([['a',u]]));
+    steps = `<div>把 ${N(it.x)} 分成 ${N(10)} 和 ${N(u)}</div>
+             <div>${N(10)} － ${N(it.y)} ＝ ${N(r)}</div>
+             <div>${N(r)} ＋ ${N(u)} ＝ ？</div>`;
+  } else if (it.op==='+'){
+    frames = frame(fill([['a',it.x],['b',it.y]]));
+    steps = `<div>藍色 ${N(it.x)} 個，橘色 ${N(it.y)} 個，一共幾個？</div>`;
+  } else {
+    frames = frame(fill([['a',it.x-it.y],['x',it.y]]));
+    steps = `<div>${N(it.x)} 個，劃掉 ${N(it.y)} 個，還剩幾個？</div>`;
+  }
+  $('#gHint').innerHTML = `<div class="frames">${frames}</div><div class="steps">${steps}</div>` +
+    (reveal ? `<div class="reveal">答案是 ${N(it.ans)}，輸入看看</div>` : '');
+  $('#gHint').hidden = false;
+}
+
+/* ---------- 離開畫面：這一題的秒數作廢，回來再出一次 ---------- */
+function pause(){
+  if (screen!=='game' || !G || G.lock) return;
+  G.voided = true;
+  $('#pauseCover').hidden = false;
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+window.addEventListener('blur', pause);
+window.addEventListener('pagehide', pause);
+$('#resumeBtn').addEventListener('click', () => {
+  $('#pauseCover').hidden = true;
+  if (G && !G.lock) G.start = performance.now();
+});
+
+/* ---------- 結算：只和自己比 ---------- */
+function endRound(){
+  const g = G; G = null;
+  const litAfter = litCount(range), total = ITEMS[range].length, gain = litAfter - g.litBefore;
+  P.rounds++; save();
+  Sound.win();
+
+  let trend;
+  if (g.roundsBefore===0) trend = {cls:'best', text:'🚀 第一次練習！'};
+  else if (gain > 0) trend = {cls:'up', text:`👍 這一局點亮了 ${gain} 格！`};
+  else if (gain === 0) trend = {cls:'', text:'💪 穩住了！'};
+  else trend = {cls:'', text:'🔁 再練一局，把它們點亮回來！'};
+
+  const ids = [...new Set(g.log.map(l => l.id))];
+  const byId = id => ITEMS[range].find(it => it.id===id);
+  const chip = id => { const it = byId(id), s = stOf(id); return `<span class="qchip ${STATE[s].cls}">${fmt(it)}</span>`; };
+  const newly = ids.filter(id => !isLit(g.snap[id]) && isLit(stOf(id)));
+  const weakNow = ids.filter(id => ['weak','learn'].includes(stOf(id)));
+  const firstTry = g.log.filter(l => !l.wrongs).length;
+  const newSuper = ids.filter(id => g.snap[id]!=='super' && stOf(id)==='super');
+
+  const sp = g.log.filter(l => l.speed);
+  const faster = sp.filter(l => l.prevRt!=null && l.rt < l.prevRt - 0.05).length;
+  const extra = `<div class="r-stats"><div>一次就答對<b>${firstTry}</b> 題</div><div>練了<b>${g.log.length}</b> 次</div>` +
+    (sp.length ? `<div>⚡ 比上次快<b>${faster}</b> 題</div>` : '') + `</div>`;
+
+  show('result');
+  $('#result').innerHTML = `
+    <div class="r-top"><h2>🔍 練習完成！</h2><span class="trend ${trend.cls}">${trend.text}</span></div>
+    <div class="lit" style="max-width:560px"><div class="lit-txt">${total} 格，已經點亮 <b>${litAfter}</b> 格</div><div class="bar"><i style="width:${Math.round(litAfter/total*100)}%"></i></div></div>
+    ${extra}
+    ${newSuper.length ? `<div class="r-row"><b>🌟 超熟練，之後不用再練：</b>${newSuper.map(chip).join('')}</div>` : ''}
+    ${newly.filter(id => !newSuper.includes(id)).length ? `<div class="r-row"><b>✨ 新點亮：</b>${newly.filter(id => !newSuper.includes(id)).map(chip).join('')}</div>` : ''}
+    <div class="r-row"><b>${weakNow.length ? '🔍 下一局會多練：' : '這一局的題目都點亮了，太厲害了！'}</b>${weakNow.map(chip).join('')}</div>
+    <div class="r-grid">${tableHTML(range,'+')}${tableHTML(range,'-')}</div>
+    ${legendHTML()}
+    <div class="row">
+      <button class="btn primary" type="button" id="rAgain">再練一局</button>
+      <button class="btn" type="button" id="rHome">回首頁</button>
+    </div>`;
+  $('#rAgain').onclick = () => startRound();
+  $('#rHome').onclick = () => show('home');
+}
+
+/* ---------- 小提示 ---------- */
+function toast(text, ms){
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = text;
+  document.body.appendChild(t); setTimeout(() => t.remove(), ms||2000);
+}
+
+/* =====================================================================
+   老師設定：連點標題 5 下（只在首頁）
+   ===================================================================== */
+let tClicks = 0, tTimer = 0, tRange = 'r20', tSel = null, tSort = 'weak';
+$('#title').addEventListener('click', () => {
+  tClicks++; clearTimeout(tTimer); tTimer = setTimeout(() => tClicks = 0, 2000);
+  if (tClicks >= 5 && screen==='home'){ tClicks = 0; openTeacher(); }
+});
+function openTeacher(){ tRange = (openRanges()[0] || RANGES.find(r=>r.ready)).id; tSel = null; renderTeacher(); $('#tp').hidden = false; }
+const S_ORDER = {weak:0, learn:1, fresh:2, ok:3, super:4};
+function listHTML(list){
+  const rows = list.map((it,i) => { const r = P.items[it.id] || {s:'fresh', seen:0, wrong:0, rts:[], last:null, guess:0}; return {it, r, i, a:avg(r.rts)}; });
+  const by = {
+    weak:(x,y) => S_ORDER[x.r.s]-S_ORDER[y.r.s] || y.r.wrong-x.r.wrong || (y.a||0)-(x.a||0),
+    wrong:(x,y) => y.r.wrong-x.r.wrong || S_ORDER[x.r.s]-S_ORDER[y.r.s],
+    seen:(x,y) => y.r.seen-x.r.seen || y.r.wrong-x.r.wrong,
+    order:(x,y) => x.i-y.i
+  };
+  rows.sort(by[tSort]);
+  return `<div class="tlist"><table><thead><tr><th>題目</th><th>熟練度</th><th>挑戰次數</th><th>答錯</th><th>平均秒數</th><th>最近秒數</th><th>快速猜答</th></tr></thead><tbody>` +
+    rows.map(o => `<tr data-id="${o.it.id}"><td><span class="qchip ${STATE[o.r.s].cls}">${fmt(o.it)}</span></td><td>${STATE[o.r.s].name}</td><td>${o.r.seen}</td><td>${o.r.wrong||''}</td><td>${o.a!=null?o.a.toFixed(1):'—'}</td><td>${o.r.last!=null?o.r.last.toFixed(1):'—'}</td><td>${o.r.guess||''}</td></tr>`).join('') +
+    `</tbody></table></div>`;
+}
+function renderTeacher(){
+  const list = ITEMS[tRange];
+  const recs = list.map(it => ({it, r:P.items[it.id]})).filter(o => o.r);
+  const allRts = recs.flatMap(o => o.r.rts);
+  const top5 = recs.filter(o => o.r.wrong>0 || ['weak','learn'].includes(o.r.s))
+    .sort((a,b) => b.r.wrong-a.r.wrong || (avg(b.r.rts)||99)-(avg(a.r.rts)||99)).slice(0,5);
+  const cnt = k => list.filter(it => stOf(it.id)===k).length;
+  const sel = tSel && list.find(it => it.id===tSel);
+  let detail = '<span class="dim">點表格裡的題目，看這一題的紀錄。</span>';
+  if (sel){
+    const r = P.items[sel.id] || {s:'fresh', seen:0, wrong:0, rts:[], guess:0};
+    const a = avg(r.rts);
+    detail = `<b>${fmt(sel)}</b>：${STATE[r.s].name}・做過 ${r.seen} 次・答錯 ${r.wrong} 次・快速猜答 ${r.guess||0} 次・平均 ${a!=null ? a.toFixed(1)+' 秒' : '—'}` +
+      (r.s!=='weak' && r.s!=='fresh' ? ` <button class="btn sm" type="button" id="tBack">放回練習（改成不熟）</button>` : '');
+  }
+  $('#tpBox').innerHTML = `
+    <div class="tp-head"><h2>老師設定</h2><button class="btn sm" type="button" id="tClose">關閉</button></div>
+    <div class="tp-sec"><h3>小名（一人一台，設定一次就好）</h3>
+      <div class="row"><input type="text" id="tSeat" maxlength="${NAME_MAX}" autocomplete="off" value="${H(P.name||'')}" placeholder="例：小安"><button class="btn sm primary" type="button" id="tSeatSave">儲存小名</button></div>
+      <p class="dim">請用小名或暱稱，不要用全名。小名只存在這台 iPad，也會用在進度檔的檔名。</p></div>
+    <div class="tp-sec"><h3>開放的練習範圍</h3>
+      <div class="row">${RANGES.map(r => `<label><input type="checkbox" data-open="${r.id}" ${P.open.includes(r.id)?'checked':''} ${r.ready?'':'disabled'}>${r.name}${r.ready?'':'<span class="dim">（下一版）</span>'}</label>`).join('')}</div>
+      <p class="dim">學生首頁只看到勾選的範圍；只開一個時直接進入。同一題在不同範圍的紀錄是共用的。</p></div>
+    <div class="tp-sec"><h3>報表：${RANGES.find(r=>r.id===tRange).name}</h3>
+      <div class="r-stats">
+        <div>點亮<b>${litCount(tRange)}/${list.length}</b></div>
+        <div>不熟<b>${cnt('weak')}</b></div><div>練習中<b>${cnt('learn')}</b></div><div>沒出現過<b>${cnt('fresh')}</b></div>
+        <div>練習局數<b>${P.rounds}</b></div>
+        <div>平均秒數<b>${allRts.length ? avg(allRts).toFixed(1) : '—'}</b></div>
+        <div>快速猜答<b>${P.guess}</b> 次</div>
+      </div>
+      <div class="r-row"><b>最不熟前 5 題：</b><span class="top5">${top5.length ? top5.map(o => `<span class="qchip ${STATE[o.r.s].cls}">${fmt(o.it)}　錯 ${o.r.wrong}</span>`).join('') : '<span class="dim">目前沒有</span>'}</span></div>
+      <div class="tp-grid" id="tGrids">${tableHTML(tRange,'+',{teacher:true})}${tableHTML(tRange,'-',{teacher:true})}</div>
+      ${legendHTML()}<p class="dim">紅色小圓圈＝答錯次數。</p>
+      <div class="detail" id="tDetail">${detail}</div></div>
+    <div class="tp-sec"><h3>全部組合清單</h3>
+      <div class="row"><span class="dim">排序：</span>${[['weak','最不熟'],['wrong','答錯最多'],['seen','挑戰最多'],['order','題目順序']].map(([k,t]) => `<button class="btn sm ${tSort===k?'primary':''}" type="button" data-sort="${k}">${t}</button>`).join('')}</div>
+      ${listHTML(list)}
+      <p class="dim">狀態依最近一次作答更新；挑戰次數、答錯次數、平均秒數會一直累加保留。平均秒數只算沒看提示、沒離開畫面的作答（最近 5 次）。</p></div>
+    <div class="tp-sec"><h3>進度檔（備份或換 iPad 時用）</h3>
+      <div class="row"><button class="btn sm" type="button" id="tDown">下載進度檔</button>
+        <label class="btn sm">讀入進度檔<input type="file" id="tUp" accept=".json,application/json" hidden></label>
+        <button class="btn sm" type="button" id="tReset">清除這台 iPad 的紀錄</button></div>
+      <p class="dim">檔名用小名。紀錄只存在這台 iPad，網頁不會傳到網路上。</p></div>`;
+  if (tSel){ const c = $('#tGrids').querySelector(`[data-id="${tSel}"]`); if (c) c.classList.add('sel'); }
+}
+$('#tpBox').addEventListener('click', e => {
+  const id = e.target.closest('#tClose, #tSeatSave, #tDown, #tReset, #tBack');
+  const cell = e.target.closest('#tGrids .cell[data-id]');
+  if (cell){ tSel = cell.dataset.id; renderTeacher(); return; }
+  const so = e.target.closest('[data-sort]'); if (so){ tSort = so.dataset.sort; const y = $('#tpBox').scrollTop; renderTeacher(); $('#tpBox').scrollTop = y; return; }
+  if (!id) return;
+  if (id.id==='tClose'){ $('#tp').hidden = true; renderHome(); }
+  if (id.id==='tSeatSave'){
+    const v = $('#tSeat').value.trim();
+    if (!v || v.length > NAME_MAX) return toast(`請輸入 1～${NAME_MAX} 個字的小名`);
+    P.name = v; save(); toast(`已設定為「${v}」`); renderTeacher();
+  }
+  if (id.id==='tBack'){ rec(tSel).s = 'weak'; save(); renderTeacher(); }
+  if (id.id==='tDown'){
+    const blob = new Blob([JSON.stringify(P, null, 1)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `${safeFile(who()||'未設定')}_加減法進度.json`; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  if (id.id==='tReset'){
+    if (!id.dataset.arm){ id.dataset.arm = '1'; id.textContent = '再按一次確認清除'; setTimeout(() => { if (id.isConnected){ delete id.dataset.arm; id.textContent = '清除這台 iPad 的紀錄'; } }, 3000); return; }
+    P = blank(); save(); toast('已清除'); renderTeacher();
+  }
+});
+$('#tpBox').addEventListener('change', e => {
+  const cb = e.target.closest('[data-open]');
+  if (cb){
+    P.open = RANGES.filter(r => r.ready && document.querySelector(`[data-open="${r.id}"]`).checked).map(r => r.id);
+    save(); return;
+  }
+  if (e.target.id==='tUp'){
+    const f = e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try{
+        const d = JSON.parse(rd.result);
+        if (d.app!=='mathfact' || typeof d.items!=='object') throw 0;
+        P = Object.assign(blank(), d); save(); toast(`已讀入「${who()||''}」的進度`); renderTeacher();
+      }catch(err){ toast('這個檔案不是加減法進度檔'); }
+    };
+    rd.readAsText(f);
+  }
+});
+
+show('home');
+</script>
+</body>
+</html>
