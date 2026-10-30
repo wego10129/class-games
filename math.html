@@ -79,6 +79,17 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 .mode:disabled{cursor:default;background:var(--wash)}
 .mode:disabled .ic{filter:grayscale(1);opacity:.5}
 .empty-seat{display:grid;gap:10px;justify-items:start}
+.mine{margin-top:14px;border-top:2px dashed var(--grid);padding-top:10px;display:grid;gap:6px}
+.mine h3{font-size:17px}
+.pref-row{display:flex;align-items:center;gap:10px;font-weight:900}
+.pref-row>span{min-width:4.5em}
+.seg{display:inline-flex;border:3px solid var(--ink);border-radius:12px;overflow:hidden;box-shadow:2px 2px 0 var(--ink)}
+.seg button{font:700 16px var(--f-body);border:0;border-left:2px solid var(--ink);background:var(--card);padding:4px 14px;cursor:pointer;min-height:38px}
+.seg button:first-child{border-left:0}
+.seg button.on{background:var(--hl)}
+.pin-in{font:700 30px var(--f-num)!important;letter-spacing:.3em;width:5.2em!important;text-align:center}
+.warn{color:#B4232A}
+.loglist{font-size:14px;font-weight:700;color:var(--ink-soft);display:grid;gap:2px;max-height:140px;overflow:auto}
 
 /* ---------- 加法表、減法表 ---------- */
 .tables{display:grid;gap:12px}
@@ -105,6 +116,7 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 .dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink);background:#fff}
 .dots i.done{background:var(--good)}
 .dots i.redo{background:var(--s-weak)}
+.dots i.rev{background:var(--s-super)}
 .dots i.now{background:var(--hl);transform:scale(1.25)}
 .qcard{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative;overflow:hidden}
 .eq{display:flex;align-items:center;justify-content:center;gap:.28em;font-family:var(--f-num);font-weight:600;font-size:clamp(46px,10.5vmin,112px);line-height:1;flex-wrap:nowrap}
@@ -236,18 +248,22 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 /* =====================================================================
    參數區（對應「主題設定表：20以內加減法」；改數字不用動下面的程式）
    ===================================================================== */
-const VERSION = {id:'r20v1', name:'20以內 v1.2'};
+const VERSION = {id:'r20v13', name:'20以內 v1.3'};
 const RANGES = [                      /* 範圍＝內容分段，不是難度（規格書 12.5） */
   {id:'r10', name:'10以內',          note:'總和 10 以內', ready:false},
   {id:'r20', name:'20以內',          note:'一定要進位・退位，最大 9+9、18−9', ready:true},
   {id:'mix', name:'混合',            note:'10以內＋20以內一起練', ready:false},
 ];
 const DEFAULT_OPEN = ['r20'];         /* 這一版只開 20以內 */
-const ROUND_N = 15;                   /* 每局題數 */
+const ROUND_OPTS = [10, 15];          /* 學生可選的每局題數 */
+const ROUND_N = 15;                   /* 每局題數（預設） */
+const REDO_MAX = 5;                   /* 每局補出的題目最多幾題（15 題＋補出 ≤ 20 題） */
+const REVIEW_N = 2;                   /* 每局抽幾題 🌟 回來複習（固定） */
 const MASTER_SEC = 5;                 /* 沒看提示、5 秒內答對＝熟練 */
-const SUPER_SEC = 3;                  /* 沒看提示、3 秒內答對＝超熟練（之後不再出題） */
-const MIX = {weak:5, fresh:5, ok:5};  /* 每局：不熟＋練習中／沒出現過／熟練 各幾題，不夠時互相補 */
+const SUPER_SEC = 3;                  /* 沒看提示、3 秒內答對＝超熟練（之後只在複習時出現） */
 const NAME_MAX = 8;                   /* 小名最多幾個字 */
+const PIN_LEN = 4;                    /* 大人密碼位數 */
+const BACKUP_WARN_DAYS = 14;          /* 超過幾天沒下載進度檔，報表用顏色提醒 */
 const REINSERT_GAP = 3;               /* 答錯的題目，隔幾個位置再出一次（中間隔 2 題） */
 const GUESS_SEC = 1;                  /* 1 秒內就答錯＝可能是猜的 */
 const GUESS_STREAK = 2;               /* 連續幾題快速答錯，就提醒「先想一想」 */
@@ -290,13 +306,34 @@ const store = {
   get(){ try{ const v = localStorage.getItem(STORE_KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } },
   set(v){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(v)); return true; }catch(e){ return false; } }
 };
-const blank = () => ({app:'mathfact', ver:1, name:null, seat:null, open:DEFAULT_OPEN.slice(), items:{}, playedA:{}, rounds:0, guess:0, lastLit:{}});
-let P = Object.assign(blank(), store.get() || {});
+/* v1.3 新增欄位：pref（學生設定）、pin（大人密碼，存雜湊）、log（設定變更紀錄）、lastBackup；
+   每題新增 best（個人最快秒數）、at（最近作答時間）。舊紀錄讀入時自動補上預設值，原有資料不變。 */
+const blankPref = () => ({ops:'both', n:ROUND_N, sound:true, speed:true, day:null});
+const blank = () => ({app:'mathfact', ver:1, name:null, seat:null, open:DEFAULT_OPEN.slice(), items:{}, playedA:{}, rounds:0, guess:0, lastLit:{},
+                      pref:blankPref(), pin:null, log:[], lastBackup:null});
+let P;
+function loadP(d){
+  P = Object.assign(blank(), d || {});
+  P.pref = Object.assign(blankPref(), P.pref || {});
+  if (!Array.isArray(P.log)) P.log = [];
+}
+loadP(store.get());
 const save = () => store.set(P);
-const rec = id => P.items[id] || (P.items[id] = {s:'fresh', seen:0, wrong:0, rts:[], last:null, guess:0});
+const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; };
+/* 聲音、速度回饋只在當天有效：隔天自動恢復成「開」 */
+if (P.pref.day !== todayStr()){ P.pref.sound = true; P.pref.speed = true; P.pref.day = todayStr(); save(); }
+const rec = id => P.items[id] || (P.items[id] = {s:'fresh', seen:0, wrong:0, rts:[], last:null, guess:0, best:null, at:0});
 const stOf = id => (P.items[id] && P.items[id].s) || 'fresh';
 const isLit = s => s==='ok' || s==='super';
-const litCount = range => ITEMS[range].filter(it => isLit(stOf(it.id))).length;
+const RANK = {fresh:0, weak:1, learn:2, ok:3, super:4};
+const bestOf = r => r.best!=null ? r.best : (r.rts && r.rts.length ? Math.min(...r.rts) : null);   /* 舊紀錄沒有 best：用最近 5 次裡最快的 */
+const OPS = {both:'都練', '+':'只練加法', '-':'只練減法'};
+const opOk = it => P.pref.ops==='both' || it.op===P.pref.ops;
+const itemsOf = range => ITEMS[range].filter(opOk);          /* 依學生選的項目（加法／減法／都練） */
+const litCount = range => itemsOf(range).filter(it => isLit(stOf(it.id))).length;
+const addLog = text => { P.log.unshift({t:Date.now(), text}); if (P.log.length > 30) P.log.length = 30; };
+const hashPin = s => { let h = 2166136261; for (const c of 'mathfact:' + s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); };
+const fmtTime = t => { const d = new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
 const openRanges = () => RANGES.filter(r => r.ready && P.open.includes(r.id));
 const who = () => P.name || (P.seat ? P.seat + ' 號' : null);   /* 顯示用：小名（舊資料沿用座號） */
 const safeFile = s => String(s).replace(/[\\/:*?"<>|\s]/g, '');
@@ -319,7 +356,13 @@ const Sound = {
   soft(){ this.tone(330,.22,'sine',0,.09); },
   win(){ [523,659,784,1047].forEach((f,i)=>this.tone(f,.22,'triangle',i*.11)); }
 };
-$('#soundBtn').addEventListener('click', () => { Sound.init(); Sound.muted = !Sound.muted; $('#soundBtn').textContent = Sound.muted ? '聲音：關' : '聲音：開'; });
+function setSound(on, logIt){
+  Sound.muted = !on; P.pref.sound = on; P.pref.day = todayStr();
+  if (logIt) addLog(`學生設定：聲音${on?'開':'關'}（今天）`);
+  save(); $('#soundBtn').textContent = on ? '聲音：開' : '聲音：關';
+}
+setSound(P.pref.sound, false);
+$('#soundBtn').addEventListener('click', () => { Sound.init(); setSound(Sound.muted, true); if (screen==='home') renderHome(); });
 document.addEventListener('pointerdown', () => Sound.init(), {passive:true});
 
 $('#verBadge').textContent = VERSION.name;
@@ -359,40 +402,61 @@ function tableHTML(rng, op, opts){
 const legendHTML = () => `<div class="legend">${Object.keys(STATE).map(k => `<span><i class="cell ${STATE[k].cls}" style="min-height:0"></i>${STATE[k].name}</span>`).join('')}</div>`;
 
 /* ---------- 首頁 ---------- */
+function segHTML(key, opts, cur){
+  return `<div class="seg">${opts.map(([v,t]) => `<button type="button" class="${String(v)===String(cur)?'on':''}" data-pref="${key}" data-v="${v}">${t}</button>`).join('')}</div>`;
+}
 function renderHome(){
   const el = $('#home');
   if (!who()){
-    el.innerHTML = `<div class="card empty-seat"><h2>請老師先設定小名</h2><p>老師：連點左上角的標題「加減法小練習」5 下，打開老師設定。</p></div>`;
+    el.innerHTML = `<div class="card empty-seat"><h2>第一次使用：請大人先完成設定</h2><p>設定孩子的小名和大人密碼，大約 1 分鐘。</p><button class="btn primary" type="button" id="hSetup">開始設定（大人）</button></div>`;
     return;
   }
   const opens = openRanges();
   if (!opens.length){
-    el.innerHTML = `<div class="card empty-seat"><h2>老師還沒有開放練習範圍</h2><p>老師：連點標題 5 下，在老師設定勾選範圍。</p></div>`;
+    el.innerHTML = `<div class="card empty-seat"><h2>老師還沒有開放練習範圍</h2><p>老師：連點標題 5 下，在大人設定勾選範圍。</p></div>`;
     return;
   }
   if (!opens.find(r => r.id===range)) range = opens[0].id;
-  const R = RANGES.find(r => r.id===range), total = ITEMS[range].length, lit = litCount(range);
-  const nWeak = ITEMS[range].filter(it => ['weak','learn'].includes(stOf(it.id))).length;
-  const nFresh = ITEMS[range].filter(it => stOf(it.id)==='fresh').length;
+  const R = RANGES.find(r => r.id===range), list = itemsOf(range), total = list.length, lit = litCount(range);
+  const nWeak = list.filter(it => ['weak','learn'].includes(stOf(it.id))).length;
+  const nFresh = list.filter(it => stOf(it.id)==='fresh').length;
   const tabs = opens.length>1 ? `<div class="row">${opens.map(r => `<button class="btn sm ${r.id===range?'primary':''}" data-range="${r.id}" type="button">${r.name}</button>`).join('')}</div>` : '';
+  const pf = P.pref;
+  const tbls = (pf.ops!=='-' ? tableHTML(range,'+') : '') + (pf.ops!=='+' ? tableHTML(range,'-') : '');
   el.innerHTML = `<div class="home">
     <div class="card">
       <div class="hello"><span class="seat">${H(who())}</span>今天也來練一練！</div>
       ${tabs}
-      <h2 class="range-name" style="margin-top:8px">${R.name}</h2>
+      <h2 class="range-name" style="margin-top:8px">${R.name}・${OPS[pf.ops]}</h2>
       <p class="dim">${R.note}</p>
       <div class="lit"><div class="lit-txt">${total} 格，已經點亮 <b>${lit}</b> 格</div><div class="bar"><i style="width:${Math.round(lit/total*100)}%"></i></div></div>
       <div class="modes">
         <button class="mode a" type="button" data-mode="go"><span class="ic">🔍</span><span>開始練習<small>找出還不熟的題目，把它們一格一格點亮！慢慢想，答錯會有提示。</small></span></button>
         <p class="dim">還要多練 ${nWeak} 題・還沒出現 ${nFresh} 題</p>
       </div>
+      <div class="mine"><h3>我的練習設定</h3>
+        <div class="pref-row"><span>練什麼</span>${segHTML('ops', [['both','都練'],['+','加法'],['-','減法']], pf.ops)}</div>
+        <div class="pref-row"><span>每局</span>${segHTML('n', ROUND_OPTS.map(n => [n, n+' 題']), pf.n)}</div>
+        <div class="pref-row"><span>聲音</span>${segHTML('sound', [[1,'開'],[0,'關']], pf.sound?1:0)}</div>
+        <div class="pref-row"><span>顯示快慢</span>${segHTML('speed', [[1,'開'],[0,'關']], pf.speed?1:0)}</div>
+        <p class="dim">聲音、顯示快慢只有今天有效，明天會自動打開。</p>
+      </div>
     </div>
-    <div class="card tables">${tableHTML(range,'+')}${tableHTML(range,'-')}${legendHTML()}</div>
+    <div class="card tables">${tbls}${legendHTML()}</div>
   </div>`;
 }
 $('#home').addEventListener('click', e => {
+  if (e.target.closest('#hSetup')) return openTeacher();
   const m = e.target.closest('[data-mode]'); if (m) return startRound();
-  const r = e.target.closest('[data-range]'); if (r){ range = r.dataset.range; renderHome(); }
+  const r = e.target.closest('[data-range]'); if (r){ range = r.dataset.range; renderHome(); return; }
+  const b = e.target.closest('[data-pref]'); if (!b) return;
+  const k = b.dataset.pref, v = b.dataset.v, pf = P.pref;
+  if (k==='ops' && pf.ops!==v){ pf.ops = v; addLog(`學生設定：${OPS[v]}`); }
+  else if (k==='n' && pf.n!==+v){ pf.n = +v; addLog(`學生設定：每局 ${v} 題`); }
+  else if (k==='sound' && pf.sound!==(v==='1')){ Sound.init(); setSound(v==='1', true); }
+  else if (k==='speed' && pf.speed!==(v==='1')){ pf.speed = v==='1'; pf.day = todayStr(); addLog(`學生設定：顯示快慢${pf.speed?'開':'關'}（今天）`); }
+  else return;
+  save(); renderHome();
 });
 
 /* ---------- 出題 ---------- */
@@ -407,31 +471,36 @@ function interleave(list){
   return out;
 }
 function buildRound(){
-  const pool = ITEMS[range].filter(it => stOf(it.id)!=='super');
+  const n = P.pref.n || ROUND_N, all = itemsOf(range);
+  const pool = all.filter(it => stOf(it.id)!=='super');
+  /* 🌟 複習：固定抽 REVIEW_N 題，最久沒做的優先 */
+  const supers = shuffle(all.filter(it => stOf(it.id)==='super')).sort((a,b) => (rec(a.id).at||0)-(rec(b.id).at||0));
+  const review = supers.slice(0, REVIEW_N);
   const by = {weak:[], fresh:[], ok:[]};
   pool.forEach(it => { const s = stOf(it.id); (s==='weak'||s==='learn' ? by.weak : s==='fresh' ? by.fresh : by.ok).push(it); });
   /* 不熟的排前面，答錯次數多的優先 */
   shuffle(by.weak).sort((a,b) => (stOf(a.id)==='weak'?0:1)-(stOf(b.id)==='weak'?0:1) || rec(b.id).wrong-rec(a.id).wrong);
   shuffle(by.fresh); shuffle(by.ok);
-  const n = Math.min(ROUND_N, pool.length), pick = [];
-  const take = (arr,k) => { while (k-- > 0 && arr.length && pick.length < n) pick.push(arr.shift()); };
-  take(by.weak, MIX.weak); take(by.fresh, MIX.fresh); take(by.ok, MIX.ok);
-  [by.weak, by.fresh, by.ok].forEach(arr => take(arr, n));
-  return interleave(pick);
+  const rest = n - review.length, k = Math.ceil(rest/3);
+  const m = Math.min(rest, pool.length), pick = [];
+  const take = (arr,c) => { while (c-- > 0 && arr.length && pick.length < m) pick.push(arr.shift()); };
+  take(by.weak, k); take(by.fresh, k); take(by.ok, rest - 2*k);
+  [by.weak, by.fresh, by.ok].forEach(arr => take(arr, m));
+  return {list: interleave(pick.concat(review)), review: new Set(review.map(it => it.id))};
 }
 
 /* ---------- 一局 ---------- */
 function startRound(){
-  const q = buildRound();
-  if (!q.length){ return toast('這個範圍全部都超熟練了，太厲害了！🌟', 3000); }
+  const b = buildRound(), q = b.list;
+  if (!q.length){ return toast('這個範圍沒有題目可以練', 3000); }
   const snap = {}; ITEMS[range].forEach(it => snap[it.id] = stOf(it.id));
-  G = {q:q.map(it => ({it, redo:false})), i:0, snap, log:[], redone:new Set(), fastStreak:0, litBefore:litCount(range), roundsBefore:P.rounds};
+  G = {q:q.map(it => ({it, redo:false, review:b.review.has(it.id)})), i:0, snap, log:[], redone:new Set(), fastStreak:0, litBefore:litCount(range), roundsBefore:P.rounds};
   show('game');
   $('#gMode').textContent = '🔍 加減法練習';
   nextQ();
 }
 function renderDots(){
-  $('#gDots').innerHTML = G.q.map((e,i) => `<i class="${i<G.i?'done':i===G.i?'now':e.redo?'redo':''}"></i>`).join('');
+  $('#gDots').innerHTML = G.q.map((e,i) => `<i class="${i<G.i?'done':i===G.i?'now':e.redo?'redo':e.review?'rev':''}"></i>`).join('');
 }
 function renderEq(state){
   const it = G.cur;
@@ -489,33 +558,45 @@ function submit(){
 }
 function correct(rt){
   G.lock = true;
-  const it = G.cur, r = rec(it.id), before = r.s, prevRt = r.last;
+  const ent = G.q[G.i], it = G.cur, r = rec(it.id), before = r.s, prevRt = r.last, prevBest = bestOf(r);
   if (G.wrongs===0 && G.firstFast!==true) G.fastStreak = 0;
-  r.seen++;
+  r.seen++; r.at = Date.now();
+  const clean = !G.wrongs && !G.voided;           /* 沒看提示、沒離開畫面 */
+  const timed = clean && !ent.redo;               /* 補出的題目剛看過答案，秒數不列入紀錄 */
   let after;
-  if (G.wrongs > 0){ r.wrong++; after = 'weak'; }                       /* 答錯過或看了提示 → 不熟 */
-  else if (G.voided){ after = (before==='ok' || before==='super') ? before : 'learn'; }  /* 中途離開：秒數不算，只記對錯 */
+  if (G.wrongs > 0){ r.wrong++; after = 'weak'; }                        /* 答錯過或看了提示 → 不熟 */
+  else if (G.voided){ after = before; }                                  /* 中途離開：這一次不算，狀態不升也不降 */
   else {
     after = rt <= SUPER_SEC ? 'super' : rt <= MASTER_SEC ? 'ok' : 'learn';
-    r.rts.push(+rt.toFixed(2)); if (r.rts.length > 5) r.rts.shift();
+    if (ent.redo){                                                       /* 補出的題目：同一局不升級，最高到 🟨（原本更高就維持） */
+      const cap = Math.max(RANK[before], RANK.learn);
+      if (RANK[after] > cap) after = before==='fresh' || before==='weak' ? 'learn' : before;
+    }
+  }
+  let newBest = false;
+  if (timed){
+    r.rts.push(+rt.toFixed(2)); if (r.rts.length > 5) r.rts.shift();   /* 秒數只保留最近 5 次 */
     r.last = +rt.toFixed(2);
+    if (prevBest==null || rt < prevBest){ newBest = prevBest!=null && rt < prevBest - 0.05; r.best = +rt.toFixed(2); }
   }
   r.s = after; save();
-  const speedItem = (before==='learn' || before==='ok') && !G.wrongs && !G.voided;   /* 已經會算的題目才顯示速度 */
-  G.log.push({id:it.id, before, after, rt: G.wrongs||G.voided ? null : rt, prevRt, wrongs:G.wrongs, speed:speedItem});
+  const speedItem = RANK[before] >= RANK.learn && timed;                 /* 已經會算的題目才顯示速度 */
+  const showSpeed = speedItem && P.pref.speed;
+  G.log.push({id:it.id, before, after, rt: timed ? rt : null, prevRt, wrongs:G.wrongs, speed:speedItem, best:speedItem && newBest, review:ent.review && !ent.redo});
 
-  /* 答錯過（或中途離開）的題目，隔 2 題再出一次 */
-  if ((G.wrongs>0 || G.voided) && !G.redone.has(it.id)){
+  /* 答錯過（或中途離開）的題目，隔 2 題再出一次；每局最多補 REDO_MAX 題 */
+  if ((G.wrongs>0 || G.voided) && !G.redone.has(it.id) && G.redone.size < REDO_MAX){
     G.redone.add(it.id);
-    G.q.splice(Math.min(G.i + REINSERT_GAP, G.q.length), 0, {it, redo:true});
+    G.q.splice(Math.min(G.i + REINSERT_GAP, G.q.length), 0, {it, redo:true, review:false});
   }
 
   renderEq('ok');
   const m = $('#gMsg'); m.className = 'msg good';
   const fx = $('#gFx'); fx.hidden = true;
-  if (speedItem){
+  if (showSpeed){
     let t = '答對了！';
-    if (prevRt!=null && rt < prevRt - 0.05) t += `比上次快 ${(prevRt-rt).toFixed(1)} 秒`;
+    if (newBest) t += '🏅 這題你的最快紀錄！';
+    else if (prevRt!=null && rt < prevRt - 0.05) t += `比上次快 ${(prevRt-rt).toFixed(1)} 秒`;
     m.textContent = t;
     if (rt <= SUPER_SEC){ fx.className = 'fx super'; fx.textContent = '🌟 超熟練！'; fx.hidden = false; Sound.star(); }
     else if (rt <= MASTER_SEC){ fx.className = 'fx ok'; fx.textContent = '⚡ 熟練！'; fx.hidden = false; Sound.good(); }
@@ -576,7 +657,7 @@ $('#resumeBtn').addEventListener('click', () => {
 /* ---------- 結算：只和自己比 ---------- */
 function endRound(){
   const g = G; G = null;
-  const litAfter = litCount(range), total = ITEMS[range].length, gain = litAfter - g.litBefore;
+  const litAfter = litCount(range), total = itemsOf(range).length, gain = litAfter - g.litBefore;
   P.rounds++; save();
   Sound.win();
 
@@ -593,21 +674,24 @@ function endRound(){
   const weakNow = ids.filter(id => ['weak','learn'].includes(stOf(id)));
   const firstTry = g.log.filter(l => !l.wrongs).length;
   const newSuper = ids.filter(id => g.snap[id]!=='super' && stOf(id)==='super');
+  const rev = g.log.filter(l => l.review), revKeep = rev.filter(l => l.after==='super').length;
 
-  const sp = g.log.filter(l => l.speed);
+  const sp = P.pref.speed ? g.log.filter(l => l.speed) : [];
   const faster = sp.filter(l => l.prevRt!=null && l.rt < l.prevRt - 0.05).length;
+  const bests = sp.filter(l => l.best).length;
   const extra = `<div class="r-stats"><div>一次就答對<b>${firstTry}</b> 題</div><div>練了<b>${g.log.length}</b> 次</div>` +
-    (sp.length ? `<div>⚡ 比上次快<b>${faster}</b> 題</div>` : '') + `</div>`;
+    (sp.length ? `<div>⚡ 比上次快<b>${faster}</b> 題</div>` : '') + (bests ? `<div>🏅 最快紀錄<b>${bests}</b> 題</div>` : '') +
+    (rev.length ? `<div>🌟 複習穩住<b>${revKeep}/${rev.length}</b> 題</div>` : '') + `</div>`;
 
   show('result');
   $('#result').innerHTML = `
     <div class="r-top"><h2>🔍 練習完成！</h2><span class="trend ${trend.cls}">${trend.text}</span></div>
     <div class="lit" style="max-width:560px"><div class="lit-txt">${total} 格，已經點亮 <b>${litAfter}</b> 格</div><div class="bar"><i style="width:${Math.round(litAfter/total*100)}%"></i></div></div>
     ${extra}
-    ${newSuper.length ? `<div class="r-row"><b>🌟 超熟練，之後不用再練：</b>${newSuper.map(chip).join('')}</div>` : ''}
+    ${newSuper.length ? `<div class="r-row"><b>🌟 超熟練，之後偶爾抽考：</b>${newSuper.map(chip).join('')}</div>` : ''}
     ${newly.filter(id => !newSuper.includes(id)).length ? `<div class="r-row"><b>✨ 新點亮：</b>${newly.filter(id => !newSuper.includes(id)).map(chip).join('')}</div>` : ''}
     <div class="r-row"><b>${weakNow.length ? '🔍 下一局會多練：' : '這一局的題目都點亮了，太厲害了！'}</b>${weakNow.map(chip).join('')}</div>
-    <div class="r-grid">${tableHTML(range,'+')}${tableHTML(range,'-')}</div>
+    <div class="r-grid">${P.pref.ops!=='-' ? tableHTML(range,'+') : ''}${P.pref.ops!=='+' ? tableHTML(range,'-') : ''}</div>
     ${legendHTML()}
     <div class="row">
       <button class="btn primary" type="button" id="rAgain">再練一局</button>
@@ -631,7 +715,76 @@ $('#title').addEventListener('click', () => {
   tClicks++; clearTimeout(tTimer); tTimer = setTimeout(() => tClicks = 0, 2000);
   if (tClicks >= 5 && screen==='home'){ tClicks = 0; openTeacher(); }
 });
-function openTeacher(){ tRange = (openRanges()[0] || RANGES.find(r=>r.ready)).id; tSel = null; renderTeacher(); $('#tp').hidden = false; }
+function openTeacher(){
+  tRange = (openRanges()[0] || RANGES.find(r=>r.ready)).id; tSel = null;
+  renderGate(!P.name ? 'name' : !P.pin ? 'newpin' : 'lock');
+  $('#tp').hidden = false;
+}
+/* ---------- 大人關卡：第一次設定（小名→密碼）、輸入密碼、忘記密碼 ---------- */
+let gMode = 'lock', gFirst = null;
+const pinInput = (id, ph) => `<input type="password" class="pin-in" id="${id}" inputmode="numeric" pattern="[0-9]*" maxlength="${PIN_LEN}" autocomplete="off" placeholder="${ph||''}">`;
+function renderGate(mode, msg){
+  gMode = mode; const box = $('#tpBox'); let h = '';
+  const head = t => `<div class="tp-head"><h2>${t}</h2><button class="btn sm" type="button" id="tClose">關閉</button></div>`;
+  const err = msg ? `<p class="warn" style="font-weight:900">${msg}</p>` : '';
+  if (mode==='name'){
+    h = head('第一次設定（1/2）：小名') + `<div class="tp-sec">
+      <div class="row"><input type="text" id="gName" maxlength="${NAME_MAX}" autocomplete="off" placeholder="例：小安"><button class="btn primary" type="button" id="gNext">下一步</button></div>
+      <p class="dim">請用小名或暱稱（最多 ${NAME_MAX} 個字），不要用全名。小名只存在這台 iPad，也會用在進度檔的檔名。</p>${err}</div>`;
+  } else if (mode==='newpin' || mode==='newpin2'){
+    const step = !P.name || gFirst==='setup' ? '第一次設定（2/2）：大人密碼' : '設定大人密碼';
+    h = head(step) + `<div class="tp-sec">
+      <p><b>${mode==='newpin' ? `請輸入 ${PIN_LEN} 位數字的密碼` : '請再輸入一次，確認密碼'}</b></p>
+      <div class="row">${pinInput('gPin')}<button class="btn primary" type="button" id="gPinOk">確定</button></div>
+      <p class="dim">進入大人設定（報表、小名、範圍、進度檔、清除紀錄）時要輸入這組密碼。請不要讓孩子看到。忘記密碼時，可以先下載進度檔，重設後再讀入，紀錄不會不見。</p>${err}</div>`;
+  } else if (mode==='lock'){
+    h = head('大人設定') + `<div class="tp-sec">
+      <p><b>請輸入大人密碼</b></p>
+      <div class="row">${pinInput('gPin')}<button class="btn primary" type="button" id="gPinOk">確定</button></div>${err}
+      <div class="row"><button class="btn sm" type="button" id="gForgot">忘記密碼</button></div></div>`;
+  } else if (mode==='forgot'){
+    h = head('忘記密碼') + `<div class="tp-sec">
+      <p><b>照這 3 步做，紀錄不會不見：</b></p>
+      <p>① 先下載進度檔（備份）　<button class="btn sm primary" type="button" id="tDown">下載進度檔</button></p>
+      <p>② 清除這台 iPad 的紀錄，重新設定小名和密碼　<button class="btn sm" type="button" id="gWipe">清除並重設</button></p>
+      <p>③ 重設後打開大人設定，在「進度檔」按「讀入進度檔」，選剛剛下載的檔案。</p>
+      <p class="dim">下載後的檔案可以在 iPad 的「檔案」App 找到。</p>
+      <div class="row"><button class="btn sm" type="button" id="gBack">回上一步</button></div></div>`;
+  }
+  box.innerHTML = h;
+  const f = box.querySelector('input'); if (f) setTimeout(() => f.focus(), 50);
+}
+function gateAction(id){
+  if (id==='gNext'){
+    const v = $('#gName').value.trim();
+    if (!v || v.length > NAME_MAX) return renderGate('name', `請輸入 1～${NAME_MAX} 個字的小名`);
+    P.name = v; gFirst = 'setup'; addLog(`設定小名「${v}」`); save();
+    return renderGate('newpin');
+  }
+  if (id==='gPinOk'){
+    const v = $('#gPin').value.trim();
+    if (!new RegExp(`^\\d{${PIN_LEN}}$`).test(v)) return renderGate(gMode, `請輸入 ${PIN_LEN} 位數字`);
+    if (gMode==='lock'){
+      if (hashPin(v)!==P.pin) return renderGate('lock', '密碼不對，再試一次');
+      return renderTeacher();
+    }
+    if (gMode==='newpin'){ gPinTmp = v; return renderGate('newpin2'); }
+    if (gMode==='newpin2'){
+      if (v!==gPinTmp) return renderGate('newpin', '兩次輸入的不一樣，請重新設定');
+      P.pin = hashPin(v); gPinTmp = null; addLog('設定大人密碼'); save();
+      if (gFirst==='setup'){ gFirst = null; toast('設定完成！可以開始練習了'); $('#tp').hidden = true; return show('home'); }
+      toast('密碼已設定'); return renderTeacher();
+    }
+  }
+  if (id==='gForgot') return renderGate('forgot');
+  if (id==='gBack') return renderGate('lock');
+  if (id==='gWipe'){
+    const b = $('#gWipe');
+    if (!b.dataset.arm){ b.dataset.arm = '1'; b.textContent = '再按一次：確定清除'; setTimeout(() => { if (b.isConnected){ delete b.dataset.arm; b.textContent = '清除並重設'; } }, 3000); return; }
+    loadP(null); save(); toast('已清除，請重新設定'); return renderGate('name');
+  }
+}
+let gPinTmp = null;
 const S_ORDER = {weak:0, learn:1, fresh:2, ok:3, super:4};
 function listHTML(list){
   const rows = list.map((it,i) => { const r = P.items[it.id] || {s:'fresh', seen:0, wrong:0, rts:[], last:null, guess:0}; return {it, r, i, a:avg(r.rts)}; });
@@ -646,7 +799,14 @@ function listHTML(list){
     rows.map(o => `<tr data-id="${o.it.id}"><td><span class="qchip ${STATE[o.r.s].cls}">${fmt(o.it)}</span></td><td>${STATE[o.r.s].name}</td><td>${o.r.seen}</td><td>${o.r.wrong||''}</td><td>${o.a!=null?o.a.toFixed(1):'—'}</td><td>${o.r.last!=null?o.r.last.toFixed(1):'—'}</td><td>${o.r.guess||''}</td></tr>`).join('') +
     `</tbody></table></div>`;
 }
+function backupLine(){
+  const has = Object.keys(P.items).length > 0;
+  if (!P.lastBackup) return `<p id="tBackup" class="${has?'warn':'dim'}" style="font-weight:900">還沒下載過進度檔${has?'，建議現在備份一次':''}</p>`;
+  const d = Math.floor((Date.now() - P.lastBackup) / 86400000);
+  return `<p id="tBackup" class="${d > BACKUP_WARN_DAYS ? 'warn' : 'dim'}" style="font-weight:900">上次下載進度檔：${d===0 ? '今天' : d + ' 天前'}${d > BACKUP_WARN_DAYS ? '，建議再備份一次' : ''}</p>`;
+}
 function renderTeacher(){
+  gMode = 'panel';
   const list = ITEMS[tRange];
   const recs = list.map(it => ({it, r:P.items[it.id]})).filter(o => o.r);
   const allRts = recs.flatMap(o => o.r.rts);
@@ -662,7 +822,7 @@ function renderTeacher(){
       (r.s!=='weak' && r.s!=='fresh' ? ` <button class="btn sm" type="button" id="tBack">放回練習（改成不熟）</button>` : '');
   }
   $('#tpBox').innerHTML = `
-    <div class="tp-head"><h2>老師設定</h2><button class="btn sm" type="button" id="tClose">關閉</button></div>
+    <div class="tp-head"><h2>大人設定</h2><button class="btn sm" type="button" id="tClose">關閉</button></div>
     <div class="tp-sec"><h3>小名（一人一台，設定一次就好）</h3>
       <div class="row"><input type="text" id="tSeat" maxlength="${NAME_MAX}" autocomplete="off" value="${H(P.name||'')}" placeholder="例：小安"><button class="btn sm primary" type="button" id="tSeatSave">儲存小名</button></div>
       <p class="dim">請用小名或暱稱，不要用全名。小名只存在這台 iPad，也會用在進度檔的檔名。</p></div>
@@ -671,7 +831,7 @@ function renderTeacher(){
       <p class="dim">學生首頁只看到勾選的範圍；只開一個時直接進入。同一題在不同範圍的紀錄是共用的。</p></div>
     <div class="tp-sec"><h3>報表：${RANGES.find(r=>r.id===tRange).name}</h3>
       <div class="r-stats">
-        <div>點亮<b>${litCount(tRange)}/${list.length}</b></div>
+        <div>點亮<b>${list.filter(it => isLit(stOf(it.id))).length}/${list.length}</b></div>
         <div>不熟<b>${cnt('weak')}</b></div><div>練習中<b>${cnt('learn')}</b></div><div>沒出現過<b>${cnt('fresh')}</b></div>
         <div>練習局數<b>${P.rounds}</b></div>
         <div>平均秒數<b>${allRts.length ? avg(allRts).toFixed(1) : '—'}</b></div>
@@ -684,42 +844,60 @@ function renderTeacher(){
     <div class="tp-sec"><h3>全部組合清單</h3>
       <div class="row"><span class="dim">排序：</span>${[['weak','最不熟'],['wrong','答錯最多'],['seen','挑戰最多'],['order','題目順序']].map(([k,t]) => `<button class="btn sm ${tSort===k?'primary':''}" type="button" data-sort="${k}">${t}</button>`).join('')}</div>
       ${listHTML(list)}
-      <p class="dim">狀態依最近一次作答更新；挑戰次數、答錯次數、平均秒數會一直累加保留。平均秒數只算沒看提示、沒離開畫面的作答（最近 5 次）。</p></div>
+      <p class="dim">狀態依最近一次作答更新；挑戰次數、答錯次數一直累加。秒數只保留最近 5 次，只算沒看提示、沒離開畫面、不是補出的作答。</p></div>
+    <div class="tp-sec"><h3>學生目前的練習設定</h3>
+      <p><b>${OPS[P.pref.ops]}・每局 ${P.pref.n} 題・聲音${P.pref.sound?'開':'關'}・顯示快慢${P.pref.speed?'開':'關'}</b></p>
+      <p class="dim">這些由學生在首頁自己選。想要孩子集中練某一項時，請孩子自己切換（例：只練減法）。</p></div>
+    <div class="tp-sec"><h3>設定變更紀錄（最近 30 筆）</h3>
+      <div class="loglist">${P.log.length ? P.log.map(l => `<div>${fmtTime(l.t)}　${H(l.text)}</div>`).join('') : '目前沒有'}</div></div>
     <div class="tp-sec"><h3>進度檔（備份或換 iPad 時用）</h3>
       <div class="row"><button class="btn sm" type="button" id="tDown">下載進度檔</button>
         <label class="btn sm">讀入進度檔<input type="file" id="tUp" accept=".json,application/json" hidden></label>
         <button class="btn sm" type="button" id="tReset">清除這台 iPad 的紀錄</button></div>
-      <p class="dim">檔名用小名。紀錄只存在這台 iPad，網頁不會傳到網路上。</p></div>`;
+      ${backupLine()}
+      <p class="dim">檔名用小名。紀錄只存在這台 iPad，網頁不會傳到網路上。</p></div>
+    <div class="tp-sec"><h3>大人密碼</h3><div class="row"><button class="btn sm" type="button" id="tPin">更改密碼</button></div></div>`;
   if (tSel){ const c = $('#tGrids').querySelector(`[data-id="${tSel}"]`); if (c) c.classList.add('sel'); }
 }
 $('#tpBox').addEventListener('click', e => {
-  const id = e.target.closest('#tClose, #tSeatSave, #tDown, #tReset, #tBack');
+  const g = e.target.closest('#gNext, #gPinOk, #gForgot, #gBack, #gWipe');
+  if (g) return gateAction(g.id);
+  const id = e.target.closest('#tClose, #tSeatSave, #tDown, #tReset, #tBack, #tPin');
   const cell = e.target.closest('#tGrids .cell[data-id]');
   if (cell){ tSel = cell.dataset.id; renderTeacher(); return; }
   const so = e.target.closest('[data-sort]'); if (so){ tSort = so.dataset.sort; const y = $('#tpBox').scrollTop; renderTeacher(); $('#tpBox').scrollTop = y; return; }
   if (!id) return;
-  if (id.id==='tClose'){ $('#tp').hidden = true; renderHome(); }
+  if (id.id==='tClose'){ $('#tp').hidden = true; gFirst = null; renderHome(); }
+  if (id.id==='tPin'){ gFirst = null; return renderGate('newpin'); }
   if (id.id==='tSeatSave'){
     const v = $('#tSeat').value.trim();
     if (!v || v.length > NAME_MAX) return toast(`請輸入 1～${NAME_MAX} 個字的小名`);
-    P.name = v; save(); toast(`已設定為「${v}」`); renderTeacher();
+    if (v!==P.name){ addLog(`小名改為「${v}」`); P.name = v; save(); }
+    toast(`已設定為「${v}」`); renderTeacher();
   }
-  if (id.id==='tBack'){ rec(tSel).s = 'weak'; save(); renderTeacher(); }
+  if (id.id==='tBack'){ const it = ITEMS[tRange].find(x => x.id===tSel); rec(tSel).s = 'weak'; addLog(`${fmt(it)} 放回練習`); save(); renderTeacher(); }
   if (id.id==='tDown'){
     const blob = new Blob([JSON.stringify(P, null, 1)], {type:'application/json'});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
     a.download = `${safeFile(who()||'未設定')}_加減法進度.json`; document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    P.lastBackup = Date.now(); save();
+    if (gMode!=='forgot' && !$('#tp').hidden && $('#tBackup')) renderTeacher();
   }
   if (id.id==='tReset'){
     if (!id.dataset.arm){ id.dataset.arm = '1'; id.textContent = '再按一次確認清除'; setTimeout(() => { if (id.isConnected){ delete id.dataset.arm; id.textContent = '清除這台 iPad 的紀錄'; } }, 3000); return; }
-    P = blank(); save(); toast('已清除'); renderTeacher();
+    loadP(null); save(); toast('已清除，請重新設定'); renderGate('name');
   }
+});
+$('#tpBox').addEventListener('keydown', e => {
+  if (e.key!=='Enter' || e.target.tagName!=='INPUT') return;
+  const b = $('#tpBox').querySelector('#gNext, #gPinOk, #tSeatSave'); if (b){ e.preventDefault(); b.click(); }
 });
 $('#tpBox').addEventListener('change', e => {
   const cb = e.target.closest('[data-open]');
   if (cb){
     P.open = RANGES.filter(r => r.ready && document.querySelector(`[data-open="${r.id}"]`).checked).map(r => r.id);
+    addLog(`開放範圍：${RANGES.filter(r => P.open.includes(r.id)).map(r => r.name).join('、') || '無'}`);
     save(); return;
   }
   if (e.target.id==='tUp'){
@@ -729,7 +907,8 @@ $('#tpBox').addEventListener('change', e => {
       try{
         const d = JSON.parse(rd.result);
         if (d.app!=='mathfact' || typeof d.items!=='object') throw 0;
-        P = Object.assign(blank(), d); save(); toast(`已讀入「${who()||''}」的進度`); renderTeacher();
+        const pin = P.pin; loadP(d); P.pin = pin;               /* 密碼沿用這台 iPad 的，不被檔案蓋掉 */
+        addLog(`讀入進度檔（${who()||''}）`); save(); toast(`已讀入「${who()||''}」的進度`); renderTeacher();
       }catch(err){ toast('這個檔案不是加減法進度檔'); }
     };
     rd.readAsText(f);
