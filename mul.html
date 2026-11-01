@@ -113,9 +113,9 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 .chips{display:grid;gap:8px;border:3px dashed var(--ink-soft);border-radius:14px;padding:10px 12px;background:var(--wash)}
 .chips .cl{font-weight:900;font-size:15px}
 .chiprow{display:flex;gap:10px;flex-wrap:wrap}
-.segchip{font:600 22px var(--f-num);min-width:84px;min-height:48px;border:3px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:3px 3px 0 var(--ink);cursor:pointer;padding:0 10px}
-.segchip.on{background:var(--hl)}
-.segchip.on::before{content:"✓ ";font-weight:600}
+.chipgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.segchip{font:900 19px var(--f-body);min-height:52px;border:3px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:3px 3px 0 var(--ink);cursor:pointer;padding:0 6px;color:var(--ink-soft);white-space:nowrap}
+.segchip.on{background:var(--hl);color:var(--ink);box-shadow:0 0 0 3px rgba(255,224,102,.55),3px 3px 0 var(--ink)}
 .segchip:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 
 /* ---------- 練習畫面 ---------- */
@@ -214,7 +214,8 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
   .gridt .hd{font-size:11px}
   .groups{grid-template-columns:1fr}
   .gbtn{font-size:20px}
-  .segchip{min-width:72px}
+  .chipgrid{gap:7px}
+  .segchip{font-size:15px;min-height:46px;padding:0 2px}
   .mode{font-size:20px;padding:10px 12px}
   .mode .ic{width:46px;height:46px;font-size:24px}
   .r-top h2{font-size:24px}
@@ -287,13 +288,13 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 /* =====================================================================
    參數區（對應「主題設定表：乘法小練習（家長版）」；改數字不用動下面的程式）
    ===================================================================== */
-const VERSION = {id:'mulv10', name:'家長版 v1.0'};
+const VERSION = {id:'mulv11', name:'家長版 v1.1'};
 const GROUPS = [                        /* 範圍＝內容分段，不是難度；孩子自己選（規格書 3.7） */
-  {id:'g1', name:'第一大組', segs:[2,5,4,8]},
+  {id:'g1', name:'第一大組', segs:[2,4,5,8]},
   {id:'g2', name:'第二大組', segs:[3,6,7,9]},
 ];
-const SEGS = GROUPS.flatMap(g => g.segs);   /* 亮燈表的列順序：2、5、4、8、3、6、7、9 段 */
-const MULT_MAX = 10;                  /* 每一段 ×1～×10 */
+const SEGS = [2,3,4,5,6,7,8,9];       /* 2的乘法～9的乘法；亮燈表、選範圍按鈕都依這個順序 */
+const MULT_MAX = 10;                  /* 每一個乘法 ×1～×10 */
 const ROUND_OPTS = [10, 15];          /* 孩子可選的每局題數 */
 const ROUND_N = 15;                   /* 每局題數（預設） */
 const REDO_MAX = 5;                   /* 每局補出的題目最多幾題（15 題＋補出 ≤ 20 題） */
@@ -318,7 +319,7 @@ const $ = s => document.querySelector(s);
 const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 const fmt = it => `${it.a}×${it.b}`;
 
-/* ---------- 題庫：段數寫在前面（7×6 是 7 的段） ---------- */
+/* ---------- 題庫：被乘數寫在前面（7×6 是「7的乘法」） ---------- */
 const ALL = [];
 SEGS.forEach(a => { for (let b=1;b<=MULT_MAX;b++) ALL.push({id:`${a}x${b}`, a, b, ans:a*b}); });
 const BY_ID = {}; ALL.forEach(it => BY_ID[it.id] = it);
@@ -353,12 +354,12 @@ const litCount = segs => itemsOf(segs).filter(it => isLit(stOf(it.id))).length;
 const sameSet = (x,y) => x.length===y.length && x.every(v => y.includes(v));
 function segLabel(segs){
   if (!segs || !segs.length) return '還沒選練習範圍';
-  if (sameSet(segs, SEGS)) return '全部（8 段）';
+  if (sameSet(segs, SEGS)) return '全部（2～9的乘法）';
   const g = GROUPS.find(g => sameSet(g.segs, segs));
-  if (g) return `${g.name}（${g.segs.join('、')} 段）`;
-  return SEGS.filter(s => segs.includes(s)).join('、') + ' 段';
+  if (g) return `${g.name}（${g.segs.join('、')}的乘法）`;
+  return SEGS.filter(s => segs.includes(s)).join('、') + '的乘法';
 }
-const segShort = segs => { const g = GROUPS.find(g => sameSet(g.segs, segs)); return sameSet(segs,SEGS) ? '全部' : g ? g.name : SEGS.filter(s => segs.includes(s)).join('、') + ' 段'; };
+const segShort = segs => { const g = GROUPS.find(g => sameSet(g.segs, segs)); return sameSet(segs,SEGS) ? '全部' : g ? g.name : SEGS.filter(s => segs.includes(s)).join('、') + '的乘法'; };
 
 /* ---------- 聲音 ---------- */
 const Sound = {
@@ -417,12 +418,12 @@ function renderHome(){
   const list = itemsOf(segs), total = list.length, lit = litCount(segs);
   const nWeak = list.filter(it => ['weak','learn'].includes(stOf(it.id))).length;
   const nFresh = list.filter(it => stOf(it.id)==='fresh').length;
-  const tbl = segs.length ? tableHTML(segs) : `<div class="tbl"><h3>亮燈表</h3><p class="dim" style="margin-top:6px">選好練習範圍後，這裡會出現每一題的燈。</p></div>`;
+  const tbl = tableHTML(SEGS);         /* 亮燈表不隨練習範圍改變，永遠顯示 2～9的乘法全部 80 題 */
   el.innerHTML = `<div class="home">
     <div class="card">
       <div class="hello">今天也來練一練！</div>
       <div class="sel-now"><h2 class="range-name">${segLabel(segs)}</h2></div>
-      ${segs.length ? `<div class="lit"><div class="lit-txt">${total} 格，已經點亮 <b>${lit}</b> 格</div><div class="bar"><i style="width:${Math.round(lit/total*100)}%"></i></div></div>` : ''}
+      ${segs.length ? `<div class="lit"><div class="lit-txt">這次的範圍 ${total} 題，已經點亮 <b>${lit}</b> 題</div><div class="bar"><i style="width:${Math.round(lit/total*100)}%"></i></div></div>` : ''}
       <div class="modes">
         <button class="mode" type="button" id="hStart"><span class="ic" style="font:600 34px var(--f-num)">×</span><span>開始練習<small>${segs.length ? '找出還不熟的題目，把它們一格一格點亮！慢慢想，答錯會有提示。' : '先選這次要練習的範圍。'}</small></span></button>
         ${segs.length ? `<p class="dim">還要多練 ${nWeak} 題・還沒練過 ${nFresh} 題</p>` : ''}
@@ -450,7 +451,7 @@ $('#home').addEventListener('click', e => {
   save(); renderHome();
 });
 
-/* ---------- 選擇練習範圍：兩個大組；按下後展開 4 個段，可以單選某一段 ---------- */
+/* ---------- 選擇練習範圍：兩個大組＋2～9的乘法 8 個按鈕；亮起來的就是要練的，可以只練一個 ---------- */
 let pick = null;   /* {segs:[...], open:'g1'|'g2'|'all'} */
 function openPicker(){
   const s = curSegs().slice();
@@ -466,16 +467,15 @@ function openPicker(){
 function renderPicker(){
   const s = pick.segs;
   const gState = g => g.segs.every(v => s.includes(v)) && s.length===g.segs.length ? 'on' : g.segs.some(v => s.includes(v)) ? 'part' : '';
-  const shown = pick.open==='all' ? GROUPS : GROUPS.filter(g => g.id===pick.open);
   const n = itemsOf(s).length;
   $('#picker').innerHTML = `
     <div class="pk-head"><h2>這次要練哪些？</h2>${P.segs ? '<button class="btn sm" type="button" id="pkCancel">取消</button>' : ''}</div>
-    <div class="groups">${GROUPS.map(g => `<button type="button" class="gbtn ${pick.open!=='all'?gState(g):''}" data-g="${g.id}">${g.name}<small>${g.segs.join('、')} 段</small></button>`).join('')}</div>
-    <button type="button" class="btn sm allbtn ${sameSet(s,SEGS)?'on':''}" data-g="all">全部 8 段一起練</button>
-    ${shown.map(g => `<div class="chips"><div class="cl">${g.name}：想只練某一段，就把其他段取消</div>
-      <div class="chiprow">${g.segs.map(v => `<button type="button" class="segchip ${s.includes(v)?'on':''}" data-seg="${v}">${v} 段</button>`).join('')}</div></div>`).join('')}
+    <div class="groups">${GROUPS.map(g => `<button type="button" class="gbtn ${gState(g)}" data-g="${g.id}">${g.name}<small>${g.segs.join('、')}的乘法</small></button>`).join('')}</div>
+    <button type="button" class="btn sm allbtn ${sameSet(s,SEGS)?'on':''}" data-g="all">全部一起練</button>
+    <div class="chips"><div class="cl">亮起來的就是這次要練的；點一下可以加入或取消，也可以只練一個乘法</div>
+      <div class="chipgrid">${SEGS.map(v => `<button type="button" class="segchip ${s.includes(v)?'on':''}" data-seg="${v}">${v}的乘法</button>`).join('')}</div></div>
     <div class="row" style="justify-content:space-between">
-      <span class="dim">${s.length ? `已選：${segLabel(s)}，共 ${n} 題` : '請至少選一段'}</span>
+      <span class="dim">${s.length ? `已選：${segLabel(s)}，共 ${n} 題` : '請至少選一個乘法'}</span>
       <button class="btn primary" type="button" id="pkOk" ${s.length?'':'disabled'}>就練這些</button>
     </div>`;
 }
@@ -502,7 +502,7 @@ $('#picker').addEventListener('click', e => {
 
 /* ---------- 出題 ---------- */
 function spread(list){
-  /* 同一段盡量不連續出現 */
+  /* 同一個乘法盡量不連續出現 */
   const out = [], rest = shuffle(list.slice());
   while (rest.length){
     const last = out.length ? out[out.length-1].a : null;
@@ -521,7 +521,7 @@ function buildRound(){
   pool.forEach(it => { const s = stOf(it.id); (s==='weak'||s==='learn' ? by.weak : s==='fresh' ? by.fresh : by.ok).push(it); });
   /* 不熟的排前面，答錯次數多的優先 */
   shuffle(by.weak).sort((a,b) => (stOf(a.id)==='weak'?0:1)-(stOf(b.id)==='weak'?0:1) || rec(b.id).wrong-rec(a.id).wrong);
-  /* 還沒練過的：照段的順序、乘數由小到大先出（第一次學乘法，從前面的句子開始） */
+  /* 還沒練過的：乘數由小到大先出（第一次學乘法，從前面的句子開始） */
   shuffle(by.fresh).sort((a,b) => a.b-b.b);
   shuffle(by.ok);
   const rest = n - review.length, k = Math.ceil(rest/3);
@@ -741,7 +741,7 @@ function endRound(){
     ${newSuper.length ? `<div class="r-row"><b>🌟 超熟練，之後偶爾抽考：</b>${newSuper.map(chip).join('')}</div>` : ''}
     ${newly.filter(id => !newSuper.includes(id)).length ? `<div class="r-row"><b>✨ 新點亮：</b>${newly.filter(id => !newSuper.includes(id)).map(chip).join('')}</div>` : ''}
     <div class="r-row"><b>${weakNow.length ? '🔍 下一局會多練：' : '這一局的題目都點亮了，太厲害了！'}</b>${weakNow.map(chip).join('')}</div>
-    <div class="r-tbl">${tableHTML(segs)}${legendHTML()}</div>
+    <div class="r-tbl">${tableHTML(SEGS)}${legendHTML()}</div>
     <div class="row">
       <button class="btn primary" type="button" id="rAgain">再練一局</button>
       <button class="btn" type="button" id="rHome">回首頁</button>
@@ -775,9 +775,9 @@ $('#clearYes').addEventListener('click', () => {
 /* ---------- 聚光燈導覽（第一次使用；可以略過；首頁「怎麼玩？」可以再看） ---------- */
 const TOUR = [
   {sel:'#hStart', title:'開始練習', text:'準備好就按這裡。每次 10 或 15 題，畫面上沒有倒數計時，慢慢想沒關係。'},
-  {sel:'#hRange', title:'選擇練習範圍', text:'按這裡選要練的段：可以選一整組，也可以只練某一段，例如只練 7 段。'},
+  {sel:'#hRange', title:'選擇練習範圍', text:'按這裡選要練的乘法：可以選一整組，也可以只練一個，例如只練 7的乘法。'},
   {sel:null, title:'用數字鍵作答', demo:true, text:'看到題目，用數字鍵輸入答案，再按「確定」。答錯了也沒關係，會出現提示：從會的前一句往後加一個數。'},
-  {sel:'#hTable', title:'把燈點亮', text:'每一題都有一盞燈。答得又對又順，燈就會亮起來；變成星星的題目，之後偶爾會抽出來複習。'},
+  {sel:'#hTable', title:'把燈點亮', text:'2～9的乘法，每一題都有一盞燈。答得又對又順，燈就會亮起來；變成星星的題目，之後偶爾會抽出來複習。'},
   {sel:'#hMine', title:'我的練習設定', text:'每局題數、聲音、顯示快慢，都可以自己選。'},
 ];
 let tourI = 0;
