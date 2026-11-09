@@ -251,7 +251,7 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
    乘法的寫法：被乘數（1 份有幾個）寫在前面，乘數（有幾份）寫在後面。
    例：1 盤有 4 個，有 3 盤 → 4×3（和 mul.html「7×6 是 7的乘法」一致）
    ===================================================================== */
-const VERSION = {id:'mulpic20', name:'v2.0'};
+const VERSION = {id:'mulpic21', name:'家長版 v2.1'};
 const ROUND_OPTS = [5, 10];           /* 孩子可選的每局題數 */
 const ROUND_N = 10;                   /* 每局題數（預設） */
 const A_MIN = 2, A_MAX = 9;           /* 1 份有幾個（被乘數） */
@@ -291,7 +291,9 @@ const PEOPLE = ['弟弟','妹妹','哥哥','姊姊','媽媽','爸爸','老師'];
 /* ---------- 注音 ----------
    破音字的做法：先用「詞」查 WORDS（例如「數了」的數讀ㄕㄨˇ、「乘數」的數讀ㄕㄨˋ），
    查不到才用單字 ZY。破音字（數）不放在單字表裡，避免標錯；題目只用表裡有的詞。
-   「一」標本調（ㄧ），不標變調。輕聲寫在最前面（˙ㄉㄜ）。要改讀音，直接改這兩張表。 */
+   「一」照課本標變調：後面的字是四聲（或輕聲）→ ㄧˊ，例：一個、一次；
+   後面是一、二、三聲 → ㄧˋ，例：一朵、一包、一組；後面沒有字（句尾、標點、數字）→ ㄧ。
+   輕聲寫在最前面（˙ㄉㄜ）。要改讀音，直接改這兩張表。 */
 const WORDS = {
   '被乘數':'ㄅㄟˋ ㄔㄥˊ ㄕㄨˋ', '乘數':'ㄔㄥˊ ㄕㄨˋ',
   '數了':'ㄕㄨˇ ˙ㄌㄜ', '一數':'ㄧ ㄕㄨˇ', '數一次':'ㄕㄨˇ ㄧ ㄘˋ', '數一下':'ㄕㄨˇ ㄧ ㄒㄧㄚˋ',
@@ -348,25 +350,26 @@ function zyCol(py){
   if ('ˊˇˋ'.includes(last)){ tone = last; py = py.slice(0,-1); }
   return `<span class="zr"><span class="zs">${light ? '<span class="zl">˙</span>' : ''}${[...py].map(c => `<span>${c}</span>`).join('')}</span>${tone ? `<span class="zt">${tone}</span>` : ''}</span>`;
 }
+function yiTone(next){
+  if (!next || !next.py) return 'ㄧ';
+  const p = next.py, t = p[p.length-1];
+  return t==='ˋ' || p[0]==='˙' ? 'ㄧˊ' : 'ㄧˋ';
+}
 function zy(str){
   str = String(str);
   if (!P.pref.zy) return esc(str);
-  const ch = [...str]; let out = '';
+  const ch = [...str], seq = [];          /* 先查出每個字的讀音，再處理「一」的變調 */
   for (let i=0;i<ch.length;){
     let hit = null;
     for (let L=3;L>=2 && !hit;L--){ const w = ch.slice(i,i+L).join(''); if (w.length===L && WORDS[w]) hit = [w, WORDS[w].split(' ')]; }
-    if (hit){
-      [...hit[0]].forEach((c,k) => out += `<span class="zc">${c}${zyCol(hit[1][k])}</span>`);
-      i += [...hit[0]].length; continue;
-    }
+    if (hit){ [...hit[0]].forEach((c,k) => seq.push({c, py:hit[1][k]})); i += [...hit[0]].length; continue; }
     const c = ch[i];
-    if (isHan(c)){
-      if (ZY[c]) out += `<span class="zc">${c}${zyCol(ZY[c])}</span>`;
-      else { MISSING.add(c); out += c; }
-    } else out += esc(c);
+    if (isHan(c) && !ZY[c]) MISSING.add(c);
+    seq.push({c, py: isHan(c) ? ZY[c] || null : null});
     i++;
   }
-  return out;
+  seq.forEach((x,i) => { if (x.c==='一') x.py = yiTone(seq[i+1]); });
+  return seq.map(x => x.py ? `<span class="zc">${x.c}${zyCol(x.py)}</span>` : esc(x.c)).join('');
 }
 /* 文字裡的數字用 {數字}，會換成醒目的數字 */
 const T = s => String(s).split(/(\{[^}]*\})/).map(p => p[0]==='{' ? `<span class="n">${esc(p.slice(1,-1))}</span>` : zy(p)).join('');
