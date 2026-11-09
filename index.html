@@ -17,27 +17,36 @@ a.game:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
 .ic{flex:none;width:64px;height:64px;border:3px solid var(--ink);border-radius:16px;background:#DCEEFF;display:grid;place-items:center;font-size:30px;font-weight:900}
 .t{font-size:26px;font-weight:900}
 .d{font-size:16px;color:var(--soft);font-weight:700}
+.cat{display:grid;gap:14px;background:rgba(255,255,255,.55);border:3px dashed var(--soft);border-radius:22px;padding:14px 14px 18px}
+.cat h2{margin:0;font-size:24px;display:flex;align-items:center;gap:8px}
+.cat h2::before{content:'';width:10px;height:26px;border-radius:4px;background:var(--hl);border:2px solid var(--ink)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1><span class="tag">+−×</span>課堂遊戲</h1>
-  <a class="game" href="math.html">
-    <span class="ic">+−</span>
-    <span><span class="t">加減法小練習</span><br><span class="d">20以內加減法（學習扶助）</span></span>
-  </a>
-  <a class="game" href="plusnminus.html">
-    <span class="ic">( )</span>
-    <span><span class="t">列式練習</span><br><span class="d">依題意列式與驗算（學習扶助）</span></span>
-  </a>
-  <a class="game" href="mulpic.html">
-    <span class="ic">🍎</span>
-    <span><span class="t">認識乘法</span><br><span class="d">看圖填空、列式（家長版，在家練習）</span></span>
-  </a>
-  <a class="game" href="mul.html">
-    <span class="ic">×</span>
-    <span><span class="t">乘法小練習</span><br><span class="d">九九乘法 2～9 段（家長版，在家練習）</span></span>
-  </a>
+  <section class="cat">
+    <h2>加減法</h2>
+    <a class="game" href="math.html">
+      <span class="ic">+−</span>
+      <span><span class="t">加減法小練習</span><br><span class="d">20以內加減法</span></span>
+    </a>
+    <a class="game" href="plusnminus.html">
+      <span class="ic">( )</span>
+      <span><span class="t">列式練習</span><br><span class="d">依題意列式與驗算</span></span>
+    </a>
+  </section>
+  <section class="cat">
+    <h2>乘法</h2>
+    <a class="game" href="mulpic.html">
+      <span class="ic">🍎</span>
+      <span><span class="t">認識乘法</span><br><span class="d">看圖、文字題列式，答案的單位，被乘數・乘數・積</span></span>
+    </a>
+    <a class="game" href="mul.html">
+      <span class="ic">×</span>
+      <span><span class="t">乘法小練習</span><br><span class="d">九九乘法 2～9 的乘法，把亮燈表點亮</span></span>
+    </a>
+  </section>
 </div>
 </body>
 </html>

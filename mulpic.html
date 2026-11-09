@@ -14,11 +14,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;700;900&display=swap">
 <style>
-/* 外觀沿用乘法小練習（mul.html）；看圖填空、列式，不用算出答案 */
+/* 外觀沿用乘法小練習（mul.html）；認識乘法的意義：看圖、文字題、連加和倍、被乘數・乘數・積 */
 :root{
   --paper:#E3EDF2; --grid:#D0DEE6; --ink:#1B2836; --ink-soft:#4C5D6E; --card:#FFFFFF; --wash:#F3F7FA;
   --hl:#FFE066; --good:#1FA963; --bad:#E5484D; --orange:#FF8A3D;
-  --s-new:#FFFFFF; --s-weak:#FFB3B3; --s-learn:#FFE38A; --s-ok:#8FE0AE; --s-super:#FFC933;
   --f-display:'LXGW WenKai TC','PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;
   --f-body:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
   --f-num:'Fredoka','Noto Sans TC',sans-serif;
@@ -61,15 +60,23 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
 main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
 [data-screen="home"],[data-screen="result"]{overflow:auto;padding:0 6px 6px 0}
 
+/* ---------- 注音（字的右邊直排；破音字用「詞」來標，見程式的 WORDS） ---------- */
+.zc{display:inline-flex;align-items:center;white-space:nowrap;vertical-align:baseline}
+.zr{display:inline-flex;align-items:center;margin-left:.06em;font:400 max(.33em,9px)/1 var(--f-body);color:var(--ink)}
+.zs{display:inline-flex;flex-direction:column;align-items:center;line-height:1.02}
+.zt{align-self:center;margin-left:.02em;font-size:1.1em}
+.zl{font-size:1.1em;line-height:.6}
+.zy-on .line,.zy-on .ask{line-height:1.6}
+
 /* ---------- 首頁 ---------- */
 .home{display:grid;grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);gap:16px;align-items:start}
 .hello{font-weight:900;font-size:18px}
-.range-name{font-size:24px;margin-top:6px}
 .modes{display:grid;gap:10px;margin-top:12px}
-.mode{display:flex;align-items:center;gap:14px;text-align:left;width:100%;font:900 22px var(--f-body);border:3px solid var(--ink);border-radius:16px;padding:12px 16px;box-shadow:4px 4px 0 var(--ink);cursor:pointer;background:var(--card);text-decoration:none;color:var(--ink)}
+.mode{display:flex;align-items:center;gap:14px;text-align:left;width:100%;font:900 22px var(--f-body);border:3px solid var(--ink);border-radius:16px;padding:10px 14px;box-shadow:4px 4px 0 var(--ink);cursor:pointer;background:var(--card);text-decoration:none;color:var(--ink)}
 .mode:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
-.mode .ic{flex:none;width:54px;height:54px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;font-size:28px;background:#DCEEFF}
+.mode .ic{flex:none;width:52px;height:52px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;font-size:26px;background:#DCEEFF;font-family:var(--f-emoji)}
 .mode small{display:block;font-size:15px;font-weight:700;color:var(--ink-soft);line-height:1.35}
+.mode.mix{background:#FFFBEA}
 .mine{margin-top:14px;border-top:2px dashed var(--grid);padding-top:10px;display:grid;gap:8px}
 .mine h3{font-size:17px}
 .pref-row{display:flex;align-items:center;gap:10px;font-weight:900;flex-wrap:wrap}
@@ -79,47 +86,14 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 .seg button:first-child{border-left:0}
 .seg button.on{background:var(--hl)}
 .learn h3{font-size:20px;margin-bottom:8px}
-.learn .say{font-weight:900;font-size:19px;line-height:1.7}
+.learn .say{font-weight:900;font-size:21px;line-height:1.9}
 .learn .say b{font-family:var(--f-num);font-size:24px;display:inline-block;min-width:1.2em;text-align:center;border-bottom:3px solid var(--ink)}
-.learn .eqx{font:600 30px var(--f-num);margin-top:4px}
+.learn .eqx{font:600 28px var(--f-num);margin-top:4px}
 .learn .terms{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin-top:10px;font-weight:700}
 .learn .terms span:nth-child(odd){font-weight:900}
 .tA{background:#FFE2CC;border-radius:6px;padding:0 6px}
 .tB{background:#DCEEFF;border-radius:6px;padding:0 6px}
-
-/* ---------- 亮燈表（和乘法小練習同一種樣子；燈號是「看圖列式」自己的） ---------- */
-.rcol{display:grid;gap:16px}
-.lit{display:grid;gap:4px;margin-top:10px}
-.lit-txt{font-weight:900}
-.lit-txt b{font-family:var(--f-num);font-size:22px}
-.bar{height:14px;border:2px solid var(--ink);border-radius:999px;background:var(--wash);overflow:hidden}
-.bar i{display:block;height:100%;background:var(--s-ok)}
-.tbl h3{font-size:18px;margin-bottom:4px}
-.gridt{display:grid;gap:3px;grid-template-columns:30px repeat(10,1fr)}
-.gridt .hd{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--ink-soft);display:grid;place-items:center;white-space:nowrap}
-.gridt .rh{font-size:15px;color:var(--ink)}
-.cell{border:2px solid var(--ink);border-radius:6px;font-family:var(--f-num);font-weight:600;font-size:clamp(9px,1.15vw,13px);display:grid;place-items:center;min-height:28px;padding:0 1px;white-space:nowrap;background:var(--s-new);position:relative;line-height:1.1}
-.cell.weak{background:var(--s-weak)} .cell.learn{background:var(--s-learn)} .cell.ok{background:var(--s-ok)} .cell.super{background:var(--s-super)}
-.cell.super::after{content:"★";position:absolute;top:-8px;right:-5px;font-size:12px;color:var(--ink)}
-.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;font-weight:700;color:var(--ink-soft);margin-top:10px}
-.legend span{display:inline-flex;align-items:center;gap:4px}
-.legend i{width:16px;height:16px;border:2px solid var(--ink);border-radius:4px;display:inline-block}
-.fx{position:absolute;top:10px;right:12px;font-weight:900;font-size:clamp(16px,3vmin,24px);border:3px solid var(--ink);border-radius:14px;padding:2px 12px;background:var(--s-ok);z-index:2}
-.fx.super{background:var(--s-super)}
-
-/* ---------- 選範圍 ---------- */
-.cover{position:fixed;inset:0;z-index:40;background:rgba(27,40,54,.72);display:grid;place-items:center;padding:16px}
-.cover>.card{max-width:520px;text-align:center;display:grid;gap:12px;justify-items:center}
-.cover .big{font-size:26px;font-weight:900}
-.cover>.card.picker{width:min(620px,100%);max-width:620px;max-height:100%;overflow:auto;text-align:left;justify-items:stretch}
-.picker h2{font-size:24px}
-.pk-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.chips{display:grid;gap:8px;border:3px dashed var(--ink-soft);border-radius:14px;padding:10px 12px;background:var(--wash)}
-.chips .cl{font-weight:900;font-size:15px}
-.chipgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.segchip{font:900 19px var(--f-body);min-height:52px;border:3px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:3px 3px 0 var(--ink);cursor:pointer;padding:0 6px;color:var(--ink-soft);white-space:nowrap}
-.segchip.on{background:var(--hl);color:var(--ink);box-shadow:0 0 0 3px rgba(255,224,102,.55),3px 3px 0 var(--ink)}
-.segchip:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.tC{background:#D9F6E5;border-radius:6px;padding:0 6px}
 
 /* ---------- 練習畫面 ---------- */
 .game{flex:1;min-height:0;display:grid;grid-template-columns:1fr minmax(240px,30%);gap:16px}
@@ -134,7 +108,16 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 .qcard{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:12px;overflow:auto;padding:12px;position:relative}
 .qcard::before,.qcard::after{content:'';flex:1 1 0;min-height:0}
 
-/* 圖：每一份是一個框 */
+/* 題目：圖或文字 */
+.prompt{display:grid;gap:10px;justify-items:center;width:100%}
+.ask{font-weight:900;font-size:clamp(20px,3.8vmin,32px);text-align:center;max-width:760px;line-height:1.5}
+.ask .n,.line .n{font-family:var(--f-num);font-weight:600;color:#C2410C}
+.story{display:flex;gap:12px;align-items:center;background:#FFFBEA;border:3px solid var(--ink);border-radius:16px;padding:10px 16px;max-width:780px}
+.story .em{font-family:var(--f-emoji);font-size:clamp(34px,7vmin,60px);flex:none}
+.story .ask{text-align:left}
+.bigeq{font:600 clamp(30px,6.5vmin,56px) var(--f-num);background:#FFFBEA;border:3px solid var(--ink);border-radius:16px;padding:4px 20px;display:flex;flex-wrap:wrap;justify-content:center;gap:0 .15em}
+.bigeq .ad{position:relative;display:inline-block}
+.bigeq .ad .no{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:13px;background:var(--orange);color:#fff;border:2px solid var(--ink);border-radius:999px;min-width:22px;height:22px;display:grid;place-items:center;line-height:1}
 .pic{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(8px,1.6vmin,16px);max-width:100%}
 .box{position:relative;border:3px solid var(--ink);border-radius:18px;padding:8px;display:grid;gap:2px;justify-content:center;align-content:center;transition:box-shadow .2s}
 .box .it{font-family:var(--f-emoji);font-size:var(--e);line-height:1.15;width:1.2em;text-align:center;position:relative}
@@ -147,25 +130,33 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 .u-basket{background:#FDEBD3;border-radius:6px 6px 26px 26px}
 .u-bowl{background:#FFE8EC;border-radius:8px 8px 40px 40px}
 
-/* 填空句子 */
+/* 填空 */
 .lines{display:grid;gap:10px;justify-items:center;width:100%}
-.line{display:flex;align-items:center;justify-content:center;gap:.3em;flex-wrap:wrap;font-weight:900;font-size:clamp(22px,4.6vmin,40px);line-height:1.3}
-.line .lab{font-size:.7em;color:var(--ink-soft);margin-right:.2em}
-.line.wait{opacity:.35}
+.line{display:flex;align-items:center;justify-content:center;gap:.25em;flex-wrap:wrap;font-weight:900;font-size:clamp(20px,4.2vmin,36px);line-height:1.3}
+.line .lab{color:var(--ink-soft)}
+.line.wait{opacity:.3}
 .line .x{font-family:var(--f-num);font-weight:600;color:var(--ink-soft)}
+.line .shown{font:600 1.1em var(--f-num);padding:0 .1em}
 .slot{display:inline-grid;justify-items:center;gap:2px}
-.bl{font:600 1em var(--f-num);min-width:1.6em;height:1.35em;border:4px solid var(--ink);border-radius:14px;background:var(--wash);display:grid;place-items:center;padding:0 .1em;cursor:pointer;line-height:1}
+.bl{font:600 1em var(--f-num);min-width:1.6em;height:1.35em;border:4px solid var(--ink);border-radius:14px;background:var(--wash);display:grid;place-items:center;padding:0 .12em;cursor:pointer;line-height:1}
 .bl:disabled{cursor:default;color:var(--ink)}
 .bl.focus{background:#FFF8D6;box-shadow:0 0 0 6px rgba(255,224,102,.6)}
 .bl.ok{background:#D9F6E5;border-color:var(--good)}
 .bl.no{background:#FFE1E1;border-color:var(--bad);animation:shake .35s}
 .bl .cur{width:4px;height:.8em;background:var(--ink-soft);animation:blink 1s steps(1) infinite}
+.units{display:inline-flex;gap:.25em;align-items:center}
+.ub{font:900 .9em var(--f-body);min-width:1.9em;min-height:1.45em;border:4px solid var(--ink);border-radius:14px;background:var(--card);box-shadow:3px 3px 0 var(--ink);cursor:pointer;padding:0 .2em;line-height:1.1}
+.ub.on{background:var(--hl)}
+.ub.ok{background:#D9F6E5;border-color:var(--good)}
+.ub.no{background:#FFE1E1;border-color:var(--bad);animation:shake .35s}
+.ub:disabled{cursor:default;box-shadow:none;opacity:.35}
+.ub.ok:disabled{opacity:1}
 .term{font:900 clamp(12px,2vmin,15px) var(--f-body);white-space:nowrap;line-height:1.2}
 @keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 @keyframes blink{50%{opacity:0}}
-.msg{min-height:1.5em;font-weight:900;font-size:clamp(17px,3vmin,24px);text-align:center;max-width:640px}
+.msg{min-height:1.5em;font-weight:900;font-size:clamp(17px,3vmin,24px);text-align:center;max-width:680px;line-height:1.6}
 .msg.good{color:var(--good)} .msg.bad{color:#B4232A}
-.sum{font-weight:900;font-size:clamp(16px,2.8vmin,22px);text-align:center;background:#FFFBEA;border:3px dashed var(--ink-soft);border-radius:14px;padding:6px 14px;max-width:640px}
+.sum{font-weight:900;font-size:clamp(16px,2.8vmin,22px);text-align:center;background:#FFFBEA;border:3px dashed var(--ink-soft);border-radius:14px;padding:6px 14px;max-width:680px;line-height:1.7}
 .sum .n{font-family:var(--f-num);font-weight:600}
 
 .pad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:10px;min-height:0}
@@ -176,6 +167,9 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 .pad .go:disabled{opacity:.5}
 
 .toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:80;background:var(--ink);color:#fff;border:3px solid var(--hl);border-radius:16px;padding:10px 22px;font-weight:900;font-size:20px;box-shadow:0 6px 0 rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center}
+.cover{position:fixed;inset:0;z-index:40;background:rgba(27,40,54,.72);display:grid;place-items:center;padding:16px}
+.cover>.card{max-width:520px;text-align:center;display:grid;gap:12px;justify-items:center}
+.cover .big{font-size:26px;font-weight:900}
 
 /* ---------- 結算 ---------- */
 .result{display:grid;gap:14px}
@@ -185,9 +179,6 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 .r-row>b{margin-right:4px}
 .qchip{font-family:var(--f-num);font-weight:600;font-size:18px;border:2px solid var(--ink);border-radius:10px;padding:0 10px;background:#8FE0AE;white-space:nowrap}
 .qchip.miss{background:#FFB3B3}
-.qchip.new{background:var(--s-new)} .qchip.weak{background:var(--s-weak)} .qchip.learn{background:var(--s-learn)} .qchip.ok{background:var(--s-ok)} .qchip.super{background:var(--s-super)}
-.r-tbl{max-width:720px}
-.trend{font-weight:900;font-size:18px;border:3px solid var(--ink);border-radius:999px;padding:2px 14px;background:var(--hl)}
 .r-stats{display:flex;gap:10px;flex-wrap:wrap}
 .r-stats div{border:2px solid var(--ink);border-radius:10px;padding:4px 14px;background:var(--wash);font-weight:700}
 .r-stats b{font-family:var(--f-num);font-size:22px;margin-left:6px}
@@ -195,22 +186,18 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 @media (max-aspect-ratio:1/1){
   .home{grid-template-columns:1fr}
   .game{grid-template-columns:1fr;grid-template-rows:1fr auto;gap:10px}
-  .pad{height:min(30vh,300px);gap:8px}
+  .pad{height:min(28vh,280px);gap:8px}
 }
 @media (max-width:600px){
   .brand h1{font-size:21px}
   .badge{display:none}
   .card{padding:12px;border-radius:16px;box-shadow:4px 4px 0 var(--ink)}
-  .chipgrid{gap:7px}
-  .segchip{font-size:15px;min-height:46px;padding:0 2px}
   .mode{font-size:20px;padding:10px 12px}
-  .mode .ic{width:46px;height:46px;font-size:24px}
+  .mode .ic{width:44px;height:44px;font-size:22px}
   .qcard{gap:8px;padding:8px}
   .chipm{font-size:14px;padding:0 10px}
   .dots i{width:11px;height:11px}
-  .gridt{grid-template-columns:24px repeat(10,1fr);gap:2px}
-  .gridt .hd{font-size:11px}
-  .cell{font-size:9px;min-height:24px;border-width:1.5px}
+  .story{padding:8px 10px}
 }
 @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
 </style>
@@ -219,7 +206,10 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 <div class="wrap">
   <header class="top">
     <div class="brand"><span class="tagk">×</span><h1 id="title">認識乘法</h1><span class="badge" id="verBadge"></span></div>
-    <div class="row"><button class="btn sm" id="homeBtn" type="button" hidden>回首頁</button></div>
+    <div class="row">
+      <a class="btn sm" id="backBtn" href="index.html">← 回到上一頁</a>
+      <button class="btn sm" id="homeBtn" type="button" hidden>回首頁</button>
+    </div>
   </header>
 
   <main>
@@ -229,8 +219,8 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
       <div class="game">
         <div class="g-left">
           <div class="g-bar"><span id="gMode" class="chipm"></span><div id="gDots" class="dots"></div></div>
-          <div class="card qcard"><div id="gFx" class="fx" hidden></div>
-            <div class="pic" id="gPic"></div>
+          <div class="card qcard" id="gCard">
+            <div class="prompt" id="gPrompt"></div>
             <div class="lines" id="gLines"></div>
             <div id="gMsg" class="msg"></div>
             <div id="gSum" class="sum" hidden></div>
@@ -249,101 +239,137 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
   </main>
 </div>
 
-<div id="pickCover" class="cover" hidden><div class="card picker" id="picker"></div></div>
 <div id="clearCover" class="cover" hidden><div class="card">
   <div class="big">清除練習紀錄？</div>
-  <p>這台裝置上「認識乘法」的紀錄和亮燈表會清除，清除後不能復原。（乘法小練習的燈號不會被清除）</p>
+  <p>這台裝置上「認識乘法」的紀錄會清除，清除後不能復原。（乘法小練習的燈號不會被清除）</p>
   <div class="row" style="justify-content:center"><button class="btn" type="button" id="clearYes">清除紀錄</button><button class="btn primary" type="button" id="clearNo">取消</button></div>
 </div></div>
 
 <script>
 /* =====================================================================
-   參數區（改數字不用動下面的程式）
+   參數區（改數字、改字不用動下面的程式）
    乘法的寫法：被乘數（1 份有幾個）寫在前面，乘數（有幾份）寫在後面。
    例：1 盤有 4 個，有 3 盤 → 4×3（和 mul.html「7×6 是 7的乘法」一致）
    ===================================================================== */
-const VERSION = {id:'mulpic11', name:'家長版 v1.1'};
-const SEGS = [2,3,4,5,6,7,8,9];       /* 1 份有幾個（被乘數）：2的乘法～9的乘法 */
+const VERSION = {id:'mulpic20', name:'v2.0'};
 const ROUND_OPTS = [5, 10];           /* 孩子可選的每局題數 */
 const ROUND_N = 10;                   /* 每局題數（預設） */
-const COUNT_OPTS = [5, 10];           /* 有幾份（乘數）：2～5 份比較好數；1～10 份（亮燈表 ×1～×10 都練得到） */
-const COUNT_MAX = 5;                  /* 有幾份（預設最多 5 份） */
-const countLo = cmax => cmax >= 10 ? 1 : 2;   /* 1～10 份時，最少 1 份 */
-const MULT_MAX = 10;                  /* 亮燈表：×1～×10 */
-const ROW_MAX = 5;                    /* 一個框裡一排最多放幾個，方便數 */
-const STORE_KEY = 'mulpic1';          /* 瀏覽器儲存的鍵名（和乘法小練習 mulfact1 分開，不會互相影響） */
+const A_MIN = 2, A_MAX = 9;           /* 1 份有幾個（被乘數） */
+const B_MIN = 2, B_MAX = 5;           /* 有幾份（乘數）：看圖、文字題、連加；認識乘法階段先用小的數 */
+const ROW_MAX = 5;                    /* 圖：一個框裡一排最多放幾個，方便數 */
+const STORE_KEY = 'mulpic1';          /* 瀏覽器儲存的鍵名（和乘法小練習 mulfact1 分開） */
 
-/* 亮燈表的燈號：看圖列式「一次就答對」才會亮
-   還沒練過 →（一次答對）熟練 →（再一次答對）超熟練
-   答錯過 → 不熟 →（一次答對）練習中 →（一次答對）熟練 */
-const STATE = {
-  fresh:{name:'還沒練過', cls:'new'},
-  weak: {name:'不熟',     cls:'weak'},
-  learn:{name:'練習中',   cls:'learn'},
-  ok:   {name:'熟練',     cls:'ok'},
-  super:{name:'超熟練',   cls:'super'},
-};
-const NEXT_CLEAN = {fresh:'ok', weak:'learn', learn:'ok', ok:'super', super:'super'};
-
-/* 圖上的東西：單位、圖案、框的樣子 */
-const THINGS = [
-  {u:'盤', e:'🍎', cls:'u-plate'},
-  {u:'袋', e:'🍬', cls:'u-bag'},
-  {u:'盒', e:'🍪', cls:'u-box'},
-  {u:'籃', e:'🍊', cls:'u-basket'},
-  {u:'碗', e:'🍓', cls:'u-bowl'},
+/* 題型（依課本「認識乘法」練習園地） */
+const TYPES = [
+  {id:'pic',  ic:'🍎', name:'看圖列式',         d:'看圖說一說，再列式、寫答案和單位'},
+  {id:'word', ic:'📝', name:'文字題',           d:'讀題目，列式、寫答案和單位'},
+  {id:'add',  ic:'➕', name:'連加和倍',         d:'5＋5＋5 改寫成乘法，是 5 的幾倍'},
+  {id:'term', ic:'🔤', name:'被乘數・乘數・積', d:'認識算式裡每個數的名稱'},
 ];
+
+/* 看圖：c＝一份的單位、n＝東西、u＝答案的單位 */
+const PIC_THINGS = [
+  {c:'盤', n:'蘋果', u:'個', e:'🍎', cls:'u-plate'},
+  {c:'袋', n:'糖果', u:'個', e:'🍬', cls:'u-bag'},
+  {c:'盒', n:'餅乾', u:'片', e:'🍪', cls:'u-box'},
+  {c:'籃', n:'橘子', u:'個', e:'🍊', cls:'u-basket'},
+  {c:'碗', n:'草莓', u:'顆', e:'🍓', cls:'u-bowl'},
+];
+/* 文字題：c＝一份的單位、cn＝一份的名稱、n＝問的東西、u＝答案的單位、v＝動作 */
+const WORD_CTX = [
+  {e:'🍬', c:'包', cn:'糖果',   n:'糖果',   u:'個', v:'拿了'},
+  {e:'🍪', c:'盒', cn:'餅乾',   n:'餅乾',   u:'片', v:'買了'},
+  {e:'🍯', c:'組', cn:'果醬',   n:'果醬',   u:'瓶', v:'買了'},
+  {e:'🐟', c:'個', cn:'魚缸',   n:'魚',     u:'條', v:'有'},
+  {e:'🍌', c:'串', cn:'香蕉',   n:'香蕉',   u:'根', v:'買了'},
+  {e:'🌷', c:'束', cn:'花',     n:'花',     u:'朵', v:'買了'},
+  {e:'🖍️', c:'盒', cn:'彩色筆', n:'彩色筆', u:'枝', v:'買了'},
+  {e:'🍊', c:'籃', cn:'橘子',   n:'橘子',   u:'個', v:'買了'},
+];
+const PEOPLE = ['弟弟','妹妹','哥哥','姊姊','媽媽','爸爸','老師'];
+
+/* ---------- 注音 ----------
+   破音字的做法：先用「詞」查 WORDS（例如「數了」的數讀ㄕㄨˇ、「乘數」的數讀ㄕㄨˋ），
+   查不到才用單字 ZY。破音字（數）不放在單字表裡，避免標錯；題目只用表裡有的詞。
+   「一」標本調（ㄧ），不標變調。輕聲寫在最前面（˙ㄉㄜ）。要改讀音，直接改這兩張表。 */
+const WORDS = {
+  '被乘數':'ㄅㄟˋ ㄔㄥˊ ㄕㄨˋ', '乘數':'ㄔㄥˊ ㄕㄨˋ',
+  '數了':'ㄕㄨˇ ˙ㄌㄜ', '一數':'ㄧ ㄕㄨˇ', '數一次':'ㄕㄨˇ ㄧ ㄘˋ', '數一下':'ㄕㄨˇ ㄧ ㄒㄧㄚˋ',
+  '弟弟':'ㄉㄧˋ ˙ㄉㄧ', '妹妹':'ㄇㄟˋ ˙ㄇㄟ', '哥哥':'ㄍㄜ ˙ㄍㄜ', '姊姊':'ㄐㄧㄝˇ ˙ㄐㄧㄝ',
+  '媽媽':'ㄇㄚ ˙ㄇㄚ', '爸爸':'ㄅㄚˋ ˙ㄅㄚ', '橘子':'ㄐㄩˊ ˙ㄗ', '彩色':'ㄘㄞˇ ㄙㄜˋ', '餅乾':'ㄅㄧㄥˇ ㄍㄢ',
+};
+const ZY = {
+  '一':'ㄧ','了':'˙ㄌㄜ','的':'˙ㄉㄜ','個':'ㄍㄜˋ','有':'ㄧㄡˇ','共':'ㄍㄨㄥˋ','幾':'ㄐㄧˇ','次':'ㄘˋ','裡':'ㄌㄧˇ',
+  '盤':'ㄆㄢˊ','蘋':'ㄆㄧㄥˊ','果':'ㄍㄨㄛˇ','袋':'ㄉㄞˋ','糖':'ㄊㄤˊ','盒':'ㄏㄜˊ','片':'ㄆㄧㄢˋ','籃':'ㄌㄢˊ',
+  '碗':'ㄨㄢˇ','草':'ㄘㄠˇ','莓':'ㄇㄟˊ','顆':'ㄎㄜ','包':'ㄅㄠ','組':'ㄗㄨˇ','醬':'ㄐㄧㄤˋ','瓶':'ㄆㄧㄥˊ',
+  '缸':'ㄍㄤ','魚':'ㄩˊ','條':'ㄊㄧㄠˊ','串':'ㄔㄨㄢˋ','香':'ㄒㄧㄤ','蕉':'ㄐㄧㄠ','根':'ㄍㄣ','束':'ㄕㄨˋ',
+  '花':'ㄏㄨㄚ','朵':'ㄉㄨㄛˇ','枝':'ㄓ','筆':'ㄅㄧˇ','老':'ㄌㄠˇ','師':'ㄕ',
+  '拿':'ㄋㄚˊ','買':'ㄇㄞˇ','每':'ㄇㄟˇ','列':'ㄌㄧㄝˋ','式':'ㄕˋ','答':'ㄉㄚˊ','案':'ㄢˋ','是':'ㄕˋ',
+  '前':'ㄑㄧㄢˊ','後':'ㄏㄡˋ','面':'ㄇㄧㄢˋ','放':'ㄈㄤˋ','反':'ㄈㄢˇ','寫':'ㄒㄧㄝˇ','題':'ㄊㄧˊ','目':'ㄇㄨˋ',
+  '把':'ㄅㄚˇ','相':'ㄒㄧㄤ','加':'ㄐㄧㄚ','請':'ㄑㄧㄥˇ','輸':'ㄕㄨ','入':'ㄖㄨˋ','再':'ㄗㄞˋ','讀':'ㄉㄨˊ',
+  '問':'ㄨㄣˋ','單':'ㄉㄢ','位':'ㄨㄟˋ','倍':'ㄅㄟˋ','用':'ㄩㄥˋ','乘':'ㄔㄥˊ','法':'ㄈㄚˇ','算':'ㄙㄨㄢˋ',
+  '記':'ㄐㄧˋ','作':'ㄗㄨㄛˋ','積':'ㄐㄧ','比':'ㄅㄧˇ','多':'ㄉㄨㄛ','說':'ㄕㄨㄛ','對':'ㄉㄨㄟˋ','出':'ㄔㄨ',
+  '就':'ㄐㄧㄡˋ','太':'ㄊㄞˋ','棒':'ㄅㄤˋ','成':'ㄔㄥˊ','選':'ㄒㄩㄢˇ','你':'ㄋㄧˇ','看':'ㄎㄢˋ','圖':'ㄊㄨˊ',
+  '正':'ㄓㄥˋ','往':'ㄨㄤˇ','確':'ㄑㄩㄝˋ','要':'ㄧㄠˋ','下':'ㄒㄧㄚˋ',
+};
 
 /* ---------- 小工具 ---------- */
 const $ = s => document.querySelector(s);
 const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 const rnd = (lo,hi) => lo + Math.floor(Math.random()*(hi-lo+1));
-const sameSet = (x,y) => x.length===y.length && x.every(v => y.includes(v));
+const pickOne = a => a[Math.floor(Math.random()*a.length)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---------- 儲存（只存在這台裝置；不記名字、不對外傳輸） ---------- */
 const store = {
   get(){ try{ const v = localStorage.getItem(STORE_KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } },
   set(v){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(v)); return true; }catch(e){ return false; } }
 };
-const blankPref = () => ({n:ROUND_N, cmax:COUNT_MAX, sound:true});
-const blank = () => ({app:'mulpic', ver:1, segs:null, rounds:0, done:0, clean:0, items:{}, pref:blankPref()});
+const blankPref = () => ({n:ROUND_N, sound:true, zy:true});
+const blank = () => ({app:'mulpic', ver:2, rounds:0, done:0, clean:0, pref:blankPref()});
 let P;
 function loadP(d){
-  P = Object.assign(blank(), d || {});
-  P.pref = Object.assign(blankPref(), P.pref || {});
-  if (P.segs) P.segs = P.segs.filter(s => SEGS.includes(s));
-  if (P.segs && !P.segs.length) P.segs = null;
+  d = d || {};
+  P = Object.assign(blank(), {rounds:d.rounds||0, done:d.done||0, clean:d.clean||0});
+  P.pref = Object.assign(blankPref(), d.pref || {});
   if (!ROUND_OPTS.includes(P.pref.n)) P.pref.n = ROUND_N;
-  if (P.pref.cmax===9) P.pref.cmax = 10;   /* v1.0 的「2～9 份」改成「1～10 份」 */
-  if (!COUNT_OPTS.includes(P.pref.cmax)) P.pref.cmax = COUNT_MAX;
-  if (!P.items || typeof P.items!=='object') P.items = {};
+  delete P.pref.cmax;
 }
 loadP(store.get());
 const save = () => store.set(P);
-const curSegs = () => P.segs || [];
-function segLabel(segs){
-  if (!segs || !segs.length) return '還沒選練習範圍';
-  if (sameSet(segs, SEGS)) return '全部（2～9的乘法）';
-  return SEGS.filter(s => segs.includes(s)).join('、') + '的乘法';
+
+/* ---------- 注音 ---------- */
+const MISSING = new Set();
+const isHan = ch => /[㐀-鿿]/.test(ch);
+function zyCol(py){
+  let light = false, tone = '';
+  if (py[0]==='˙'){ light = true; py = py.slice(1); }
+  const last = py[py.length-1];
+  if ('ˊˇˋ'.includes(last)){ tone = last; py = py.slice(0,-1); }
+  return `<span class="zr"><span class="zs">${light ? '<span class="zl">˙</span>' : ''}${[...py].map(c => `<span>${c}</span>`).join('')}</span>${tone ? `<span class="zt">${tone}</span>` : ''}</span>`;
 }
-/* ---------- 亮燈表的資料 ---------- */
-const keyOf = (a,b) => `${a}x${b}`;
-const stOf = id => (P.items[id] && P.items[id].s) || 'fresh';
-const isLit = s => s==='ok' || s==='super';
-const rangeItems = (segs, cmax) => { const out = []; segs.forEach(a => { for (let b=countLo(cmax);b<=cmax;b++) out.push({a, b, id:keyOf(a,b)}); }); return out; };
-const ALL80 = rangeItems(SEGS, MULT_MAX);
-const litOf = list => list.filter(it => isLit(stOf(it.id))).length;
-function tableHTML(){
-  let h = `<div class="gridt"><span class="hd"></span>`;
-  for (let b=1;b<=MULT_MAX;b++) h += `<span class="hd">×${b}</span>`;
-  SEGS.forEach(a => {
-    h += `<span class="hd rh">${a}</span>`;
-    for (let b=1;b<=MULT_MAX;b++){ const id = keyOf(a,b); h += `<span class="cell ${STATE[stOf(id)].cls}" data-id="${id}" title="${a}×${b}">${a}×${b}</span>`; }
-  });
-  return `<div class="tbl"><h3>亮燈表　<span class="dim">點亮 ${litOf(ALL80)}/${ALL80.length}</span></h3>${h}</div></div>`;
+function zy(str){
+  str = String(str);
+  if (!P.pref.zy) return esc(str);
+  const ch = [...str]; let out = '';
+  for (let i=0;i<ch.length;){
+    let hit = null;
+    for (let L=3;L>=2 && !hit;L--){ const w = ch.slice(i,i+L).join(''); if (w.length===L && WORDS[w]) hit = [w, WORDS[w].split(' ')]; }
+    if (hit){
+      [...hit[0]].forEach((c,k) => out += `<span class="zc">${c}${zyCol(hit[1][k])}</span>`);
+      i += [...hit[0]].length; continue;
+    }
+    const c = ch[i];
+    if (isHan(c)){
+      if (ZY[c]) out += `<span class="zc">${c}${zyCol(ZY[c])}</span>`;
+      else { MISSING.add(c); out += c; }
+    } else out += esc(c);
+    i++;
+  }
+  return out;
 }
-const legendHTML = () => `<div class="legend">${Object.keys(STATE).map(k => `<span><i class="cell ${STATE[k].cls}" style="min-height:0"></i>${STATE[k].name}</span>`).join('')}</div>`;
-const segShort = segs => sameSet(segs, SEGS) ? '全部' : SEGS.filter(s => segs.includes(s)).join('、') + '的乘法';
+/* 文字裡的數字用 {數字}，會換成醒目的數字 */
+const T = s => String(s).split(/(\{[^}]*\})/).map(p => p[0]==='{' ? `<span class="n">${esc(p.slice(1,-1))}</span>` : zy(p)).join('');
 
 /* ---------- 聲音 ---------- */
 const Sound = {
@@ -372,6 +398,8 @@ function show(name){
   screen = name;
   document.querySelectorAll('[data-screen]').forEach(s => s.hidden = s.dataset.screen!==name);
   $('#homeBtn').hidden = name==='home';
+  $('#backBtn').hidden = name!=='home';
+  document.body.classList.toggle('zy-on', !!P.pref.zy);
   if (name==='home') renderHome();
 }
 $('#homeBtn').addEventListener('click', () => { G = null; show('home'); });
@@ -379,188 +407,256 @@ $('#homeBtn').addEventListener('click', () => { G = null; show('home'); });
 /* ---------- 畫圖：b 份，每份 a 個 ---------- */
 function picHTML(a, b, th){
   const cols = a <= ROW_MAX ? a : Math.ceil(a/2);
-  const e = b > 8 && a > 5 ? 'clamp(14px,2.8vmin,24px)' : b > 6 ? 'clamp(16px,3.3vmin,28px)' : a > 6 || b > 4 ? 'clamp(20px,4.2vmin,34px)' : 'clamp(24px,5.4vmin,44px)';
+  const e = b > 6 ? 'clamp(16px,3.3vmin,28px)' : a > 6 || b > 4 ? 'clamp(20px,4.2vmin,34px)' : 'clamp(24px,5.4vmin,44px)';
   let h = '';
   for (let k=0;k<b;k++){
     h += `<div class="box ${th.cls}" data-box="${k}" style="grid-template-columns:repeat(${cols},auto);--e:${e}">`;
     for (let i=0;i<a;i++) h += `<span class="it">${th.e}</span>`;
     h += '</div>';
   }
-  return h;
+  return `<div class="pic" id="gPic">${h}</div>`;
 }
-/* 提示用：把第一份裡的東西編號，或把每一份編號 */
 function markItems(){ const bx = document.querySelector('#gPic .box'); if (!bx) return; bx.classList.add('hl'); bx.querySelectorAll('.it').forEach((it,i) => { if (!it.querySelector('.no')) it.insertAdjacentHTML('beforeend', `<span class="no">${i+1}</span>`); }); }
 function markBoxes(){ document.querySelectorAll('#gPic .box').forEach((bx,i) => { if (!bx.querySelector(':scope>.no')) bx.insertAdjacentHTML('beforeend', `<span class="no">${i+1}</span>`); }); }
+function markAddends(){ document.querySelectorAll('#gPrompt .ad').forEach((s,i) => { if (!s.querySelector('.no')) s.insertAdjacentHTML('beforeend', `<span class="no">${i+1}</span>`); }); }
 
 /* ---------- 首頁 ---------- */
 function segHTML(key, opts, cur){
   return `<div class="seg">${opts.map(([v,t]) => `<button type="button" class="${String(v)===String(cur)?'on':''}" data-pref="${key}" data-v="${v}">${t}</button>`).join('')}</div>`;
 }
 function renderHome(){
-  const segs = curSegs(), pf = P.pref;
-  const list = rangeItems(segs, pf.cmax), lit = litOf(list);
+  const pf = P.pref;
   $('#home').innerHTML = `<div class="home">
     <div class="card">
-      <div class="hello">看圖說一說，再寫出乘法算式！</div>
-      <h2 class="range-name">${segLabel(segs)}</h2>
-      ${segs.length ? `<div class="lit"><div class="lit-txt">這次的範圍（${countLo(pf.cmax)}～${pf.cmax} 份）${list.length} 格，已經點亮 <b>${lit}</b> 格</div><div class="bar"><i style="width:${Math.round(lit/list.length*100)}%"></i></div></div>` : ''}
+      <div class="hello">選一種題型來練習！</div>
       <div class="modes">
-        <button class="mode" type="button" id="hStart"><span class="ic">🍎</span><span>開始練習<small>${segs.length ? '看圖填空格，再列出乘法算式。不用算出答案，一次就答對就能點亮一格！' : '先選這次要練習的範圍。'}</small></span></button>
-        <div class="row"><button class="btn" type="button" id="hRange">📋 選擇練習範圍</button></div>
+        ${TYPES.map(t => `<button class="mode" type="button" data-type="${t.id}"><span class="ic">${t.ic}</span><span>${t.name}<small>${t.d}</small></span></button>`).join('')}
+        <button class="mode mix" type="button" data-type="mix"><span class="ic">🎲</span><span>綜合練習<small>四種題型混在一起</small></span></button>
         ${P.done ? `<p class="dim">已經練了 ${P.done} 題，一次就答對 ${P.clean} 題</p>` : ''}
       </div>
       <div class="mine"><h3>我的練習設定</h3>
         <div class="pref-row"><span>每局</span>${segHTML('n', ROUND_OPTS.map(n => [n, n+' 題']), pf.n)}</div>
-        <div class="pref-row"><span>有幾份</span>${segHTML('cmax', COUNT_OPTS.map(n => [n, countLo(n)+'～'+n+' 份']), pf.cmax)}</div>
+        <div class="pref-row"><span>注音</span>${segHTML('zy', [[1,'開'],[0,'關']], pf.zy?1:0)}</div>
         <div class="pref-row"><span>聲音</span>${segHTML('sound', [[1,'開'],[0,'關']], pf.sound?1:0)}</div>
       </div>
+    </div>
+    <div class="card learn">
+      <h3>怎麼列式？</h3>
+      <div class="pic">${picHTML(4, 3, PIC_THINGS[0]).replace(' id="gPic"','')}</div>
+      <p class="say" style="margin-top:10px">${T('1 盤有 ')}<b>4</b>${T(' 個，有 ')}<b>3</b>${T(' 盤')}<br><b>4</b>${T(' 個一數，數了 ')}<b>3</b>${T(' 次')}</p>
+      <p class="eqx"><span class="tA">4</span> × <span class="tB">3</span> ＝ <span class="tC">12</span></p>
+      <div class="terms">
+        <span class="tA">4</span><span>被乘數：1 盤有幾個（每一份一樣多）</span>
+        <span class="tB">3</span><span>乘數：有幾盤（數了幾次）</span>
+        <span class="tC">12</span><span>積：一共有幾個</span>
+      </div>
+      <p class="say" style="margin-top:6px">${T('答：')}<b>12</b>${T(' 個')}</p>
+      <p class="dim" style="margin-top:4px">4 的 3 倍，寫成 4×3。答案的單位要看題目問什麼：問「幾個蘋果」，單位就是「個」，不是「盤」。</p>
       <div class="mine"><h3>會列式了嗎？</h3>
         <a class="mode" href="mul.html"><span class="ic" style="font:600 30px var(--f-num)">×</span><span>去「乘法小練習」點燈<small>練習算出答案，把 2～9的乘法一格一格點亮。</small></span></a>
       </div>
     </div>
-    <div class="rcol">
-    <div class="card" id="hTable">${tableHTML()}${legendHTML()}</div>
-    <div class="card learn">
-      <h3>怎麼看圖列式？</h3>
-      <div class="pic">${picHTML(4, 3, THINGS[0])}</div>
-      <p class="say" style="margin-top:10px">1 盤有 <b>4</b> 個，有 <b>3</b> 盤<br><b>4</b> 個一數，數了 <b>3</b> 次</p>
-      <p class="eqx">列式：<span class="tA">4</span> × <span class="tB">3</span></p>
-      <div class="terms">
-        <span class="tA">4</span><span>被乘數：1 盤有幾個（每一份一樣多）</span>
-        <span class="tB">3</span><span>乘數：有幾盤（數了幾次）</span>
-      </div>
-      <p class="dim" style="margin-top:8px">4 的 3 倍，寫成 4×3。× 前面寫「1 份有幾個」，× 後面寫「有幾份」。</p>
-    </div>
-    </div>
   </div>`;
 }
 $('#home').addEventListener('click', e => {
-  if (e.target.closest('#hStart')) return curSegs().length ? startRound() : openPicker();
-  if (e.target.closest('#hRange')) return openPicker();
+  const t = e.target.closest('[data-type]'); if (t) return startRound(t.dataset.type);
   const b = e.target.closest('[data-pref]'); if (!b) return;
   const k = b.dataset.pref, v = b.dataset.v, pf = P.pref;
   if (k==='n') pf.n = +v;
-  else if (k==='cmax') pf.cmax = +v;
+  else if (k==='zy'){ pf.zy = v==='1'; document.body.classList.toggle('zy-on', pf.zy); }
   else if (k==='sound'){ Sound.init(); pf.sound = v==='1'; Sound.muted = !pf.sound; }
   save(); renderHome();
 });
 
-/* ---------- 選擇練習範圍：1 份有幾個（2～9） ---------- */
-let pick = null;
-function openPicker(){ pick = curSegs().slice(); renderPicker(); $('#pickCover').hidden = false; }
-function renderPicker(){
-  $('#picker').innerHTML = `
-    <div class="pk-head"><h2>這次要練哪些？</h2>${P.segs ? '<button class="btn sm" type="button" id="pkCancel">取消</button>' : ''}</div>
-    <button type="button" class="btn sm ${sameSet(pick,SEGS)?'primary':''}" data-all="1" style="justify-self:start">全部一起練</button>
-    <div class="chips"><div class="cl">亮起來的就是這次要練的。例如選「3的乘法」，圖上每一份都是 3 個。</div>
-      <div class="chipgrid">${SEGS.map(v => `<button type="button" class="segchip ${pick.includes(v)?'on':''}" data-seg="${v}">${v}的乘法</button>`).join('')}</div></div>
-    <div class="row" style="justify-content:space-between">
-      <span class="dim">${pick.length ? '已選：' + segLabel(pick) : '請至少選一個乘法'}</span>
-      <button class="btn primary" type="button" id="pkOk" ${pick.length?'':'disabled'}>就練這些</button>
-    </div>`;
-}
-$('#picker').addEventListener('click', e => {
-  if (e.target.closest('#pkCancel')){ $('#pickCover').hidden = true; return; }
-  if (e.target.closest('#pkOk')){
-    if (!pick.length) return;
-    P.segs = SEGS.filter(v => pick.includes(v)); save();
-    $('#pickCover').hidden = true; renderHome(); return;
-  }
-  if (e.target.closest('[data-all]')){ pick = SEGS.slice(); return renderPicker(); }
-  const c = e.target.closest('[data-seg]');
-  if (c){ const v = +c.dataset.seg, i = pick.indexOf(v); if (i>=0) pick.splice(i,1); else pick.push(v); renderPicker(); }
-});
+/* =====================================================================
+   出題：每一題＝題目（圖或文字）＋幾行填空，一行一行做
+   行裡的東西：字串（會加注音；{5} 是數字）、{k:'n'} 數字格、{k:'u'} 單位按鈕、{k:'show'} 直接顯示的數
+   ===================================================================== */
+const NUM = (want, max) => ({k:'n', want, max});
+const UNIT = (want, opts) => ({k:'u', want, opts});
+const SHOW = v => ({k:'show', v});
+const X = {k:'x'};
+const unitOpts = (u, c) => shuffle([u, c]);
+const addExpr = (a, b) => Array(b).fill(a).join('＋');
+const revealTxt = (q, k) => q.keys[k].k==='u' ? `「${q.keys[k].want}」` : String(q.keys[k].want);
 
-/* ---------- 出題：每一題＝一張圖＋句子填空＋列式 ---------- */
-function buildRound(){
-  const segs = curSegs(), n = P.pref.n, cmax = P.pref.cmax;
-  const all = rangeItems(segs, cmax);
-  /* 先出還沒點亮的：不熟／練習中、還沒練過、熟練，各約 1/3；超熟練的最後才補 */
-  const by = {weak:[], fresh:[], ok:[], super:[]};
-  shuffle(all.slice()).forEach(it => { const s = stOf(it.id); (s==='weak'||s==='learn' ? by.weak : by[s]).push(it); });
-  by.weak.sort((x,y) => (stOf(x.id)==='weak'?0:1) - (stOf(y.id)==='weak'?0:1));
-  const k = Math.ceil(n/3), first = [];
-  const take = (arr,c) => { while (c-- > 0 && arr.length && first.length < n) first.push(arr.shift()); };
-  take(by.weak, k); take(by.fresh, k); take(by.ok, n - 2*k);
-  [by.weak, by.fresh, by.ok, by.super].forEach(arr => take(arr, n));
-  let pool = shuffle(first), list = [];
-  while (list.length < n){
-    if (!pool.length) pool = shuffle(all.slice());
-    const last = list.length ? list[list.length-1] : null;
-    let k = pool.findIndex(q => !last || (q.a!==last.a && q.b!==last.a));   /* 同一個乘法不連著出；也避免把上一題的答案放反 */
-    if (k < 0) k = 0;
-    list.push(pool.splice(k,1)[0]);
-  }
-  /* 兩種說法各一半：A「1 盤有幾個，有幾盤」、B「幾個一數，數了幾次」 */
-  const kinds = shuffle(list.map((_,i) => i%2 ? 'B' : 'A'));
-  let th = shuffle(THINGS.slice()), ti = 0;
-  return list.map((q,i) => ({a:q.a, b:q.b, id:q.id, kind:kinds[i], th:th[ti++ % th.length], miss:false}));
+function makePic(a, b){
+  const th = pickOne(PIC_THINGS), kind = Math.random() < .5 ? 'A' : 'B', ab = a*b;
+  const front = kind==='A' ? `1 ${th.c}有幾${th.u}` : `幾${th.u}一數`, back = kind==='A' ? `有幾${th.c}` : '數了幾次';
+  const sent = kind==='A'
+    ? [`1 ${th.c}有`, NUM(a,1), `${th.u}，有`, NUM(b,1), th.c]
+    : [NUM(a,1), `${th.u}一數，數了`, NUM(b,1), '次'];
+  return {type:'pic', a, b, label:`${a}×${b}＝${ab}`,
+    prompt: picHTML(a, b, th) + `<div class="ask">${T(`一共有幾${th.u}${th.n}？`)}</div>`,
+    lines: [
+      {toks: sent, hint(bad){
+        const tips = [];
+        if (bad.includes(0)){ markItems(); tips.push(kind==='A' ? `請你數一下，1 ${th.c}裡有幾${th.u}？` : `幾${th.u}一數？請你數一下 1 ${th.c}裡有幾${th.u}`); }
+        if (bad.includes(1)){ markBoxes(); tips.push(kind==='A' ? `請你數一下，一共有幾${th.c}？` : `1 ${th.c}數一次，數了幾次？`); }
+        return tips.join('　');
+      }},
+      formulaLine(a, b, front, back),
+      answerLine(ab, th.u, th.c, th.n),
+    ],
+    sum: `{${a}} ${th.u}一數，數了 {${b}} 次，就是 {${a}} 的 {${b}} 倍，寫成 {${a}×${b}＝${ab}}`};
 }
-function startRound(){
-  if (!curSegs().length) return openPicker();
-  const snap = {}; ALL80.forEach(it => snap[it.id] = stOf(it.id));
-  G = {q:buildRound(), i:0, snap, litBefore:litOf(ALL80)};
+function makeWord(a, b){
+  const c = pickOne(WORD_CTX), who = pickOne(PEOPLE), ab = a*b, kind = Math.random() < .5 ? 1 : 2;
+  const extra = c.cn===c.n ? '' : c.n;          /* 魚缸裡的「魚」 */
+  const text = kind===1
+    ? `一${c.c}${c.cn}有 {${a}} ${c.u}${extra}，${who}${c.v} {${b}} ${c.c}${extra ? c.cn : ''}，共有幾${c.u}${c.n}？`
+    : `${who}有 {${b}} ${c.c}${c.cn}，每${c.c}${c.cn}有 {${a}} ${c.u}${extra}，${who}共有幾${c.u}${c.n}？`;
+  return {type:'word', a, b, label:`${a}×${b}＝${ab}`,
+    prompt: `<div class="story"><span class="em">${c.e}</span><div class="ask">${T(text)}</div></div>`,
+    lines: [ formulaLine(a, b, `每${c.c}有幾${c.u}`, `有幾${c.c}`), answerLine(ab, c.u, c.c, c.n) ],
+    sum: `每${c.c}有 {${a}} ${c.u}，有 {${b}} ${c.c}，就是 {${a}} 的 {${b}} 倍，寫成 {${a}×${b}＝${ab}}，答：{${ab}} ${c.u}`};
+}
+function makeAdd(a, b){
+  const ab = a*b;
+  return {type:'add', a, b, label:`${addExpr(a,b)}＝${ab}`,
+    prompt: `<div class="bigeq">${Array(b).fill(`<span class="ad">${a}</span>`).join('<span>＋</span>')}<span>＝${ab}</span></div>`,
+    lines: [
+      {toks:['一共有', NUM(b,1), `個 {${a}} 相加`], hint(){ markAddends(); return `請你數一下，有幾個 {${a}}？`; }},
+      {toks:[`是 {${a}} 的`, NUM(b,1), '倍'], hint(){ return `有幾個 {${a}} 相加，就是 {${a}} 的幾倍`; }},
+      {toks:['用乘法算式記作：', NUM(a,1), X, NUM(b,1), '＝', NUM(ab,2)], terms:true, hint(bad, q, vals){
+        const ks = q.lineKeys[2];
+        if (+vals[ks[0]]===b && +vals[ks[1]]===a && a!==b) return `前後放反了！× 前面寫 {${a}}，× 後面寫有幾個 {${a}}`;
+        if (bad.includes(ks[2]) && bad.length===1) return `${addExpr(a,b)}＝{${ab}}`;
+        return `× 前面寫 {${a}}，× 後面寫有幾個 {${a}}`;
+      }},
+    ],
+    sum: `{${b}} 個 {${a}} 相加，就是 {${a}} 的 {${b}} 倍，寫成 {${a}×${b}＝${ab}}`};
+}
+function makeTerm(a, b){
+  const ab = a*b;
+  if (b >= 3 && Math.random() < .4){
+    /* 4×6 比 4×5 多了幾個 4，是多幾 */
+    return {type:'term', a, b, label:`${a}×${b} 比 ${a}×${b-1}`,
+      prompt: `<div class="bigeq"><span>${a}×${b}</span><span style="font-size:.6em;align-self:center">${zy('比')}</span><span>${a}×${b-1}</span></div>`,
+      lines: [{toks:[`{${a}×${b}} 比 {${a}×${b-1}} 多了`, NUM(1,1), `個 {${a}}，是多`, NUM(a,1)], hint(){
+        return `{${a}×${b}} 是 {${b}} 個 {${a}}，{${a}×${b-1}} 是 {${b-1}} 個 {${a}}`; }}],
+      sum: `{${a}×${b}} 比 {${a}×${b-1}} 多了 {1} 個 {${a}}，是多 {${a}}`};
+  }
+  return {type:'term', a, b, label:`${a}×${b}＝${ab}`,
+    prompt: `<div class="bigeq"><span class="tA">${a}</span><span>×</span><span class="tB">${b}</span><span>＝</span><span class="tC">${ab}</span></div>`,
+    lines: [{toks:['被乘數是', NUM(a,1), '，乘數是', NUM(b,1), '，積是', NUM(ab,2)], hint(){
+      return '× 前面是被乘數，× 後面是乘數，＝ 後面是積'; }}],
+    sum: `{${a}×${b}＝${ab}}：被乘數是 {${a}}，乘數是 {${b}}，積是 {${ab}}`};
+}
+function formulaLine(a, b, front, back){
+  const ab = a*b;
+  return {toks:['列式：', NUM(a,1), X, NUM(b,1), '＝', NUM(ab,2)], terms:true, hint(bad, q, vals){
+    const ks = q.lineKeys[q.step];
+    if (+vals[ks[0]]===b && +vals[ks[1]]===a && a!==b) return `前後放反了！× 前面寫「${front}」，× 後面寫「${back}」`;
+    if (bad.includes(ks[0]) || bad.includes(ks[1])) return `再讀一次題目：× 前面寫「${front}」，× 後面寫「${back}」`;
+    return `把 {${b}} 個 {${a}} 相加：${addExpr(a,b)}＝？`;
+  }};
+}
+function answerLine(ab, u, c, n){
+  return {toks:['答：', SHOW(ab), UNIT(u, unitOpts(u, c))], hint(bad, q){
+    const k = q.lineKeys[q.step][0];
+    return G.wrong[k] >= 2 ? `答案的單位是「${u}」` : `再讀一次題目：問的是「幾${u}${n}」`;
+  }};
+}
+const MAKERS = {pic:makePic, word:makeWord, add:makeAdd, term:makeTerm};
+
+function buildRound(type){
+  const n = P.pref.n, list = [], seen = new Set();
+  const types = type==='mix' ? shuffle(Array.from({length:n}, (_,i) => TYPES[i % TYPES.length].id)) : Array(n).fill(type);
+  types.forEach(t => {
+    let a, b, tries = 0, key;
+    do {
+      a = rnd(A_MIN, A_MAX);
+      b = t==='term' ? rnd(2, 9) : rnd(B_MIN, t==='add' ? B_MAX+1 : B_MAX);
+      key = t + a + 'x' + b; tries++;
+    } while ((seen.has(key) || (list.length && list[list.length-1].a===a)) && tries < 30);
+    seen.add(key);
+    const q = MAKERS[t](a, b);
+    /* 每一格編號 */
+    q.keys = []; q.lineKeys = q.lines.map(L => L.toks.filter(x => x.k==='n' || x.k==='u').map(x => (q.keys.push(x), q.keys.length-1)));
+    q.miss = false;
+    list.push(q);
+  });
+  return list;
+}
+const TYPE_NAME = id => id==='mix' ? '綜合練習' : TYPES.find(t => t.id===id).name;
+function startRound(type){
+  G = {q:buildRound(type), i:0, type};
   show('game');
-  $('#gMode').textContent = '🍎 ' + segShort(curSegs());
+  $('#gMode').textContent = (type==='mix' ? '🎲 ' : TYPES.find(t => t.id===type).ic + ' ') + TYPE_NAME(type);
   nextQ();
 }
 function renderDots(){
   $('#gDots').innerHTML = G.q.map((e,i) => `<i class="${i<G.i ? (e.miss?'miss':'done') : i===G.i ? 'now' : ''}"></i>`).join('');
 }
-
-/* 每一題有兩步：step 0 填句子（2 格）、step 1 列式（2 格） */
 function nextQ(){
   if (!G) return;
   if (G.i >= G.q.length) return endRound();
-  const q = G.q[G.i];
-  q.lo = countLo(P.pref.cmax);
-  G.cur = q; G.step = 0; G.vals = ['','','','']; G.focus = 0; G.wrong = [0,0,0,0]; G.lock = false; G.state = ['','','',''];
-  $('#gPic').innerHTML = picHTML(q.a, q.b, q.th);
-  $('#gMsg').textContent = ''; $('#gMsg').className = 'msg'; $('#gSum').hidden = true; $('#gFx').hidden = true;
+  const q = G.cur = G.q[G.i];
+  q.step = 0;
+  const nk = q.keys.length;
+  G.vals = Array(nk).fill(''); G.state = Array(nk).fill(''); G.wrong = Array(nk).fill(0); G.lock = false;
+  G.focus = q.lineKeys[0][0];
+  $('#gPrompt').innerHTML = q.prompt;
+  $('#gMsg').textContent = ''; $('#gMsg').className = 'msg'; $('#gSum').hidden = true;
+  $('#gCard').scrollTop = 0;
   renderLines(); renderDots(); updGo();
 }
-/* 每一格的正確答案：0＝1 份幾個、1＝有幾份、2＝被乘數、3＝乘數 */
-const want = k => [G.cur.a, G.cur.b, G.cur.a, G.cur.b][k];
-function blankHTML(k){
-  const st = G.state[k], active = G.step===(k<2?0:1) && st!=='ok';
-  const v = G.vals[k] ? G.vals[k] : (active && G.focus===k ? '<span class="cur"></span>' : '');
-  const cls = st || (active && G.focus===k ? 'focus' : '');
-  return `<button type="button" class="bl ${cls}" data-bl="${k}" ${active?'':'disabled'}>${v}</button>`;
+function lineHTML(q, li){
+  const L = q.lines[li], active = li===q.step && !G.lock, done = li < q.step || (G.lock && li===q.step);
+  let h = '', nth = 0;
+  L.toks.forEach(t => {
+    if (typeof t==='string'){ h += `<span>${T(t)}</span>`; return; }
+    if (t.k==='x'){ h += '<span class="x">×</span>'; return; }
+    if (t.k==='show'){ h += `<span class="shown">${li <= q.step ? t.v : '？'}</span>`; return; }
+    const k = q.lineKeys[li][nth++], st = G.state[k], can = active && st!=='ok';
+    if (t.k==='u'){
+      h += `<span class="units">${t.opts.map(u => {
+        const on = G.vals[k]===u, cls = on ? (st || 'on') : '';
+        return `<button type="button" class="ub ${cls}" data-u="${k}" data-v="${u}" ${can?'':'disabled'}>${zy(u)}</button>`;
+      }).join('')}</span>`;
+      return;
+    }
+    const v = G.vals[k] ? G.vals[k] : (can && G.focus===k ? '<span class="cur"></span>' : '');
+    const cls = st || (can && G.focus===k ? 'focus' : '');
+    const btn = `<button type="button" class="bl ${cls}" data-bl="${k}" ${can?'':'disabled'}>${v}</button>`;
+    /* 列式答對後，下面標出被乘數、乘數、積 */
+    if (L.terms && done){ const nm = [['被乘數','tA'],['乘數','tB'],['積','tC']][nth-1]; h += `<span class="slot">${btn}<span class="term ${nm[1]}">${zy(nm[0])}</span></span>`; }
+    else h += btn;
+  });
+  return `<div class="line ${li > q.step ? 'wait' : ''}">${h}</div>`;
 }
 function renderLines(){
-  const q = G.cur, u = q.th.u;
-  const s1 = q.kind==='A'
-    ? `<span>1 ${u}有</span>${blankHTML(0)}<span>個，有</span>${blankHTML(1)}<span>${u}</span>`
-    : `${blankHTML(0)}<span>個一數，數了</span>${blankHTML(1)}<span>次</span>`;
-  const done = G.step===1 && G.state[2]==='ok';
-  const t = (k, txt, c) => `<span class="slot">${blankHTML(k)}${done ? `<span class="term ${c}">${txt}</span>` : ''}</span>`;
-  const s2 = `<span class="lab">列式</span>${t(2,'被乘數','tA')}<span class="x">×</span>${t(3,'乘數','tB')}`;
-  $('#gLines').innerHTML = `<div class="line">${s1}</div><div class="line ${G.step===0?'wait':''}">${s2}</div>`;
+  const q = G.cur;
+  $('#gLines').innerHTML = q.lines.map((_,li) => li <= q.step + 1 ? lineHTML(q, li) : '').join('');
 }
 $('#gLines').addEventListener('click', e => {
-  const b = e.target.closest('[data-bl]'); if (!b || b.disabled || G.lock) return;
+  if (!G || G.lock) return;
+  const u = e.target.closest('[data-u]');
+  if (u && !u.disabled){ const k = +u.dataset.u; G.vals[k] = u.dataset.v; if (G.state[k]==='no') G.state[k] = ''; G.focus = k; Sound.tap(); renderLines(); updGo(); return; }
+  const b = e.target.closest('[data-bl]'); if (!b || b.disabled) return;
   G.focus = +b.dataset.bl; Sound.tap(); renderLines();
 });
-const stepKeys = () => G.step===0 ? [0,1] : [2,3];
+const stepKeys = () => G.cur.lineKeys[G.cur.step];
 function updGo(){ document.querySelector('.pad .go').disabled = !G || G.lock || !stepKeys().every(k => G.vals[k] || G.state[k]==='ok'); }
 function press(k){
   if (!G || G.lock || screen!=='game') return;
   Sound.tap();
-  const keys = stepKeys();
+  const q = G.cur, keys = stepKeys();
   if (k==='go') return submit();
+  const f = G.focus, tok = q.keys[f];
   if (k==='del'){
-    if (G.vals[G.focus] && G.state[G.focus]!=='ok') G.vals[G.focus] = '';
-    else { const prev = keys.filter(x => x < G.focus && G.state[x]!=='ok').pop(); if (prev!=null){ G.focus = prev; G.vals[prev] = ''; } }
+    if (tok && tok.k==='n' && G.vals[f] && G.state[f]!=='ok') G.vals[f] = '';
+    else { const prev = keys.filter(x => x < f && G.state[x]!=='ok' && q.keys[x].k==='n').pop(); if (prev!=null){ G.focus = prev; G.vals[prev] = ''; } }
   } else {
-    /* 乘數（有幾份）在「1～10 份」時可能是兩位數：先按 1 會停在這一格，可以再按 0 變成 10 */
-    const f = G.focus, two = (f===1 || f===3) && G.cur.lo===1;
+    if (!tok || tok.k!=='n' || G.state[f]==='ok') return;
+    /* 兩位數的格子（積）：可以連按兩個數字；一位數的格子按了就跳到下一格 */
     let v = G.vals[f];
-    if (two && v==='1' && G.state[f]!=='no') v = v + k;
-    else v = k;
-    if (v==='0') return;                       /* 不能只填 0 */
-    G.vals[f] = v; G.state[f] = G.state[f]==='no' ? '' : G.state[f];
-    if (!(two && v==='1')){
-      const next = keys.find(x => x > f && G.state[x]!=='ok' && !G.vals[x]);
+    v = (tok.max > 1 && v.length===1 && G.state[f]!=='no') ? v + k : k;
+    if (v==='0') return;
+    G.vals[f] = v; if (G.state[f]==='no') G.state[f] = '';
+    if (v.length >= tok.max){
+      const next = keys.find(x => x > f && G.state[x]!=='ok' && !G.vals[x] && q.keys[x].k==='n');
       if (next!=null) G.focus = next;
     }
   }
@@ -580,67 +676,40 @@ document.addEventListener('keydown', e => {
 function submit(){
   const q = G.cur, keys = stepKeys();
   if (!keys.every(k => G.vals[k])) return;
-  const bad = keys.filter(k => +G.vals[k] !== want(k));
+  const ok = k => q.keys[k].k==='u' ? G.vals[k]===q.keys[k].want : +G.vals[k]===q.keys[k].want;
+  const bad = keys.filter(k => !ok(k));
   keys.forEach(k => { G.state[k] = bad.includes(k) ? 'no' : 'ok'; });
   if (!bad.length) return stepDone();
 
   q.miss = true; Sound.soft();
-  const m = $('#gMsg'); m.className = 'msg bad';
-  const u = q.th.u;
-  if (G.step===0){
-    bad.forEach(k => G.wrong[k]++);
-    const tips = [];
-    if (bad.includes(0)){
-      markItems();
-      tips.push(q.kind==='A' ? `數數看，1 ${u}裡有幾個？` : `幾個一數？數數看 1 ${u}裡有幾個`);
-    }
-    if (bad.includes(1)){
-      markBoxes();
-      tips.push(q.kind==='A' ? `數數看，一共有幾${u}？` : `1 ${u}數一次，數了幾次？`);
-    }
-    const reveal = bad.filter(k => G.wrong[k] >= 2);
-    m.textContent = tips.join('　') + (reveal.length ? `（答案是 ${reveal.map(want).join('、')}，輸入看看）` : '');
-  } else {
-    const swapped = +G.vals[2]===q.b && +G.vals[3]===q.a && q.a!==q.b;
-    bad.forEach(k => G.wrong[k]++);
-    const front = q.kind==='A' ? `1 ${u}有幾個` : '幾個一數', back = q.kind==='A' ? `有幾${u}` : '數了幾次';
-    m.textContent = swapped
-      ? `前後放反了！× 前面寫「${front}」，× 後面寫「${back}」`
-      : `看看上面的句子：× 前面寫「${front}」，× 後面寫「${back}」`;
-    if (bad.some(k => G.wrong[k] >= 2)) m.textContent += `（列式是 ${q.a}×${q.b}）`;
-  }
-  /* 錯的格子清空，游標放到第一個錯的格子 */
-  bad.forEach(k => G.vals[k] = '');
+  bad.forEach(k => G.wrong[k]++);
+  const vals = G.vals.slice();
+  let tip = q.lines[q.step].hint(bad, q, vals) || '';
+  const reveal = bad.filter(k => G.wrong[k] >= 2 && q.keys[k].k==='n');
+  if (reveal.length) tip += `（正確答案是 {${reveal.map(k => revealTxt(q,k)).join('、')}}，請輸入）`;
+  const m = $('#gMsg'); m.className = 'msg bad'; m.innerHTML = T(tip);
+  /* 錯的數字格清空，游標放到第一個錯的格子；單位按鈕保留紅色 */
+  bad.forEach(k => { if (q.keys[k].k==='n') G.vals[k] = ''; });
   G.focus = bad[0];
   renderLines(); updGo();
 }
 function stepDone(){
   const q = G.cur, m = $('#gMsg');
-  if (G.step===0){
+  if (q.step < q.lines.length - 1){
     Sound.good();
-    G.step = 1; G.focus = 2;
-    m.className = 'msg good'; m.textContent = '說對了！再寫出乘法算式';
+    q.step++; G.focus = q.lineKeys[q.step][0];
+    m.className = 'msg good'; m.innerHTML = T('答對了！再往下寫');
     document.querySelectorAll('#gPic .box').forEach(bx => bx.classList.remove('hl'));
     renderLines(); updGo(); return;
   }
   G.lock = true;
   renderLines(); updGo();
-  P.done++; if (!q.miss) P.clean++;
-  const r = P.items[q.id] || (P.items[q.id] = {s:'fresh', seen:0, wrong:0, at:0});
-  const before = r.s;
-  r.seen++; r.at = Date.now();
-  if (q.miss){ r.wrong++; r.s = 'weak'; } else r.s = NEXT_CLEAN[before] || 'ok';
-  save();
-  m.className = 'msg good'; m.textContent = q.miss ? '答對了！' : '一次就答對，太棒了！';
-  const fx = $('#gFx');
-  if (!isLit(before) && isLit(r.s)){ fx.className = 'fx'; fx.textContent = `✨ 點亮 ${q.a}×${q.b}！`; fx.hidden = false; }
-  else if (before!=='super' && r.s==='super'){ fx.className = 'fx super'; fx.textContent = `🌟 ${q.a}×${q.b} 超熟練！`; fx.hidden = false; }
-  const N = n => `<span class="n">${n}</span>`;
-  $('#gSum').innerHTML = `${N(q.a)} 個一數，數了 ${N(q.b)} 次，就是 ${N(q.a)} 的 ${N(q.b)} 倍，寫成 ${N(q.a)}×${N(q.b)}`;
-  $('#gSum').hidden = false;
+  P.done++; if (!q.miss) P.clean++; save();
+  m.className = 'msg good'; m.innerHTML = T(q.miss ? '答對了！' : '一次就答對，太棒了！');
+  $('#gSum').innerHTML = T(q.sum); $('#gSum').hidden = false;
   q.miss ? Sound.good() : Sound.star();
   const g = G;
-  setTimeout(() => { if (G===g){ G.i++; nextQ(); } }, q.miss ? 2600 : 2000);
+  setTimeout(() => { if (G===g){ G.i++; nextQ(); } }, q.miss ? 3000 : 2400);
 }
 
 /* ---------- 結算：只和自己比 ---------- */
@@ -649,28 +718,21 @@ function endRound(){
   P.rounds++; save();
   Sound.win();
   const clean = g.q.filter(q => !q.miss).length;
-  const chip = q => `<span class="qchip ${q.miss?'miss':''}">${q.a}×${q.b}</span>`;
+  const chip = q => `<span class="qchip ${q.miss?'miss':''}">${esc(q.label)}</span>`;
   const miss = g.q.filter(q => q.miss);
-  const litAfter = litOf(ALL80), gain = litAfter - g.litBefore;
-  const ids = [...new Set(g.q.map(q => q.id))];
-  const schip = id => { const [a,b] = id.split('x'); return `<span class="qchip ${STATE[stOf(id)].cls}">${a}×${b}</span>`; };
-  const newly = ids.filter(id => !isLit(g.snap[id]) && isLit(stOf(id)));
   show('result');
   $('#result').innerHTML = `
-    <div class="r-top"><h2>🎉 練習完成！</h2><span class="trend">${gain > 0 ? `👍 這一局點亮了 ${gain} 格！` : '💪 再練一局，把燈點亮！'}</span></div>
-    <div class="lit" style="max-width:560px"><div class="lit-txt">亮燈表 ${ALL80.length} 格，已經點亮 <b>${litAfter}</b> 格</div><div class="bar"><i style="width:${Math.round(litAfter/ALL80.length*100)}%"></i></div></div>
+    <div class="r-top"><h2>🎉 練習完成！</h2><span class="chipm">${esc(TYPE_NAME(g.type))}</span></div>
     <div class="r-stats"><div>一次就答對<b>${clean}</b> / ${g.q.length} 題</div><div>累計練了<b>${P.done}</b> 題</div></div>
-    <div class="r-row"><b>這一局列出的算式：</b>${g.q.map(chip).join('')}</div>
+    <div class="r-row"><b>這一局的題目：</b>${g.q.map(chip).join('')}</div>
     ${miss.length ? `<div class="r-row"><b>🔍 要再想一想的：</b>${miss.map(chip).join('')}</div>` : '<div class="r-row"><b>每一題都一次就答對，太厲害了！</b></div>'}
-    ${newly.length ? `<div class="r-row"><b>✨ 新點亮：</b>${newly.map(schip).join('')}</div>` : ''}
-    <div class="r-tbl">${tableHTML()}${legendHTML()}</div>
-    <p class="dim">記得：× 前面寫「1 份有幾個」（被乘數），× 後面寫「有幾份」（乘數）。</p>
+    <p class="dim">記得：× 前面寫「1 份有幾個」（被乘數），× 後面寫「有幾份」（乘數）；答案的單位，看題目問的是「幾個什麼」。</p>
     <div class="row">
       <button class="btn primary" type="button" id="rAgain">再練一局</button>
-      <button class="btn" type="button" id="rHome">回首頁</button>
+      <button class="btn" type="button" id="rHome">換題型</button>
       <a class="btn" href="mul.html">去乘法小練習點燈</a>
     </div>`;
-  $('#rAgain').onclick = () => startRound();
+  $('#rAgain').onclick = () => startRound(g.type);
   $('#rHome').onclick = () => show('home');
 }
 
@@ -696,7 +758,6 @@ $('#clearYes').addEventListener('click', () => {
 });
 
 show('home');
-if (!P.segs) openPicker();
 </script>
 </body>
 </html>
