@@ -150,23 +150,22 @@ main>section{flex:1;min-height:0}
 @keyframes hop{to{transform:translateY(-8px)}}
 .win .cr{animation:hop .3s infinite alternate}
 
-/* 拔河 */
-.tugscene{background:linear-gradient(#BFE6FF 0 58%,#7BC86C 58%)}
-.tugline{position:absolute;top:30px;bottom:20px;width:8px;margin-left:-4px;border-radius:4px}
-.tugline span{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font:700 22px var(--f-body);white-space:nowrap;background:#fff;border:3px solid var(--ink);border-radius:8px;padding:0 8px}
-.tugmid{position:absolute;top:60px;bottom:20px;left:50%;width:0;border-left:6px dashed var(--ink);opacity:.5}
-.rope{position:absolute;left:50%;top:0;bottom:0;width:0;transition:transform .5s cubic-bezier(.3,1.5,.6,1)}
-.rope .line{position:absolute;top:186px;left:-1300px;width:2600px;height:16px;border-radius:8px;background:repeating-linear-gradient(60deg,#C8A06A 0 14px,#A27840 14px 22px);border:3px solid var(--ink)}
-.rope .ribbon{position:absolute;top:150px;left:-18px;width:36px;height:90px;background:var(--hl);border:4px solid var(--ink);border-radius:6px}
-.rope .pullers{position:absolute;top:118px;display:flex;gap:6px}
-.rope .pullers .p{width:120px;height:120px}
-.rope .pullers.left{right:150px}
-.rope .pullers.right{left:150px}
-.rope .pullers.right .p{transform:scaleX(-1)}
-.rope .pullers .p .cr{transform:rotate(-10deg)}
-.rope.tugL .pullers.left .p .cr,.rope.tugR .pullers.right .p .cr{animation:pull .5s}
-@keyframes pull{50%{transform:rotate(-22deg) translateX(-10px)}}
-.tugscore{position:absolute;top:14px;font:600 40px var(--f-num);background:#fff;border:4px solid var(--ink);border-radius:14px;padding:0 16px}
+/* 蓋高樓：每一方自己蓋一棟樓 */
+.zone.tw .zq{flex:none;height:178px;border-top:5px solid var(--ink)}
+.zone.tw .qline{font-size:104px}
+.zone.tw .zmsg{bottom:2px;font-size:24px;min-height:32px}
+.tower{flex:1;min-height:0;position:relative;overflow:hidden;background:linear-gradient(#9FD8FF,#E3F4FF)}
+.tower::before{content:"";position:absolute;left:8%;top:14%;width:120px;height:40px;border-radius:40px;background:#fff;opacity:.8;box-shadow:260px 60px 0 -6px #fff}
+.tower .gnd{position:absolute;left:0;right:0;bottom:0;height:30px;background:#7BC86C;border-top:4px solid var(--ink)}
+.tower .top{position:absolute;left:0;right:0;border-top:5px dashed var(--ink);z-index:1}
+.tower .top span{position:absolute;right:10px;top:-22px;font:700 24px var(--f-body);background:var(--hl);border:3px solid var(--ink);border-radius:10px;padding:0 10px}
+.floors{position:absolute;bottom:30px;left:50%;width:220px;margin-left:-110px;display:flex;flex-direction:column-reverse}
+.floor{height:var(--bh);background-color:var(--c);border:3px solid var(--ink);border-bottom-width:0;position:relative;animation:drop .35s cubic-bezier(.3,1.4,.6,1);
+  background-image:linear-gradient(90deg,transparent 18%,rgba(255,255,255,.75) 18% 32%,transparent 32% 43%,rgba(255,255,255,.75) 43% 57%,transparent 57% 68%,rgba(255,255,255,.75) 68% 82%,transparent 82%);background-size:100% 46%;background-position:0 50%;background-repeat:no-repeat}
+.floor:first-child{border-bottom-width:3px}
+.floor b{position:absolute;left:-46px;top:50%;transform:translateY(-50%);font:600 22px var(--f-num);color:var(--ink-soft)}
+@keyframes drop{from{transform:translateY(-160px);opacity:0}}
+.climber{position:absolute;left:50%;width:84px;height:84px;margin-left:-42px;transition:bottom .4s cubic-bezier(.3,1.4,.6,1);z-index:2}
 
 /* 遮罩（倒數、暫停） */
 .cover{position:absolute;inset:0;background:rgba(27,40,54,.55);display:grid;place-items:center;z-index:20;border-radius:22px}
@@ -202,7 +201,7 @@ main>section{flex:1;min-height:0}
 <body>
 <div id="stage">
   <header class="bar">
-    <div class="brand"><span class="tag">×</span><h1 id="title">乘法大屏對抗</h1><span class="ver">教師大屏 v1.0</span></div>
+    <div class="brand"><span class="tag">×</span><h1 id="title">乘法大屏對抗</h1><span class="ver">教師大屏 v1.1</span></div>
     <div class="spacer"></div>
     <div class="timer" id="timer" hidden>3:00</div>
     <button class="btn" id="soundBtn" type="button">🔊 聲音</button>
@@ -279,16 +278,18 @@ const GAMES = {
           goal:{label:'終點', unit:'題', opts:[10,15,20], def:15}, times:[120,180,300], defTime:180},
   meteor:{name:'乘法流星雨', desc:'各自守住自己的天空，時間到，打碎最多流星的贏！', ns:[2,3],
           goal:null, times:[60,90,120,180], defTime:90},
-  tug:   {name:'乘法拔河', desc:'兩邊比快，答對就把繩子拉過來一格，拉過線的贏！', ns:[2],
-          goal:{label:'拉過', unit:'格', opts:[5,7,9], def:7}, times:[120,180,300], defTime:180},
+  tower: {name:'乘法蓋高樓', desc:'答對一題蓋一層樓，先蓋到頂樓的贏！', ns:[2,3],
+          goal:{label:'樓層', unit:'層', opts:[10,15,20], def:15}, times:[120,180,300], defTime:180},
 };
 const LOCK_WRONG = 900;   // 答錯停幾毫秒
 const LOCK_SHOW = 1600;   // 錯 2 次公布答案停幾毫秒
 const LOCK_METEOR = 600;  // 流星雨按錯停幾毫秒
 
 /* ---------- 設定（記在這台電腦的瀏覽器） ---------- */
-const S = {game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], goal:{race:15, tug:7}, time:{race:180, meteor:90, tug:180}, names:['','',''], sound:true};
+const S = {game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], goal:{race:15, tower:15}, time:{race:180, meteor:90, tower:180}, names:['','',''], sound:true};
 try { Object.assign(S, JSON.parse(localStorage.getItem('bigmul.v1') || '{}')); } catch (e) {}
+for (const k in GAMES){ if (GAMES[k].goal && !GAMES[k].goal.opts.includes(S.goal[k])) S.goal[k] = GAMES[k].goal.def; if (!GAMES[k].times.includes(S.time[k])) S.time[k] = GAMES[k].defTime; }
+if (!GAMES[S.game]) S.game = 'race';
 const save = () => { try { localStorage.setItem('bigmul.v1', JSON.stringify(S)); } catch (e) {} };
 const h = location.hash.slice(1); if (GAMES[h]) S.game = h;
 
@@ -343,11 +344,11 @@ const GAME_PIC = {
         <div style="position:absolute;left:70px;top:80px;width:66px;height:66px">${critter(TEAMS[1].c)}</div></div>`,
   meteor:`<div class="sky" style="position:absolute;inset:0"><div style="position:absolute;left:30px;top:10px;width:70px">${meteorSVG()}</div>
         <div style="position:absolute;left:110px;top:60px;width:56px">${meteorSVG()}</div></div>`,
-  tug:`<div style="position:absolute;inset:0;background:linear-gradient(#BFE6FF 0 55%,#7BC86C 55%)">
-        <div style="position:absolute;left:6px;right:6px;top:92px;height:10px;border-radius:5px;background:#C8A06A;border:3px solid #1B2836"></div>
-        <div style="position:absolute;left:88px;top:76px;width:20px;height:44px;background:#FFE066;border:3px solid #1B2836;border-radius:4px"></div>
-        <div style="position:absolute;left:4px;top:50px;width:66px;height:66px">${critter(TEAMS[0].c)}</div>
-        <div style="position:absolute;right:4px;top:50px;width:66px;height:66px;transform:scaleX(-1)">${critter(TEAMS[1].c)}</div></div>`,
+  tower:`<div style="position:absolute;inset:0;background:linear-gradient(#9FD8FF,#E3F4FF)"><div style="position:absolute;left:0;right:0;bottom:0;height:22px;background:#7BC86C;border-top:3px solid #1B2836"></div>
+        <div style="position:absolute;left:28px;bottom:22px;width:62px;height:96px;background:#E5484D;border:3px solid #1B2836"></div>
+        <div style="position:absolute;left:106px;bottom:22px;width:62px;height:60px;background:#3A9FEF;border:3px solid #1B2836"></div>
+        <div style="position:absolute;left:30px;bottom:116px;width:56px;height:56px">${critter(TEAMS[0].c)}</div>
+        <div style="position:absolute;left:110px;bottom:80px;width:56px;height:56px">${critter(TEAMS[1].c)}</div></div>`,
 };
 
 /* ---------- 設定畫面 ---------- */
@@ -361,8 +362,7 @@ function drawLobby(){
       <span><b>${v.name}</b><small>${v.desc}</small><span class="who">${v.ns.map(n => n + ' 方').join('、')}對抗</span></span>
     </button>`).join('');
   $('#modeSeg').innerHTML = [['team','小組賽'],['solo','個人賽']].map(([k, t]) => `<button class="opt ${S.mode === k ? 'on' : ''}" type="button" data-mode="${k}">${t}</button>`).join('');
-  $('#nSeg').innerHTML = [2, 3].map(n => `<button class="opt num ${S.n === n ? 'on' : ''}" type="button" data-n="${n}" ${g.ns.includes(n) ? '' : 'disabled'}>${n}</button>`).join('')
-    + (g.ns.length === 1 ? '<span class="hint">拔河只能 2 方</span>' : '');
+  $('#nSeg').innerHTML = [2, 3].map(n => `<button class="opt num ${S.n === n ? 'on' : ''}" type="button" data-n="${n}" ${g.ns.includes(n) ? '' : 'disabled'}>${n}</button>`).join('');
   $('#tabSeg').innerHTML = [1,2,3,4,5,6,7,8,9].map(t => `<button class="opt num ${S.tables.includes(t) ? 'on' : ''}" type="button" data-t="${t}">${t}</button>`).join('')
     + '<span class="hint" style="align-self:center">的乘法</span>';
   $('#goalRow').hidden = !g.goal;
@@ -411,7 +411,7 @@ const show = id => { ['lobby','game','result'].forEach(s => $('#' + s).hidden = 
 function start(){
   stop();
   const kind = S.game, gm = GAMES[kind];
-  G = {kind, n:S.n, goal:gm.goal ? S.goal[kind] : 0, time:S.time[kind], t:0, last:0, paused:true, ended:false, rope:0, zones:[]};
+  G = {kind, n:S.n, goal:gm.goal ? S.goal[kind] : 0, time:S.time[kind], t:0, last:0, paused:true, ended:false, zones:[]};
   $('#title').textContent = gm.name;
   $('#pauseBtn').textContent = '⏸ 暫停'; $('#endBtn').textContent = '結束';
   $('#game').className = 'n' + G.n;
@@ -421,9 +421,11 @@ function start(){
   for (let i = 0; i < G.n; i++){
     const T = TEAMS[i], z = {i, name:nameOf(i), c:T.c, l:T.l, score:0, right:0, wrong:0, misses:[], times:[], q:null, qT:0, input:'', lock:0, miss:0, mets:[], nextSpawn:0};
     const el = document.createElement('div');
-    el.className = 'zone'; el.style.cssText = `--c:${T.c};--l:${T.l}`;
+    el.className = kind === 'tower' ? 'zone tw' : 'zone'; el.style.cssText = `--c:${T.c};--l:${T.l}`;
     const body = kind === 'meteor'
       ? `<div class="sky"><div class="ground"></div></div><div class="ansbar"><span class="lbl">答案</span><span class="slot"></span></div>`
+      : kind === 'tower'
+      ? `<div class="tower"><div class="top"><span>頂樓 ${G.goal} 層</span></div><div class="floors"></div><div class="climber">${critter(T.c)}</div><div class="gnd"></div></div><div class="zq"><div class="qline"></div><div class="zmsg"></div></div>`
       : `<div class="zq"><div class="qline"></div><div class="zmsg"></div></div>`;
     el.innerHTML = `<div class="zhead"><span class="zn">${esc(z.name)}</span><span class="zs"></span></div>${body}
       <div class="pad">${[1,2,3,4,5,6,7,8,9,0].map(k => `<button class="key" type="button" data-k="${k}">${k}</button>`).join('')}<button class="key del" type="button" data-k="del">⌫<br>擦掉</button></div>`;
@@ -438,10 +440,12 @@ function start(){
     G.zones.push(z);
   }
   drawScene();
-  $('#scene').hidden = kind === 'meteor';
+  $('#scene').hidden = kind !== 'race';
   show('game');
   if (kind === 'meteor') G.zones.forEach(z => { z.skyW = z.sky.offsetWidth; z.skyH = z.sky.offsetHeight; });
   else G.zones.forEach(z => { z.q = newQ(); renderQ(z); });
+  if (kind === 'tower') G.zones.forEach(z => { const t = z.el.querySelector('.tower'); z.bh = Math.floor((t.offsetHeight - 30 - 100) / G.goal);
+    t.style.setProperty('--bh', z.bh + 'px'); t.querySelector('.top').style.bottom = (30 + z.bh * G.goal) + 'px'; buildTower(z); });
   G.zones.forEach(hudZ);
   $('#timer').textContent = fmt(G.time); $('#timer').classList.remove('hurry');
   countdown(() => { G.paused = false; G.last = performance.now(); G.raf = requestAnimationFrame(loop); });
@@ -536,19 +540,19 @@ function progress(z){
   if (G.kind === 'race'){
     z.score++; hudZ(z); moveRunner(z);
     if (z.score >= G.goal) finish();
-  } else if (G.kind === 'tug'){
-    z.score++; G.rope += z.i === 0 ? -1 : 1; hudZ(z); moveRope(z.i);
-    if (Math.abs(G.rope) >= G.goal) finish();
+  } else if (G.kind === 'tower'){
+    z.score++; hudZ(z); buildTower(z, true);
+    if (z.score >= G.goal) finish();
   }
 }
 function hudZ(z){
   const s = z.el.querySelector('.zs');
-  if (G.kind === 'race') s.innerHTML = `${z.score}<small> / ${G.goal}</small>`;
+  if (G.kind === 'race' || G.kind === 'tower') s.innerHTML = `${z.score}<small> / ${G.goal}</small>`;
   else if (G.kind === 'meteor') s.innerHTML = `<small>擊碎</small>${z.score}`;
   else s.innerHTML = `<small>答對</small>${z.score}`;
 }
 
-/* ---------- 場景：賽跑、拔河 ---------- */
+/* ---------- 場景：賽跑、蓋高樓 ---------- */
 function drawScene(){
   const sc = $('#scene');
   if (G.kind === 'race'){
@@ -562,38 +566,20 @@ function drawScene(){
         <div class="runner" id="run${i}">${critter(z.c)}</div>
       </div>`).join('');
     G.zones.forEach(moveRunner);
-  } else if (G.kind === 'tug'){
-    sc.className = 'scene tugscene';
-    G.step = 440 / G.goal;
-    const [A, B] = G.zones;
-    sc.innerHTML = `
-      <div class="tugmid"></div>
-      <div class="tugline" style="left:calc(50% - 440px);background:${A.c}"><span>${esc(A.name)}贏</span></div>
-      <div class="tugline" style="left:calc(50% + 440px);background:${B.c}"><span>${esc(B.name)}贏</span></div>
-      <div class="rope" id="rope"><div class="line"></div><div class="ribbon"></div>
-        <div class="pullers left">${pullers(A.c)}</div>
-        <div class="pullers right">${pullers(B.c)}</div>
-      </div>
-      <div class="tugscore" style="left:24px;color:${A.c}" id="tugA"></div>
-      <div class="tugscore" style="right:24px;color:${B.c}" id="tugB"></div>`;
-    moveRope();
   } else sc.innerHTML = '';
 }
-const pullers = c => `<div class="p">${critter(c)}</div>`.repeat(2);
 function moveRunner(z){
   const r = $('#run' + z.i); if (!r) return;
   const W = $('#scene').clientWidth, x0 = 260, x1 = W - 110;
   r.style.left = (x0 + (x1 - x0) * Math.min(1, z.score / G.goal)) + 'px';
   if (z.score){ r.classList.add('run'); clearTimeout(r._t); r._t = setTimeout(() => r.classList.remove('run'), 600); }
 }
-function moveRope(who){
-  const r = $('#rope'); if (!r) return;
-  r.style.transform = `translateX(${G.rope * G.step}px)`;
-  if (who != null){ r.classList.remove('tugL', 'tugR'); void r.offsetWidth; r.classList.add(who === 0 ? 'tugL' : 'tugR'); }
-  const lead = Math.abs(G.rope);
-  $('#tugA').textContent = G.rope < 0 ? `領先 ${lead} 格` : '';
-  $('#tugB').textContent = G.rope > 0 ? `領先 ${lead} 格` : '';
-  $('#tugA').hidden = !(G.rope < 0); $('#tugB').hidden = !(G.rope > 0);
+function buildTower(z, add){
+  const f = z.el.querySelector('.floors');
+  if (add){ const d = document.createElement('div'); d.className = 'floor'; if (z.score % 5 === 0) d.innerHTML = `<b>${z.score}</b>`; f.appendChild(d); }
+  const c = z.el.querySelector('.climber');
+  c.style.bottom = (30 + z.bh * z.score - 4) + 'px';
+  if (add){ c.classList.add('run'); clearTimeout(c._t); c._t = setTimeout(() => c.classList.remove('run'), 500); }
 }
 
 /* ---------- 流星雨 ---------- */
@@ -676,10 +662,7 @@ function finish(){
   stop();
   const Z = G.zones;
   let order;
-  if (G.kind === 'tug'){
-    const w = G.rope < 0 ? 0 : G.rope > 0 ? 1 : -1;
-    order = w < 0 ? Z.map(z => ({z, rank:1})) : [{z:Z[w], rank:1}, {z:Z[1 - w], rank:2}];
-  } else {
+  {
     const s = [...Z].sort((a, b) => b.score - a.score);
     order = s.map(z => ({z, rank:1 + s.filter(o => o.score > z.score).length}));
   }
@@ -688,7 +671,7 @@ function finish(){
     : winners.length > 1 ? `${winners.map(o => esc(o.z.name)).join('、')} 並列第一！`
     : `${esc(winners[0].z.name)} 獲勝！`;
   const why = G.manual ? '老師結束了這一局' : G.kind === 'race' ? (Z.some(z => z.score >= G.goal) ? '先跑到終點' : '時間到，跑最遠的贏')
-    : G.kind === 'tug' ? (Math.abs(G.rope) >= G.goal ? '把繩子拉過線了' : '時間到，繩子在哪一邊就是哪一邊贏')
+    : G.kind === 'tower' ? (Z.some(z => z.score >= G.goal) ? '先蓋到頂樓' : '時間到，蓋最高的贏')
     : '時間到，打碎最多流星的贏';
   const medal = r => `<span class="medal m${r}">第 ${r} 名</span>`;
   const misses = z => { const seen = new Map(); z.misses.forEach(q => seen.set(q.t, q)); return [...seen.values()].slice(-8); };
