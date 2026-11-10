@@ -54,12 +54,12 @@ main>section{flex:1;min-height:0}
 .h2 i{font:600 26px var(--f-num);font-style:normal;background:var(--ink);color:#fff;border-radius:999px;width:44px;height:44px;display:grid;place-items:center}
 .games{display:grid;gap:16px;flex:1;grid-auto-rows:1fr}
 .gcard{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:20px;text-align:left;background:var(--card);border:4px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:14px 22px 14px 14px;font:inherit}
-.gcard .pic{height:100%;min-height:150px;border:4px solid var(--ink);border-radius:16px;overflow:hidden;position:relative}
-.gcard b{font:700 40px var(--f-display);display:block}
-.gcard small{font-size:22px;font-weight:700;color:var(--ink-soft);line-height:1.45;display:block}
+.gcard .pic{height:100%;min-height:140px;border:4px solid var(--ink);border-radius:16px;overflow:hidden;position:relative}
+.gcard b{font:700 36px var(--f-display);display:block}
+.gcard small{font-size:21px;font-weight:700;color:var(--ink-soft);line-height:1.45;display:block}
 .gcard .who{display:inline-block;margin-top:6px;font:700 18px var(--f-body);background:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:0 12px}
 .gcard.on{background:#FFF6C7;box-shadow:0 0 0 6px var(--gold),6px 6px 0 var(--ink)}
-.panel{background:var(--card);border:4px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:20px 26px;display:grid;gap:16px;align-content:start;flex:1}
+.panel{background:var(--card);border:4px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:18px 26px;display:grid;gap:14px;align-content:start;flex:1}
 .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .lab{font:900 26px var(--f-body);width:150px;flex:none}
 .seg{display:flex;gap:10px;flex-wrap:wrap}
@@ -150,22 +150,49 @@ main>section{flex:1;min-height:0}
 @keyframes hop{to{transform:translateY(-8px)}}
 .win .cr{animation:hop .3s infinite alternate}
 
-/* 蓋高樓：每一方自己蓋一棟樓 */
-.zone.tw .zq{flex:none;height:178px;border-top:5px solid var(--ink)}
-.zone.tw .qline{font-size:104px}
-.zone.tw .zmsg{bottom:2px;font-size:24px;min-height:32px}
-.tower{flex:1;min-height:0;position:relative;overflow:hidden;background:linear-gradient(#9FD8FF,#E3F4FF)}
-.tower::before{content:"";position:absolute;left:8%;top:14%;width:120px;height:40px;border-radius:40px;background:#fff;opacity:.8;box-shadow:260px 60px 0 -6px #fff}
-.tower .gnd{position:absolute;left:0;right:0;bottom:0;height:30px;background:#7BC86C;border-top:4px solid var(--ink)}
-.tower .top{position:absolute;left:0;right:0;border-top:5px dashed var(--ink);z-index:1}
-.tower .top span{position:absolute;right:10px;top:-22px;font:700 24px var(--f-body);background:var(--hl);border:3px solid var(--ink);border-radius:10px;padding:0 10px}
-.floors{position:absolute;bottom:30px;left:50%;width:220px;margin-left:-110px;display:flex;flex-direction:column-reverse}
-.floor{height:var(--bh);background-color:var(--c);border:3px solid var(--ink);border-bottom-width:0;position:relative;animation:drop .35s cubic-bezier(.3,1.4,.6,1);
-  background-image:linear-gradient(90deg,transparent 18%,rgba(255,255,255,.75) 18% 32%,transparent 32% 43%,rgba(255,255,255,.75) 43% 57%,transparent 57% 68%,rgba(255,255,255,.75) 68% 82%,transparent 82%);background-size:100% 46%;background-position:0 50%;background-repeat:no-repeat}
-.floor:first-child{border-bottom-width:3px}
-.floor b{position:absolute;left:-46px;top:50%;transform:translateY(-50%);font:600 22px var(--f-num);color:var(--ink-soft)}
-@keyframes drop{from{transform:translateY(-160px);opacity:0}}
+/* 疊疊樂：每一方疊自己的積木 */
+.zone.g-stack .zq,.zone.g-mole .zq{flex:none;height:178px}
+.zone.g-stack .zq{border-top:5px solid var(--ink)}
+.zone.g-mole .zq{border-bottom:5px solid var(--ink)}
+.zone.g-stack .qline,.zone.g-mole .qline{font-size:104px}
+.zone.g-stack .zmsg,.zone.g-mole .zmsg{bottom:2px;font-size:24px;min-height:32px}
+.stackbox{flex:1;min-height:0;position:relative;overflow:hidden;background:linear-gradient(#FFF6D6,#FFE6A8)}
+.stackbox .gnd{position:absolute;left:0;right:0;bottom:0;height:30px;background:#C99A62;border-top:4px solid var(--ink)}
+.stackbox .top{position:absolute;left:0;right:0;border-top:5px dashed var(--ink);z-index:1}
+.stackbox .top span{position:absolute;right:10px;top:-22px;font:700 24px var(--f-body);background:var(--hl);border:3px solid var(--ink);border-radius:10px;padding:0 10px}
+.blocks{position:absolute;bottom:30px;left:50%;width:0;display:flex;flex-direction:column-reverse;align-items:center}
+.blk{flex:none;position:relative;left:var(--dx);height:var(--bh);width:var(--w);background:var(--bc);border:3px solid var(--ink);border-radius:7px;margin-top:-1px;
+  box-shadow:inset 0 4px 0 rgba(255,255,255,.45),inset 0 -4px 0 rgba(0,0,0,.15);transform:rotate(var(--r));animation:drop .35s cubic-bezier(.3,1.4,.6,1)}
+@keyframes drop{from{transform:translateY(-160px) rotate(var(--r));opacity:0}}
 .climber{position:absolute;left:50%;width:84px;height:84px;margin-left:-42px;transition:bottom .4s cubic-bezier(.3,1.4,.6,1);z-index:2}
+
+/* 打地鼠：6 個洞，點地鼠作答（不用鍵盤） */
+.field{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:8px 10px;padding:12px 14px 8px;background:#7BC86C;touch-action:none}
+.hole{position:relative;min-width:0}
+.pit{position:absolute;left:6%;right:6%;bottom:4%;height:22%;border-radius:50%;background:#4A3426;border:5px solid var(--ink)}
+.mwrap{position:absolute;left:0;right:0;top:0;bottom:15%;overflow:hidden}
+.mole{position:absolute;left:0;right:0;bottom:0;margin:0 auto;width:min(100%,220px);height:100%;border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  transform:translateY(102%);transition:transform .22s ease-out;touch-action:none}
+.mole.up{transform:none}
+.mole .mn{font:600 62px/1.1 var(--f-num);background:#fff;border:5px solid var(--ink);border-radius:16px;padding:0 16px;margin-bottom:-4px;position:relative;z-index:1;box-shadow:3px 3px 0 var(--ink)}
+.n3 .mole .mn{font-size:54px}
+.mole .mb{width:130px;height:118px;display:block}
+.n3 .mole .mb{width:110px;height:100px}
+.mole.hit{animation:bonk .4s}
+.mole.hit .mn{background:#D4F5E2;border-color:var(--good);color:var(--good)}
+.mole.bad .mn{background:#FFE1E2;border-color:var(--bad);color:var(--bad)}
+.mole.right .mn{background:var(--hl);animation:beat .6s infinite}
+@keyframes bonk{30%{transform:scaleY(.8) translateY(10%)}}
+
+/* 換人提醒：只蓋住那一隊 */
+.zhead .zp{font:700 24px var(--f-body);background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:999px;padding:0 12px;white-space:nowrap}
+.swap{position:absolute;left:0;right:0;top:64px;bottom:0;background:rgba(27,40,54,.62);display:grid;place-items:center;z-index:8}
+.swap .box{background:#fff;border:5px solid var(--ink);border-radius:24px;box-shadow:8px 8px 0 var(--ink);padding:26px 34px;text-align:center;display:grid;gap:16px;justify-items:center;animation:pop .5s;max-width:92%}
+.swap h3{margin:0;font:700 70px var(--f-display);color:var(--c);-webkit-text-stroke:2px var(--ink)}
+.swap .who{margin:0;font:900 40px var(--f-body)}
+.swap .who b{font:600 90px/1 var(--f-num);color:var(--c);-webkit-text-stroke:3px var(--ink);margin:0 6px}
+.swap .btn.big{font-size:36px;padding:12px 34px}
+.swap .btn:disabled{opacity:.4}
 
 /* 遮罩（倒數、暫停） */
 .cover{position:absolute;inset:0;background:rgba(27,40,54,.55);display:grid;place-items:center;z-index:20;border-radius:22px}
@@ -196,18 +223,58 @@ main>section{flex:1;min-height:0}
 .miss .chips span{font:600 30px var(--f-num);background:#FFF1F1;border:3px solid var(--bad);border-radius:12px;padding:0 10px}
 .miss .none{font:700 24px var(--f-body);color:var(--good)}
 .rbtns{flex:none;display:flex;justify-content:center;gap:24px}
+.pcs{display:flex;flex-wrap:wrap;gap:6px}
+.pc{font:700 20px var(--f-body);background:var(--l);border:3px solid var(--ink);border-radius:10px;padding:0 8px;white-space:nowrap}
+.pc b{font:600 22px var(--f-num)}
+
+/* ---------- 輸入成員座號 ---------- */
+#members{display:flex;flex-direction:column;gap:16px}
+.mtop{display:flex;align-items:center;gap:18px}
+.mtop h2{margin:0;font:700 44px var(--f-display)}
+#mzones{flex:1;min-height:0;display:grid;gap:20px;grid-template-columns:repeat(var(--n),1fr)}
+.mz{--c:#888;--l:#eee;display:flex;flex-direction:column;background:var(--card);border:5px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);overflow:hidden;min-width:0}
+.mz .clr{font:700 20px var(--f-body);border:3px solid var(--ink);border-radius:999px;background:#fff;padding:2px 14px}
+.seats{flex:1;min-height:0;overflow:auto;background:var(--l);padding:14px 16px}
+.seats .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.seatchip{font:600 34px var(--f-num);background:#fff;border:4px solid var(--ink);border-radius:14px;padding:2px 12px;display:flex;align-items:center;gap:8px;box-shadow:3px 3px 0 var(--ink)}
+.seatchip i{font:600 20px var(--f-num);font-style:normal;background:var(--c);color:#fff;border:2px solid var(--ink);border-radius:999px;width:30px;height:30px;display:grid;place-items:center}
+.seatchip span{font:900 20px var(--f-body);color:var(--bad)}
+.empty{font:700 30px var(--f-body);color:var(--ink-soft);text-align:center;margin:40px 0}
+.empty small{font-size:22px}
+.mrow{flex:none;height:96px;display:flex;align-items:center;justify-content:center;gap:16px;border-top:5px solid var(--ink);position:relative}
+.mrow .lbl{font:700 30px var(--f-body);color:var(--ink-soft)}
+.mrow .slot{font:600 62px/1 var(--f-num);height:76px;min-width:150px;border-width:5px}
+.mmsg{position:absolute;right:14px;font:700 22px var(--f-body);color:var(--bad)}
+.pad.seat .key.del{grid-column:auto;grid-row:auto;font:600 44px var(--f-num)}
+.pad.seat .key.add{font:900 30px var(--f-body);background:var(--hl)}
+.mbtns{flex:none;display:flex;justify-content:flex-end;gap:20px}
+
+/* ---------- 比賽紀錄 ---------- */
+#hist{display:flex;flex-direction:column;gap:16px}
+#hlist{flex:1;min-height:0;overflow:auto;display:grid;gap:14px;align-content:start;padding:0 10px 10px 0}
+.hrec{background:var(--card);border:4px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);padding:12px 18px;display:grid;gap:10px}
+.hmeta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;font:700 22px var(--f-body);color:var(--ink-soft)}
+.hmeta b{font:600 26px var(--f-num);color:var(--ink)}
+.hmeta .hg{font:700 26px var(--f-display);color:var(--ink);background:var(--hl);border:3px solid var(--ink);border-radius:10px;padding:0 10px}
+.hteams{display:grid;gap:12px;grid-template-columns:repeat(var(--n),1fr)}
+.ht{background:var(--l);border:3px solid var(--ink);border-left:12px solid var(--c);border-radius:12px;padding:6px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.ht b{font:700 28px var(--f-display)}
+.ht .hs{font:700 22px var(--f-body);color:var(--ink-soft)}
+.ht .pcs{width:100%}
+.medal.sm{font-size:20px;padding:0 10px;border-width:3px}
 </style>
 </head>
 <body>
 <div id="stage">
   <header class="bar">
-    <div class="brand"><span class="tag">×</span><h1 id="title">乘法大屏對抗</h1><span class="ver">教師大屏 v1.1</span></div>
+    <div class="brand"><span class="tag">×</span><h1 id="title">乘法大屏對抗</h1><span class="ver">教師大屏 v1.2</span></div>
     <div class="spacer"></div>
     <div class="timer" id="timer" hidden>3:00</div>
     <button class="btn" id="soundBtn" type="button">🔊 聲音</button>
     <button class="btn" id="fsBtn" type="button">⛶ 全螢幕</button>
     <button class="btn" id="pauseBtn" type="button" hidden>⏸ 暫停</button>
     <button class="btn warn" id="endBtn" type="button" hidden>結束</button>
+    <button class="btn" id="histBtn" type="button">📋 比賽紀錄</button>
     <a class="btn" id="backBtn" href="index.html">← 回到上一頁</a>
   </header>
 
@@ -221,8 +288,7 @@ main>section{flex:1;min-height:0}
       <div class="col">
         <h2 class="h2"><i>2</i>設定</h2>
         <div class="panel">
-          <div class="row"><span class="lab">比賽方式</span><div class="seg" id="modeSeg"></div></div>
-          <div class="row"><span class="lab">幾方對抗</span><div class="seg" id="nSeg"></div></div>
+          <div class="row"><span class="lab">比賽方式</span><div class="seg" id="modeSeg"></div><span class="lab" style="width:auto;margin-left:36px">幾方對抗</span><div class="seg" id="nSeg"></div></div>
           <div class="row" style="align-items:flex-start"><span class="lab" style="padding-top:8px">乘法範圍</span>
             <div style="display:grid;gap:10px;flex:1">
               <div class="seg" id="tabSeg"></div>
@@ -238,11 +304,23 @@ main>section{flex:1;min-height:0}
           </div>
           <div class="row" id="goalRow"><span class="lab" id="goalLab">終點</span><div class="seg" id="goalSeg"></div></div>
           <div class="row"><span class="lab">時間</span><div class="seg" id="timeSeg"></div></div>
-          <div class="row"><span class="lab">名字</span><div class="names" id="names"></div></div>
-          <p class="hint">「7的乘法」出的題目是 7×1～7×9。點數字鍵盤作答，不用按確定。答錯會停一下；同一題錯 2 次就會公布答案、換下一題。<br>
-            老師鍵盤：<kbd>空白鍵</kbd> 暫停／繼續　<kbd>F</kbd> 全螢幕</p>
+          <div class="row"><span class="lab">換人提醒</span><div class="seg" id="swapSeg"></div><span class="hint">同一隊輪流上場作答</span></div>
+          <div class="row"><span class="lab">成員座號</span><div class="seg" id="seatSeg"></div><span class="hint">開始前，各隊用數字鍵盤輸入座號</span></div>
+          <div class="row"><span class="lab">名字</span><div class="names" id="names"></div><datalist id="pastNames"></datalist></div>
+          <p class="hint">名字、座號、設定都會記在這台電腦，下次打開會自動帶出上一次的內容。點數字作答，不用按確定；同一題錯 2 次會公布答案、換下一題。老師鍵盤：<kbd>空白鍵</kbd> 暫停　<kbd>F</kbd> 全螢幕</p>
           <div class="startrow"><span class="warnmsg" id="warn"></span><button class="btn primary big" id="startBtn" type="button">開始比賽 ▶</button></div>
         </div>
+      </div>
+    </section>
+
+    <!-- 輸入成員座號 -->
+    <section id="members" hidden>
+      <div class="mtop"><h2>各隊輸入成員座號</h2><span class="hint">依照上場順序輸入。上一次的座號會自動帶出來，不用每次重打。</span></div>
+      <div id="mzones"></div>
+      <div class="mbtns">
+        <button class="btn big" type="button" id="mBack">← 回到設定</button>
+        <button class="btn big" type="button" id="mSkip">跳過，不輸入座號</button>
+        <button class="btn primary big" type="button" id="mStart">開始比賽 ▶</button>
       </div>
     </section>
 
@@ -255,6 +333,13 @@ main>section{flex:1;min-height:0}
 
     <!-- 結果 -->
     <section id="result" hidden></section>
+
+    <!-- 比賽紀錄 -->
+    <section id="hist" hidden>
+      <div class="mtop"><h2>比賽紀錄</h2><span class="hint" id="hcount"></span><span class="spacer"></span>
+        <button class="btn warn" type="button" id="hClear">清除全部紀錄</button><button class="btn primary" type="button" id="hBack">← 回到設定</button></div>
+      <div id="hlist"></div>
+    </section>
   </main>
 </div>
 
@@ -264,34 +349,51 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--){ const j = ri(0, i); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = s => { s = Math.max(0, Math.ceil(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
 /* ---------- 參數 ---------- */
 const TEAMS = [
-  {c:'#E5484D', l:'#FDE3E4', team:'紅隊', solo:'紅方'},
-  {c:'#3A9FEF', l:'#DDF0FF', team:'藍隊', solo:'藍方'},
-  {c:'#1FA963', l:'#DDF6E8', team:'綠隊', solo:'綠方'},
+  {c:'#E5484D', m:'#F59A9C', l:'#FDE3E4', team:'紅隊', solo:'紅方'},
+  {c:'#3A9FEF', m:'#93CBF6', l:'#DDF0FF', team:'藍隊', solo:'藍方'},
+  {c:'#1FA963', m:'#7BD6A3', l:'#DDF6E8', team:'綠隊', solo:'綠方'},
 ];
 const GAMES = {
   race:  {name:'乘法賽跑', desc:'答對一題往前跑一格，先跑到終點的贏！', ns:[2,3],
           goal:{label:'終點', unit:'題', opts:[10,15,20], def:15}, times:[120,180,300], defTime:180},
   meteor:{name:'乘法流星雨', desc:'各自守住自己的天空，時間到，打碎最多流星的贏！', ns:[2,3],
           goal:null, times:[60,90,120,180], defTime:90},
-  tower: {name:'乘法蓋高樓', desc:'答對一題蓋一層樓，先蓋到頂樓的贏！', ns:[2,3],
-          goal:{label:'樓層', unit:'層', opts:[10,15,20], def:15}, times:[120,180,300], defTime:180},
+  stack: {name:'乘法疊疊樂', desc:'答對一題疊一塊積木，先疊到最高的贏！', ns:[2,3],
+          goal:{label:'疊到', unit:'塊', opts:[10,15,20], def:15}, times:[120,180,300], defTime:180},
+  mole:  {name:'乘法打地鼠', desc:'看題目，敲出拿著正確答案的地鼠！', ns:[2,3],
+          goal:{label:'目標', unit:'隻', opts:[10,15,20], def:15}, times:[120,180,300], defTime:180},
 };
 const LOCK_WRONG = 900;   // 答錯停幾毫秒
 const LOCK_SHOW = 1600;   // 錯 2 次公布答案停幾毫秒
 const LOCK_METEOR = 600;  // 流星雨按錯停幾毫秒
+const SWAP_WAIT = 800;    // 換人視窗出現後，多久才能按「準備好了」（避免上一位順手按掉）
+const MAX_SEATS = 15;     // 每一隊最多幾個座號
+const MAX_HIST = 60;      // 比賽紀錄最多留幾筆
 
-/* ---------- 設定（記在這台電腦的瀏覽器） ---------- */
-const S = {game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], goal:{race:15, tower:15}, time:{race:180, meteor:90, tower:180}, names:['','',''], sound:true};
+/* ---------- 設定和紀錄（記在這台電腦的瀏覽器，不會因為重新整理而不見） ---------- */
+const S = {game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], goal:{race:15, stack:15, mole:15}, time:{race:180, meteor:90, stack:180, mole:180},
+  names:['','',''], sound:true, swap:5, seats:true, members:[[],[],[]], pastNames:[]};
 try { Object.assign(S, JSON.parse(localStorage.getItem('bigmul.v1') || '{}')); } catch (e) {}
-for (const k in GAMES){ if (GAMES[k].goal && !GAMES[k].goal.opts.includes(S.goal[k])) S.goal[k] = GAMES[k].goal.def; if (!GAMES[k].times.includes(S.time[k])) S.time[k] = GAMES[k].defTime; }
+if (S.game === 'tower') S.game = 'stack';
 if (!GAMES[S.game]) S.game = 'race';
+for (const k in GAMES){
+  if (GAMES[k].goal && !GAMES[k].goal.opts.includes(S.goal[k])) S.goal[k] = GAMES[k].goal.def;
+  if (!GAMES[k].times.includes(S.time[k])) S.time[k] = GAMES[k].defTime;
+}
+if (![0, 3, 5].includes(S.swap)) S.swap = 5;
+if (!Array.isArray(S.members) || S.members.length < 3) S.members = [[],[],[]];
+if (!Array.isArray(S.pastNames)) S.pastNames = [];
 const save = () => { try { localStorage.setItem('bigmul.v1', JSON.stringify(S)); } catch (e) {} };
-const h = location.hash.slice(1); if (GAMES[h]) S.game = h;
+let H = [];
+try { H = JSON.parse(localStorage.getItem('bigmul.hist') || '[]'); if (!Array.isArray(H)) H = []; } catch (e) { H = []; }
+const saveH = () => { try { localStorage.setItem('bigmul.hist', JSON.stringify(H)); } catch (e) {} };
+const h = location.hash.slice(1); if (GAMES[h]) S.game = h; else if (h === 'tower') S.game = 'stack';
 
 /* ---------- 縮放：固定 1920×1080 的畫面，等比例放到螢幕上 ---------- */
 function fit(){ const s = Math.min(innerWidth / 1920, innerHeight / 1080); $('#stage').style.transform = `translate(-50%,-50%) scale(${s})`; }
@@ -315,6 +417,7 @@ const SND = {
   tick(){ tone(660, .12, 'triangle', .15); },
   go(){ tone(990, .35, 'triangle', .2); },
   land(){ tone(140, .3, 'sawtooth', .06); },
+  swap(){ tone(740, .18, 'triangle', .18); tone(988, .25, 'triangle', .18, .18); },
   win(){ [523, 659, 784, 1047].forEach((f, i) => tone(f, .3, 'triangle', .2, i * .13)); },
 };
 
@@ -330,6 +433,16 @@ function critter(c){
     <path d="M78 72 q8 8 17 0" fill="none" stroke="#1B2836" stroke-width="4.5" stroke-linecap="round"/>
   </svg>`;
 }
+function moleSVG(){
+  return `<svg class="cr" viewBox="0 0 120 110" aria-hidden="true">
+    <path d="M14 110 Q10 30 60 18 Q110 30 106 110 Z" fill="#A8744F" stroke="#1B2836" stroke-width="6"/>
+    <ellipse cx="60" cy="86" rx="28" ry="26" fill="#D9A77E"/>
+    <circle cx="44" cy="46" r="7" fill="#1B2836"/><circle cx="76" cy="46" r="7" fill="#1B2836"/>
+    <circle cx="46" cy="44" r="2.5" fill="#fff"/><circle cx="78" cy="44" r="2.5" fill="#fff"/>
+    <ellipse cx="60" cy="60" rx="11" ry="8" fill="#F07A9A" stroke="#1B2836" stroke-width="4"/>
+    <path d="M54 70 v8 M66 70 v8" stroke="#fff" stroke-width="6"/>
+  </svg>`;
+}
 function meteorSVG(){
   return `<svg viewBox="0 0 100 110" aria-hidden="true">
     <path d="M30 70 Q18 30 34 4 Q42 34 50 22 Q56 40 66 6 Q84 34 70 70 Z" fill="#F59E0B" opacity=".9"/>
@@ -337,22 +450,28 @@ function meteorSVG(){
     <circle cx="50" cy="78" r="24" fill="#6B5B4E" stroke="#1B2836" stroke-width="4"/>
     <circle cx="42" cy="72" r="5" fill="#4A3F36"/><circle cx="58" cy="84" r="4" fill="#4A3F36"/></svg>`;
 }
+const blk = (w, dx, r, c) => `<div style="height:20px;width:${w}px;margin-left:${dx}px;transform:rotate(${r}deg);background:${c};border:3px solid #1B2836;border-radius:6px;box-shadow:inset 0 4px 0 rgba(255,255,255,.45)"></div>`;
 const GAME_PIC = {
   race:`<div style="position:absolute;inset:0;background:#C8794A"><div style="position:absolute;left:0;right:0;top:50%;border-top:4px dashed #fff"></div>
         <div class="finish" style="--x1:38px"></div>
-        <div style="position:absolute;left:20px;top:8px;width:66px;height:66px">${critter(TEAMS[0].c)}</div>
-        <div style="position:absolute;left:70px;top:80px;width:66px;height:66px">${critter(TEAMS[1].c)}</div></div>`,
-  meteor:`<div class="sky" style="position:absolute;inset:0"><div style="position:absolute;left:30px;top:10px;width:70px">${meteorSVG()}</div>
-        <div style="position:absolute;left:110px;top:60px;width:56px">${meteorSVG()}</div></div>`,
-  tower:`<div style="position:absolute;inset:0;background:linear-gradient(#9FD8FF,#E3F4FF)"><div style="position:absolute;left:0;right:0;bottom:0;height:22px;background:#7BC86C;border-top:3px solid #1B2836"></div>
-        <div style="position:absolute;left:28px;bottom:22px;width:62px;height:96px;background:#E5484D;border:3px solid #1B2836"></div>
-        <div style="position:absolute;left:106px;bottom:22px;width:62px;height:60px;background:#3A9FEF;border:3px solid #1B2836"></div>
-        <div style="position:absolute;left:30px;bottom:116px;width:56px;height:56px">${critter(TEAMS[0].c)}</div>
-        <div style="position:absolute;left:110px;bottom:80px;width:56px;height:56px">${critter(TEAMS[1].c)}</div></div>`,
+        <div style="position:absolute;left:20px;top:8px;width:60px;height:60px">${critter(TEAMS[0].c)}</div>
+        <div style="position:absolute;left:66px;top:72px;width:60px;height:60px">${critter(TEAMS[1].c)}</div></div>`,
+  meteor:`<div class="sky" style="position:absolute;inset:0"><div style="position:absolute;left:30px;top:6px;width:64px">${meteorSVG()}</div>
+        <div style="position:absolute;left:110px;top:50px;width:52px">${meteorSVG()}</div></div>`,
+  stack:`<div style="position:absolute;inset:0;background:linear-gradient(#FFF3C4,#FFE6A8)"><div style="position:absolute;left:0;right:0;bottom:0;height:18px;background:#C99A62;border-top:3px solid #1B2836"></div>
+        <div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;flex-direction:column-reverse;align-items:center">
+        ${blk(110,0,0,TEAMS[0].c)}${blk(96,8,-2,TEAMS[0].m)}${blk(104,-6,1.5,TEAMS[0].c)}${blk(90,4,-1,TEAMS[0].m)}${blk(98,-4,2,TEAMS[0].c)}
+        <div style="width:50px;height:50px">${critter(TEAMS[0].c)}</div></div></div>`,
+  mole:`<div style="position:absolute;inset:0;background:#7BC86C">
+        <div style="position:absolute;left:18px;bottom:16px;width:72px;height:22px;border-radius:50%;background:#4A3426;border:3px solid #1B2836"></div>
+        <div style="position:absolute;left:100px;bottom:16px;width:72px;height:22px;border-radius:50%;background:#4A3426;border:3px solid #1B2836"></div>
+        <div style="position:absolute;left:104px;bottom:28px;width:64px;height:58px">${moleSVG()}</div>
+        <div style="position:absolute;left:104px;bottom:92px;font:600 28px var(--f-num);background:#fff;border:3px solid #1B2836;border-radius:10px;padding:0 8px">42</div></div>`,
 };
 
 /* ---------- 設定畫面 ---------- */
 const nameOf = i => (S.names[i] || '').trim() || TEAMS[i][S.mode];
+const tablesText = t => t.length === 8 && !t.includes(1) ? '2～9' : t.length === 9 ? '1～9' : t.join('、');
 function drawLobby(){
   const g = GAMES[S.game];
   if (!g.ns.includes(S.n)) S.n = g.ns[0];
@@ -371,9 +490,13 @@ function drawLobby(){
     $('#goalSeg').innerHTML = g.goal.opts.map(v => `<button class="opt ${S.goal[S.game] === v ? 'on' : ''}" type="button" data-goal="${v}">${v} ${g.goal.unit}</button>`).join('');
   }
   $('#timeSeg').innerHTML = g.times.map(v => `<button class="opt ${S.time[S.game] === v ? 'on' : ''}" type="button" data-time="${v}">${v % 60 ? v + ' 秒' : v / 60 + ' 分鐘'}</button>`).join('');
+  $('#swapSeg').innerHTML = [[0,'不提醒'],[3,'每 3 題'],[5,'每 5 題']].map(([v, t]) => `<button class="opt ${S.swap === v ? 'on' : ''}" type="button" data-swap="${v}">${t}</button>`).join('');
+  $('#seatSeg').innerHTML = [[1,'要輸入'],[0,'跳過']].map(([v, t]) => `<button class="opt ${+S.seats === v ? 'on' : ''}" type="button" data-seats="${v}">${t}</button>`).join('');
   $('#names').innerHTML = TEAMS.map((t, i) => `<label class="nm ${i < S.n ? '' : 'off'}" style="--c:${t.c};--l:${t.l}"><span class="dot"></span>
-    <input data-name="${i}" maxlength="8" value="${esc(S.names[i] || '')}" placeholder="${t[S.mode]}" ${i < S.n ? '' : 'disabled'}></label>`).join('');
+    <input data-name="${i}" maxlength="8" list="pastNames" value="${esc(S.names[i] || '')}" placeholder="${t[S.mode]}" ${i < S.n ? '' : 'disabled'}></label>`).join('');
+  $('#pastNames').innerHTML = S.pastNames.map(n => `<option value="${esc(n)}">`).join('');
   $('#warn').textContent = S.tables.length ? '' : '請至少選一個乘法';
+  $('#startBtn').textContent = S.seats ? '下一步：輸入座號 ▶' : '開始比賽 ▶';
   $('#title').textContent = '乘法大屏對抗';
 }
 $('#lobby').addEventListener('click', e => {
@@ -385,11 +508,64 @@ $('#lobby').addEventListener('click', e => {
   else if (b.dataset.q) S.tables = b.dataset.q.split(',').map(Number);
   else if (b.dataset.goal) S.goal[S.game] = +b.dataset.goal;
   else if (b.dataset.time) S.time[S.game] = +b.dataset.time;
-  else if (b.id === 'startBtn'){ if (S.tables.length) start(); return; }
+  else if (b.dataset.swap) S.swap = +b.dataset.swap;
+  else if (b.dataset.seats) S.seats = b.dataset.seats === '1';
+  else if (b.id === 'startBtn'){ if (S.tables.length){ if (S.seats) showMembers(); else start(true); } return; }
   else return;
   save(); drawLobby();
 });
 $('#names').addEventListener('input', e => { const i = e.target.dataset.name; if (i != null){ S.names[+i] = e.target.value; save(); } });
+
+/* ---------- 輸入成員座號（每一隊一個數字鍵盤，會記住上一次的座號） ---------- */
+const MI = ['', '', ''];
+const padKeys = extra => [1,2,3,4,5].map(k => `<button class="key" type="button" data-k="${k}">${k}</button>`).join('')
+  + `<button class="key del" type="button" data-k="del">⌫</button>`
+  + [6,7,8,9,0].map(k => `<button class="key" type="button" data-k="${k}">${k}</button>`).join('') + extra;
+function showMembers(){
+  show('members'); $('#title').textContent = '輸入成員座號';
+  MI.fill('');
+  $('#mzones').style.setProperty('--n', S.n);
+  $('#mzones').className = 'n' + S.n;
+  $('#mzones').innerHTML = TEAMS.slice(0, S.n).map((t, i) => `<div class="mz" style="--c:${t.c};--l:${t.l}">
+    <div class="zhead"><span class="zn">${esc(nameOf(i))}</span><button class="clr" type="button" data-clr="${i}">全部清掉</button></div>
+    <div class="seats" id="seats${i}"></div>
+    <div class="mrow"><span class="lbl">座號</span><span class="slot" id="mslot${i}">&nbsp;</span><span class="mmsg" id="mmsg${i}"></span></div>
+    <div class="pad seat" data-i="${i}">${padKeys('<button class="key add" type="button" data-k="add">加入</button>')}</div>
+  </div>`).join('');
+  $$('#mzones .pad').forEach(p => p.addEventListener('pointerdown', e => {
+    const b = e.target.closest('.key'); if (!b) return;
+    e.preventDefault(); b.classList.add('down'); setTimeout(() => b.classList.remove('down'), 120);
+    mPress(+p.dataset.i, b.dataset.k);
+  }));
+  for (let i = 0; i < S.n; i++) drawSeats(i);
+}
+function drawSeats(i){
+  const m = S.members[i];
+  $('#seats' + i).innerHTML = m.length
+    ? `<p class="hint">上場順序（點一下可以刪掉）</p><div class="chips">${m.map((s, k) => `<button class="seatchip" type="button" data-rm="${i}:${k}"><i>${k + 1}</i>${s} 號 <span>✕</span></button>`).join('')}</div>`
+    : '<p class="empty">還沒有座號<br><small>用下面的鍵盤輸入座號，按「加入」</small></p>';
+}
+function mMsg(i, t){ const m = $('#mmsg' + i); m.textContent = t; clearTimeout(m._t); m._t = setTimeout(() => { m.textContent = ''; }, 1600); }
+function mPress(i, k){
+  let v = MI[i];
+  if (k === 'del') v = v.slice(0, -1);
+  else if (k === 'add'){
+    if (!v) return mMsg(i, '先輸入座號');
+    if (S.members[i].includes(+v)) { MI[i] = ''; $('#mslot' + i).innerHTML = '&nbsp;'; return mMsg(i, `${v} 號已經有了`); }
+    if (S.members[i].length >= MAX_SEATS) return mMsg(i, `最多 ${MAX_SEATS} 人`);
+    S.members[i].push(+v); save(); drawSeats(i); v = '';
+  }
+  else if (v.length < 2 && !(v === '' && k === '0')) v += k;
+  MI[i] = v; $('#mslot' + i).innerHTML = v || '&nbsp;';
+}
+$('#members').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.rm){ const [i, k] = b.dataset.rm.split(':').map(Number); S.members[i].splice(k, 1); save(); drawSeats(i); }
+  else if (b.dataset.clr != null){ S.members[+b.dataset.clr] = []; save(); drawSeats(+b.dataset.clr); }
+  else if (b.id === 'mSkip') start(true);
+  else if (b.id === 'mStart') start(false);
+  else if (b.id === 'mBack'){ show('lobby'); drawLobby(); }
+});
 
 /* ---------- 題目 ---------- */
 function newQ(prev){
@@ -401,17 +577,32 @@ function newQ(prev){
   }
   return q;
 }
+/* 打地鼠的錯誤選項：先用最容易搞混的（多一份、少一份），不夠再補 */
+function distractors(q){
+  const near = shuffle([q.a * (q.b + 1), q.a * (q.b - 1), (q.a + 1) * q.b, (q.a - 1) * q.b]);
+  const more = shuffle([q.ans + 1, q.ans - 1, q.ans + 10, q.ans - 10, q.a * (q.b + 2), q.b * (q.a + 2), q.a + q.b]);
+  const out = [];
+  for (const v of [...near, ...more]) if (v > 0 && v !== q.ans && v < 100 && !out.includes(v)) { out.push(v); if (out.length === 3) break; }
+  return out;
+}
 
 /* ---------- 遊戲 ---------- */
 let G = null;
-const show = id => { ['lobby','game','result'].forEach(s => $('#' + s).hidden = s !== id);
+const SECTIONS = ['lobby', 'members', 'game', 'result', 'hist'];
+const show = id => { SECTIONS.forEach(s => $('#' + s).hidden = s !== id);
   const playing = id === 'game';
-  $('#timer').hidden = !playing; $('#pauseBtn').hidden = !playing; $('#endBtn').hidden = !playing; $('#backBtn').hidden = id !== 'lobby'; };
+  $('#timer').hidden = !playing; $('#pauseBtn').hidden = !playing; $('#endBtn').hidden = !playing;
+  $('#backBtn').hidden = id !== 'lobby'; $('#histBtn').hidden = id !== 'lobby'; };
 
-function start(){
+function start(skipSeats){
   stop();
   const kind = S.game, gm = GAMES[kind];
-  G = {kind, n:S.n, goal:gm.goal ? S.goal[kind] : 0, time:S.time[kind], t:0, last:0, paused:true, ended:false, zones:[]};
+  G = {kind, n:S.n, goal:gm.goal ? S.goal[kind] : 0, time:S.time[kind], swap:S.swap, t:0, last:0, paused:true, ended:false, zones:[]};
+  for (let i = 0; i < G.n; i++){
+    const nm = (S.names[i] || '').trim();
+    if (nm){ S.pastNames = [nm, ...S.pastNames.filter(x => x !== nm)].slice(0, 12); }
+  }
+  save();
   $('#title').textContent = gm.name;
   $('#pauseBtn').textContent = '⏸ 暫停'; $('#endBtn').textContent = '結束';
   $('#game').className = 'n' + G.n;
@@ -419,21 +610,30 @@ function start(){
   $('#zones').className = 'n' + G.n;
   $('#zones').innerHTML = '';
   for (let i = 0; i < G.n; i++){
-    const T = TEAMS[i], z = {i, name:nameOf(i), c:T.c, l:T.l, score:0, right:0, wrong:0, misses:[], times:[], q:null, qT:0, input:'', lock:0, miss:0, mets:[], nextSpawn:0};
+    const T = TEAMS[i];
+    const z = {i, name:nameOf(i), c:T.c, m:T.m, l:T.l, score:0, right:0, wrong:0, misses:[], times:[], q:null, qT:0, input:'', lock:0, miss:0,
+      mets:[], nextSpawn:0, t:0, done:0, turn:0, swap:false, per:{}, members:skipSeats ? [] : [...S.members[i]]};
     const el = document.createElement('div');
-    el.className = kind === 'tower' ? 'zone tw' : 'zone'; el.style.cssText = `--c:${T.c};--l:${T.l}`;
+    el.className = 'zone g-' + kind; el.style.cssText = `--c:${T.c};--l:${T.l}`;
+    const qbox = `<div class="zq"><div class="qline"></div><div class="zmsg"></div></div>`;
     const body = kind === 'meteor'
       ? `<div class="sky"><div class="ground"></div></div><div class="ansbar"><span class="lbl">答案</span><span class="slot"></span></div>`
-      : kind === 'tower'
-      ? `<div class="tower"><div class="top"><span>頂樓 ${G.goal} 層</span></div><div class="floors"></div><div class="climber">${critter(T.c)}</div><div class="gnd"></div></div><div class="zq"><div class="qline"></div><div class="zmsg"></div></div>`
-      : `<div class="zq"><div class="qline"></div><div class="zmsg"></div></div>`;
-    el.innerHTML = `<div class="zhead"><span class="zn">${esc(z.name)}</span><span class="zs"></span></div>${body}
-      <div class="pad">${[1,2,3,4,5,6,7,8,9,0].map(k => `<button class="key" type="button" data-k="${k}">${k}</button>`).join('')}<button class="key del" type="button" data-k="del">⌫<br>擦掉</button></div>`;
-    el.querySelector('.pad').addEventListener('pointerdown', e => {
+      : kind === 'stack'
+      ? `<div class="stackbox"><div class="top"><span>目標 ${G.goal} 塊</span></div><div class="blocks"></div><div class="climber">${critter(T.c)}</div><div class="gnd"></div></div>${qbox}`
+      : kind === 'mole'
+      ? `${qbox}<div class="field">${('<div class="hole"><div class="pit"></div><div class="mwrap"><button class="mole" type="button" tabindex="-1"><span class="mn"></span><span class="mb">' + moleSVG() + '</span></button></div></div>').repeat(6)}</div>`
+      : qbox;
+    const pad = kind === 'mole' ? '' : `<div class="pad">${[1,2,3,4,5,6,7,8,9,0].map(k => `<button class="key" type="button" data-k="${k}">${k}</button>`).join('')}<button class="key del" type="button" data-k="del">⌫<br>擦掉</button></div>`;
+    el.innerHTML = `<div class="zhead"><span class="zn">${esc(z.name)}</span><span class="zp" hidden></span><span class="zs"></span></div>${body}${pad}`;
+    if (pad) el.querySelector('.pad').addEventListener('pointerdown', e => {
       const b = e.target.closest('.key'); if (!b) return;
       e.preventDefault();
       b.classList.add('down'); setTimeout(() => b.classList.remove('down'), 120);
       press(z, b.dataset.k);
+    });
+    if (kind === 'mole') el.querySelector('.field').addEventListener('pointerdown', e => {
+      const b = e.target.closest('.mole.up'); if (!b) return;
+      e.preventDefault(); whack(z, b);
     });
     $('#zones').appendChild(el);
     z.el = el; z.slot = el.querySelector('.slot'); z.sky = el.querySelector('.sky');
@@ -444,11 +644,15 @@ function start(){
   show('game');
   if (kind === 'meteor') G.zones.forEach(z => { z.skyW = z.sky.offsetWidth; z.skyH = z.sky.offsetHeight; });
   else G.zones.forEach(z => { z.q = newQ(); renderQ(z); });
-  if (kind === 'tower') G.zones.forEach(z => { const t = z.el.querySelector('.tower'); z.bh = Math.floor((t.offsetHeight - 30 - 100) / G.goal);
-    t.style.setProperty('--bh', z.bh + 'px'); t.querySelector('.top').style.bottom = (30 + z.bh * G.goal) + 'px'; buildTower(z); });
-  G.zones.forEach(hudZ);
+  if (kind === 'stack') G.zones.forEach(z => { const t = z.el.querySelector('.stackbox'); z.bh = Math.floor((t.offsetHeight - 30 - 100) / G.goal);
+    t.style.setProperty('--bh', z.bh + 'px'); t.querySelector('.top').style.bottom = (30 + z.bh * G.goal) + 'px'; buildStack(z); });
+  G.zones.forEach(z => { hudZ(z); showPlayer(z); });
   $('#timer').textContent = fmt(G.time); $('#timer').classList.remove('hurry');
-  countdown(() => { G.paused = false; G.last = performance.now(); G.raf = requestAnimationFrame(loop); });
+  countdown(() => {
+    G.paused = false; G.last = performance.now();
+    if (kind === 'mole') G.zones.forEach(z => moleUp(z));
+    G.raf = requestAnimationFrame(loop);
+  });
 }
 function stop(){ if (!G) return; G.ended = true; cancelAnimationFrame(G.raf); clearTimeout(G.cdT); cover(''); }
 
@@ -484,18 +688,50 @@ function loop(now){
   const dt = Math.min(.1, (now - G.last) / 1000); G.last = now;
   if (!G.paused){
     G.t += dt;
+    G.zones.forEach(z => { if (!z.swap) z.t += dt; });   // 換人的時候，這一隊的時間（流星、作答秒數）先停住
     const left = G.time - G.t;
     $('#timer').textContent = fmt(left);
     $('#timer').classList.toggle('hurry', left <= 10);
-    if (G.kind === 'meteor') G.zones.forEach(z => meteorTick(z));
+    if (G.kind === 'meteor') G.zones.forEach(z => { if (!z.swap) meteorTick(z); });
     if (left <= 0){ finish(); return; }
   }
   G.raf = requestAnimationFrame(loop);
 }
 
-/* ---------- 作答 ---------- */
+/* ---------- 換人提醒 ---------- */
+const cur = z => z.members.length ? z.members[z.turn % z.members.length] : null;
+function showPlayer(z){
+  const p = cur(z), e = z.el.querySelector('.zp');
+  e.hidden = p == null; if (p != null) e.textContent = `${p} 號作答中`;
+}
+function credit(z, ok){
+  const p = cur(z); if (p == null) return;
+  const o = z.per[p] || (z.per[p] = {r:0, w:0});
+  if (ok) o.r++; else o.w++;
+}
+/* 完成一題（答對，或錯 2 次公布答案）；每 N 題跳出換人視窗 */
+function doneQ(z){
+  z.done++;
+  if (!G.swap || G.ended || z.done % G.swap) return;
+  z.turn++; z.swap = true; z.input = '';
+  const p = cur(z);
+  const w = document.createElement('div'); w.className = 'swap';
+  w.innerHTML = `<div class="box"><h3>換人囉！</h3>
+    <p class="who">${p != null ? `請 <b>${p}</b> 號上場` : '請下一位同學上場'}</p>
+    <button class="btn primary big" type="button" disabled>${p != null ? p + ' 號' : '我'}準備好了</button></div>`;
+  z.el.appendChild(w); SND.swap();
+  const b = w.querySelector('button');
+  setTimeout(() => { b.disabled = false; }, SWAP_WAIT);
+  b.addEventListener('pointerdown', e => {
+    e.preventDefault(); if (b.disabled) return;
+    w.remove(); z.swap = false; z.qT = z.t; showPlayer(z);
+    if (G.kind !== 'meteor' && G.kind !== 'mole') renderQ(z);
+  });
+}
+
+/* ---------- 作答（數字鍵盤） ---------- */
 function press(z, k){
-  if (!G || G.ended || G.paused || performance.now() < z.lock) return;
+  if (!G || G.ended || G.paused || z.swap || performance.now() < z.lock) return;
   if (k === 'del') z.input = z.input.slice(0, -1);
   else if (z.input.length < 2) z.input += k;
   if (G.kind === 'meteor') return meteorInput(z);
@@ -505,19 +741,19 @@ function press(z, k){
 function judge(z){
   const q = z.q;
   if (+z.input === q.ans){
-    z.right++; z.times.push(G.t - z.qT); z.lock = performance.now() + 350;
+    z.right++; credit(z, true); z.times.push(z.t - z.qT); z.lock = performance.now() + 350;
     renderQ(z, 'ok'); flash(z); SND.ok();
     progress(z);
     if (G.ended) return;
-    setTimeout(() => { if (!G || G.ended) return; z.q = newQ(q); z.qT = G.t; z.input = ''; z.miss = 0; renderQ(z); }, 350);
+    setTimeout(() => { if (!G || G.ended) return; z.q = newQ(q); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); doneQ(z); }, 350);
   } else {
-    z.wrong++; z.miss++; z.misses.push(q); SND.no();
+    z.wrong++; z.miss++; z.misses.push(q); credit(z, false); SND.no();
     z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
     if (z.miss >= 2){
       z.lock = performance.now() + LOCK_SHOW; z.input = String(q.ans);
       renderQ(z, 'show', `答案是 ${q.ans}，換下一題`);
       z.el.classList.add('locked');
-      setTimeout(() => { if (!G || G.ended) return; z.el.classList.remove('locked'); z.q = newQ(q); z.qT = G.t; z.input = ''; z.miss = 0; renderQ(z); }, LOCK_SHOW);
+      setTimeout(() => { if (!G || G.ended) return; z.el.classList.remove('locked'); z.q = newQ(q); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); doneQ(z); }, LOCK_SHOW);
     } else {
       z.lock = performance.now() + LOCK_WRONG;
       renderQ(z, 'no', '再想一想！');
@@ -527,7 +763,7 @@ function judge(z){
   }
 }
 function renderQ(z, cls = '', msg = ''){
-  z.el.querySelector('.qline').innerHTML = `<span>${z.q.a}</span><span class="op">×</span><span>${z.q.b}</span><span class="op">=</span><span class="slot ${cls}">${z.input || '&nbsp;'}</span>`;
+  z.el.querySelector('.qline').innerHTML = `<span>${z.q.a}</span><span class="op">×</span><span>${z.q.b}</span><span class="op">=</span><span class="slot ${cls}">${z.input || (G.kind === 'mole' ? '?' : '&nbsp;')}</span>`;
   const m = z.el.querySelector('.zmsg'); m.textContent = msg; m.className = 'zmsg' + (cls === 'no' || cls === 'show' ? ' bad' : '');
 }
 function flash(z, x, y){
@@ -537,22 +773,18 @@ function flash(z, x, y){
   z.el.appendChild(p); setTimeout(() => p.remove(), 800);
 }
 function progress(z){
-  if (G.kind === 'race'){
-    z.score++; hudZ(z); moveRunner(z);
-    if (z.score >= G.goal) finish();
-  } else if (G.kind === 'tower'){
-    z.score++; hudZ(z); buildTower(z, true);
-    if (z.score >= G.goal) finish();
-  }
+  z.score++; hudZ(z);
+  if (G.kind === 'race') moveRunner(z);
+  if (G.kind === 'stack') buildStack(z, true);
+  if (G.goal && z.score >= G.goal) finish();
 }
 function hudZ(z){
   const s = z.el.querySelector('.zs');
-  if (G.kind === 'race' || G.kind === 'tower') s.innerHTML = `${z.score}<small> / ${G.goal}</small>`;
-  else if (G.kind === 'meteor') s.innerHTML = `<small>擊碎</small>${z.score}`;
-  else s.innerHTML = `<small>答對</small>${z.score}`;
+  if (G.goal) s.innerHTML = `${z.score}<small> / ${G.goal}</small>`;
+  else s.innerHTML = `<small>擊碎</small>${z.score}`;
 }
 
-/* ---------- 場景：賽跑、蓋高樓 ---------- */
+/* ---------- 賽跑 ---------- */
 function drawScene(){
   const sc = $('#scene');
   if (G.kind === 'race'){
@@ -574,27 +806,79 @@ function moveRunner(z){
   r.style.left = (x0 + (x1 - x0) * Math.min(1, z.score / G.goal)) + 'px';
   if (z.score){ r.classList.add('run'); clearTimeout(r._t); r._t = setTimeout(() => r.classList.remove('run'), 600); }
 }
-function buildTower(z, add){
-  const f = z.el.querySelector('.floors');
-  if (add){ const d = document.createElement('div'); d.className = 'floor'; if (z.score % 5 === 0) d.innerHTML = `<b>${z.score}</b>`; f.appendChild(d); }
+
+/* ---------- 疊疊樂：每答對一題，疊上一塊積木（寬度、位置、角度都有一點點不一樣） ---------- */
+function buildStack(z, add){
+  const f = z.el.querySelector('.blocks');
+  if (add){
+    const d = document.createElement('div'); d.className = 'blk';
+    const w = Math.min(G.n === 3 ? 190 : 230, 60 + z.bh * 3 + ri(-16, 16));   // 積木越薄就越窄，看起來才像積木
+    d.style.cssText = `--w:${w}px;--dx:${ri(-12, 12)}px;--r:${(Math.random() * 5 - 2.5).toFixed(1)}deg;--bc:${z.score % 2 ? z.c : z.m}`;
+    f.appendChild(d);
+  }
   const c = z.el.querySelector('.climber');
   c.style.bottom = (30 + z.bh * z.score - 4) + 'px';
   if (add){ c.classList.add('run'); clearTimeout(c._t); c._t = setTimeout(() => c.classList.remove('run'), 500); }
 }
 
-/* ---------- 流星雨 ---------- */
+/* ---------- 打地鼠：6 個洞，4 隻地鼠拿著答案，只有 1 隻是對的 ---------- */
+function moleUp(z){
+  if (!G || G.ended) return;
+  const opts = shuffle([z.q.ans, ...distractors(z.q)]);
+  const holes = shuffle([0, 1, 2, 3, 4, 5]).slice(0, opts.length);
+  const ms = z.el.querySelectorAll('.mole');
+  ms.forEach(m => { m.className = 'mole'; });
+  holes.forEach((hI, k) => {
+    const m = ms[hI]; m.dataset.v = opts[k]; m.querySelector('.mn').textContent = opts[k];
+    setTimeout(() => { if (G && !G.ended) m.classList.add('up'); }, 60 + k * 90);
+  });
+}
+function moleDown(z){ z.el.querySelectorAll('.mole').forEach(m => m.classList.remove('up')); }
+function nextMole(z, prev){
+  moleDown(z);
+  setTimeout(() => { if (!G || G.ended) return; z.q = newQ(prev); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); moleUp(z); doneQ(z); }, 260);
+}
+function whack(z, m){
+  if (!G || G.ended || G.paused || z.swap || performance.now() < z.lock) return;
+  const q = z.q, v = +m.dataset.v;
+  if (v === q.ans){
+    z.right++; credit(z, true); z.times.push(z.t - z.qT); z.lock = performance.now() + 700;
+    m.classList.add('hit'); z.input = String(v); renderQ(z, 'ok'); SND.ok();
+    const r = m.getBoundingClientRect(), b = z.el.getBoundingClientRect(), s = b.width / z.el.offsetWidth;
+    flash(z, (r.left - b.left) / s + 20, (r.top - b.top) / s - 40);
+    progress(z);
+    if (G.ended) return;
+    setTimeout(() => nextMole(z, q), 450);
+  } else {
+    z.wrong++; z.miss++; z.misses.push(q); credit(z, false); SND.no();
+    m.classList.add('bad'); setTimeout(() => m.classList.remove('up'), 400);
+    z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
+    if (z.miss >= 2){
+      z.lock = performance.now() + LOCK_SHOW; z.input = String(q.ans);
+      renderQ(z, 'show', `答案是 ${q.ans}，換下一題`);
+      z.el.querySelectorAll('.mole.up').forEach(o => { if (+o.dataset.v === q.ans) o.classList.add('right'); });
+      setTimeout(() => { if (G && !G.ended) nextMole(z, q); }, LOCK_SHOW);
+    } else {
+      z.lock = performance.now() + LOCK_WRONG;
+      renderQ(z, 'no', '再想一想！');
+      setTimeout(() => { if (G && !G.ended && z.q === q){ z.input = ''; renderQ(z); } }, LOCK_WRONG);
+    }
+  }
+}
+
+/* ---------- 流星雨（用每一隊自己的時間，換人時流星會停住） ---------- */
 const MW = 200, MH = 150;
 function meteorTick(z){
   const p = Math.min(1, G.t / G.time);
   const dur = 10 - 4 * p;          // 掉到地上要幾秒：10 秒慢慢變成 6 秒
   const gap = 2.8 - 1.2 * p;       // 多久來一顆
   const max = z.skyW > 700 ? 4 : 3;
-  if ((G.t >= z.nextSpawn || !z.mets.length) && z.mets.length < max){
-    if (spawn(z, dur)) z.nextSpawn = G.t + gap;
+  if ((z.t >= z.nextSpawn || !z.mets.length) && z.mets.length < max){
+    if (spawn(z, dur)) z.nextSpawn = z.t + gap;
   }
   const yEnd = z.skyH - 44 - MH + 30;
   for (const m of [...z.mets]){
-    const k = (G.t - m.born) / m.dur;
+    const k = (z.t - m.born) / m.dur;
     m.y = -MH + (yEnd + MH) * k;
     m.el.style.transform = `translate(${m.x}px,${m.y}px)`;
     if (k >= 1) landM(z, m);
@@ -614,34 +898,36 @@ function spawn(z, dur){
   }
   if (!q) return false;
   const slot = pick(free);
-  const m = {q, slot, born:G.t, dur, x:Math.round(slot * sw + (sw - MW) / 2), y:-MH};
+  const m = {q, slot, born:z.t, dur, x:Math.round(slot * sw + (sw - MW) / 2), y:-MH};
   m.el = document.createElement('div'); m.el.className = 'met';
   m.el.innerHTML = `${meteorSVG()}<div class="mq"><span>${q.a}×${q.b}</span></div>`;
   m.el.style.transform = `translate(${m.x}px,${m.y}px)`;
   z.sky.appendChild(m.el); z.mets.push(m);
   return true;
 }
+function clearSlot(z){ z.slot.className = 'slot'; z.slot.innerHTML = '&nbsp;'; }
 function meteorInput(z){
   const v = z.input;
   z.mets.forEach(m => m.el.classList.toggle('hot', !!v && String(m.q.ans).startsWith(v)));
   const hitM = z.mets.find(m => String(m.q.ans) === v);
   if (hitM){
-    z.right++; z.score++; hudZ(z); SND.ok();
+    z.right++; z.score++; credit(z, true); hudZ(z); SND.ok();
     z.slot.className = 'slot ok'; z.slot.textContent = v;
     z.mets = z.mets.filter(m => m !== hitM);
     hitM.el.style.setProperty('--at', `translate(${hitM.x}px,${hitM.y}px)`); hitM.el.classList.add('boom');
     setTimeout(() => hitM.el.remove(), 400);
     flash(z, hitM.x + 60, Math.max(20, hitM.y + 64));
     z.input = ''; z.lock = performance.now() + 200;
-    setTimeout(() => { if (G && !G.ended && !z.input) { z.slot.className = 'slot'; z.slot.innerHTML = '&nbsp;'; } }, 260);
+    setTimeout(() => { if (G && !G.ended && !z.input) clearSlot(z); }, 260);
+    doneQ(z);
     return;
   }
   if (v && !z.mets.some(m => String(m.q.ans).startsWith(v))){
-    z.wrong++; SND.no();
+    z.wrong++; credit(z, false); SND.no();
     z.slot.className = 'slot no'; z.slot.textContent = v;
     z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
     z.lock = performance.now() + LOCK_METEOR; z.el.classList.add('locked');
-    setTimeout(() => { if (!G || G.ended) return; z.input = ''; z.el.classList.remove('locked'); z.slot.className = 'slot'; z.slot.innerHTML = '&nbsp;'; z.mets.forEach(m => m.el.classList.remove('hot')); }, LOCK_METEOR);
+    setTimeout(() => { if (!G || G.ended) return; z.input = ''; z.el.classList.remove('locked'); clearSlot(z); z.mets.forEach(m => m.el.classList.remove('hot')); }, LOCK_METEOR);
     return;
   }
   z.slot.className = 'slot'; z.slot.innerHTML = v || '&nbsp;';
@@ -653,51 +939,94 @@ function landM(z, m){
   t.textContent = `${m.q.a}×${m.q.b}=${m.q.ans}`;
   t.style.left = Math.max(6, Math.min(z.skyW - 200, m.x)) + 'px';
   z.sky.appendChild(t); setTimeout(() => t.remove(), 1800);
-  if (z.input && !z.mets.some(o => String(o.q.ans).startsWith(z.input))){ z.input = ''; z.slot.className = 'slot'; z.slot.innerHTML = '&nbsp;'; }
+  if (z.input && !z.mets.some(o => String(o.q.ans).startsWith(z.input))){ z.input = ''; clearSlot(z); }
 }
 
 /* ---------- 結果 ---------- */
+const medal = (r, cls = '') => `<span class="medal m${r} ${cls}">第 ${r} 名</span>`;
+const perChips = (per, members) => {
+  const keys = [...new Set([...(members || []), ...Object.keys(per).map(Number)])].filter(k => per[k]);
+  return keys.map(k => `<span class="pc"><b>${k} 號</b> 對 ${per[k].r}${per[k].w ? `・錯 ${per[k].w}` : ''}</span>`).join('');
+};
 function finish(){
   if (!G || G.ended) return;
   stop();
   const Z = G.zones;
-  let order;
-  {
-    const s = [...Z].sort((a, b) => b.score - a.score);
-    order = s.map(z => ({z, rank:1 + s.filter(o => o.score > z.score).length}));
-  }
+  const sorted = [...Z].sort((a, b) => b.score - a.score);
+  const order = sorted.map(z => ({z, rank:1 + sorted.filter(o => o.score > z.score).length}));
   const winners = order.filter(o => o.rank === 1);
   const head = winners.length === Z.length ? '平手！大家都很厲害'
     : winners.length > 1 ? `${winners.map(o => esc(o.z.name)).join('、')} 並列第一！`
     : `${esc(winners[0].z.name)} 獲勝！`;
-  const why = G.manual ? '老師結束了這一局' : G.kind === 'race' ? (Z.some(z => z.score >= G.goal) ? '先跑到終點' : '時間到，跑最遠的贏')
-    : G.kind === 'tower' ? (Z.some(z => z.score >= G.goal) ? '先蓋到頂樓' : '時間到，蓋最高的贏')
+  const reached = Z.some(z => G.goal && z.score >= G.goal);
+  const why = G.manual ? '老師結束了這一局'
+    : G.kind === 'race' ? (reached ? '先跑到終點' : '時間到，跑最遠的贏')
+    : G.kind === 'stack' ? (reached ? '先疊到目標' : '時間到，疊最高的贏')
+    : G.kind === 'mole' ? (reached ? '先敲到目標數' : '時間到，敲最多隻的贏')
     : '時間到，打碎最多流星的贏';
-  const medal = r => `<span class="medal m${r}">第 ${r} 名</span>`;
   const misses = z => { const seen = new Map(); z.misses.forEach(q => seen.set(q.t, q)); return [...seen.values()].slice(-8); };
+  const unit = {race:'答對題數', stack:'疊了幾塊', mole:'敲到幾隻', meteor:'擊碎流星'}[G.kind];
+
+  /* 存進比賽紀錄 */
+  H.unshift({at:Date.now(), game:G.kind, tables:[...S.tables], time:G.time, goal:G.goal, manual:!!G.manual, played:Math.round(G.t),
+    teams:order.map(({z, rank}) => ({name:z.name, color:z.i, rank, score:z.score, right:z.right, wrong:z.wrong, members:z.members, per:z.per}))});
+  if (H.length > MAX_HIST) H.length = MAX_HIST;
+  saveH();
+
   $('#result').innerHTML = `
     <h2 class="rhead">🏆 ${head}<small>${why}</small></h2>
     <div class="rcards" style="--n:${Z.length}">${order.map(({z, rank}) => {
       const tot = z.right + z.wrong, acc = tot ? Math.round(z.right / tot * 100) : 0;
       const avg = z.times.length ? (z.times.reduce((a, b) => a + b, 0) / z.times.length).toFixed(1) : '–';
-      const ms = misses(z);
+      const ms = misses(z), pc = perChips(z.per, z.members);
       return `<div class="rcard" style="--c:${z.c};--l:${z.l}">
         <div class="top"><span class="who ${rank === 1 ? 'win' : ''}">${critter(z.c)}</span><b>${esc(z.name)}</b>${medal(rank)}</div>
         <div class="body">
           <div class="stats">
-            <div class="stat"><b>${z.right}</b><span>${G.kind === 'meteor' ? '擊碎流星' : '答對題數'}</span></div>
+            <div class="stat"><b>${z.score}</b><span>${unit}</span></div>
             <div class="stat"><b>${tot ? acc + '%' : '–'}</b><span>答對比例</span></div>
             <div class="stat"><b>${G.kind === 'meteor' ? z.misses.length : avg}</b><span>${G.kind === 'meteor' ? '掉到地上' : '每題秒數'}</span></div>
           </div>
+          ${pc ? `<div class="miss"><h4>每一位同學</h4><div class="pcs">${pc}</div></div>` : ''}
           <div class="miss"><h4>${G.kind === 'meteor' ? '沒打到、要再練習的題目' : '答錯、要再練習的題目'}</h4>
             ${!tot && !ms.length ? '<div class="none" style="color:var(--ink-soft)">這一局還沒有作答</div>' : ms.length ? `<div class="chips">${ms.map(q => `<span>${q.a}×${q.b}=${q.ans}</span>`).join('')}</div>` : '<div class="none">全部都對，太棒了！</div>'}</div>
         </div></div>`; }).join('')}</div>
     <div class="rbtns"><button class="btn primary big" type="button" id="againBtn">再玩一次</button><button class="btn big" type="button" id="setBtn">回到設定</button></div>`;
+  G.lastSkip = !Z.some(z => z.members.length);
   show('result'); SND.win();
 }
 $('#result').addEventListener('click', e => {
-  if (e.target.id === 'againBtn') start();
-  if (e.target.id === 'setBtn'){ $('#title').textContent = '乘法大屏對抗'; show('lobby'); drawLobby(); }
+  if (e.target.id === 'againBtn') start(G ? G.lastSkip : true);
+  if (e.target.id === 'setBtn'){ show('lobby'); drawLobby(); }
+});
+
+/* ---------- 比賽紀錄 ---------- */
+const WD = '日一二三四五六';
+function drawHist(){
+  $('#title').textContent = '比賽紀錄';
+  $('#hcount').textContent = H.length ? `共 ${H.length} 筆（最多保留 ${MAX_HIST} 筆，存在這台電腦的瀏覽器）` : '';
+  $('#hlist').innerHTML = H.length ? H.map(r => {
+    const d = new Date(r.at), g = GAMES[r.game] || {name:'乘法蓋高樓'};
+    const when = `${d.getMonth() + 1}/${d.getDate()}（${WD[d.getDay()]}）${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    return `<div class="hrec">
+      <div class="hmeta"><b>${when}</b><span class="hg">${esc(g.name)}</span><span>${tablesText(r.tables)} 的乘法</span><span>玩了 ${fmt(r.played)}</span>${r.manual ? '<span>老師提前結束</span>' : ''}</div>
+      <div class="hteams" style="--n:${r.teams.length}">${r.teams.map(t => {
+        const T = TEAMS[t.color] || TEAMS[0], tot = t.right + t.wrong, pc = perChips(t.per || {}, t.members);
+        return `<div class="ht" style="--c:${T.c};--l:${T.l}">${medal(t.rank, 'sm')}<b>${esc(t.name)}</b><span class="hs">${t.score}${r.goal ? ' / ' + r.goal : ''}・答對 ${tot ? Math.round(t.right / tot * 100) : 0}%</span>
+          ${pc ? `<div class="pcs">${pc}</div>` : ''}</div>`; }).join('')}</div>
+    </div>`; }).join('') : '<p class="empty">還沒有比賽紀錄。玩完一局，結果會自動存在這裡。</p>';
+}
+$('#histBtn').addEventListener('click', () => { show('hist'); drawHist(); });
+let clrArm = 0;
+$('#hist').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.id === 'hBack'){ show('lobby'); drawLobby(); }
+  if (b.id === 'hClear'){
+    if (!H.length) return;
+    if (performance.now() - clrArm < 2500){ H = []; saveH(); drawHist(); b.textContent = '清除全部紀錄'; return; }
+    clrArm = performance.now(); b.textContent = '再按一次，全部清除';
+    setTimeout(() => { b.textContent = '清除全部紀錄'; }, 2500);
+  }
 });
 
 /* ---------- 工具列、鍵盤 ---------- */
@@ -709,7 +1038,7 @@ function toggleFS(){
 $('#fsBtn').addEventListener('click', toggleFS);
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
-  if (e.code === 'Space'){ e.preventDefault(); if (G && !G.ended) pause(); }
+  if (e.code === 'Space'){ e.preventDefault(); if (G && !G.ended && !$('#game').hidden) pause(); }
   else if (e.key === 'f' || e.key === 'F') toggleFS();
 });
 
