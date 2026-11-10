@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="加減法流星雨">
+<meta name="theme-color" content="#E3EDF2">
+<title>加減法流星雨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<style>
+/* 改編自 info-class「字母流星雨」：流星上是加減法算式，在平板上用數字鍵盤點答案打碎流星 */
+:root{
+  --paper:#E3EDF2; --grid:#D0DEE6; --ink:#1B2836; --ink-soft:#4C5D6E; --card:#FFFFFF; --wash:#F3F7FA;
+  --hl:#FFE066; --gold:#F2B400; --mid:#B07D00; --good:#1FA963; --bad:#E5484D; --blue:#3A9FEF; --dim:#D9E1E8;
+  --f-display:'LXGW WenKai TC','PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;
+  --f-body:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
+  --f-num:'Fredoka','Noto Sans TC',sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+html{background:var(--paper)}
+body{background:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;
+  color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;height:100dvh;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;
+  padding:max(10px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.wrap{height:100%;display:flex;flex-direction:column;gap:10px;max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;margin:0;line-height:1.25}
+p{margin:0}
+button{font-family:inherit;color:var(--ink)}
+.btn{font:700 16px var(--f-body);padding:8px 16px;border:3px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:3px 3px 0 var(--ink);cursor:pointer;text-decoration:none;color:var(--ink);display:inline-flex;align-items:center}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.primary{background:var(--hl)}
+.btn.sm{font-size:14px;padding:4px 12px}
+.card{background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);padding:16px}
+.top{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{font-size:28px}
+.tag{display:inline-block;background:var(--hl);border:3px solid var(--ink);border-radius:10px;padding:0 8px;box-shadow:3px 3px 0 var(--ink);font:600 20px var(--f-num);transform:rotate(-4deg)}
+.ver{font-size:13px;font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:0 10px;background:var(--hl)}
+.hud{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hud-item{background:var(--card);border:3px solid var(--ink);border-radius:12px;padding:1px 10px;display:flex;align-items:center;gap:6px;box-shadow:3px 3px 0 var(--ink)}
+.hud-l{font-size:12px;color:var(--ink-soft);font-weight:700}
+.hud-item b{font:600 20px var(--f-num);font-variant-numeric:tabular-nums}
+.hud-item b.t{font:900 16px var(--f-body)}
+.hearts{font-size:20px;letter-spacing:2px;color:var(--bad)}
+.hearts .off{color:var(--dim)}
+main{flex:1;min-height:0;display:flex;flex-direction:column}
+main>section{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+#home,#result{overflow:auto;padding:0 6px 6px 0}
+
+/* 首頁：選題目、選等級 */
+.lead{font-weight:700;color:var(--ink-soft)}
+.step{display:flex;align-items:center;gap:8px;font:700 22px var(--f-display)}
+.step i{font:600 18px var(--f-num);font-style:normal;background:var(--ink);color:#fff;border-radius:999px;width:30px;height:30px;display:grid;place-items:center}
+.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.topic{display:grid;gap:2px;text-align:left;cursor:pointer;background:var(--card);border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:10px 14px;font:inherit;min-height:84px}
+.topic b{font:900 21px var(--f-body)}
+.topic small{font-size:14px;color:var(--ink-soft);font-weight:700}
+.topic .eg{font:600 18px var(--f-num);color:var(--ink-soft)}
+.topic.on{background:#FFF6C7;border-color:var(--ink);box-shadow:0 0 0 4px var(--gold),4px 4px 0 var(--ink)}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.level{display:grid;gap:4px;text-align:left;cursor:pointer;background:var(--card);border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:0 0 12px;overflow:hidden;font:inherit;min-height:120px}
+.level .band{height:14px;border-bottom:3px solid var(--ink)}
+.level b{font:700 26px var(--f-display);padding:0 14px}
+.level small{font-size:14px;font-weight:700;color:var(--ink-soft);padding:0 14px;line-height:1.4}
+.level .stars{padding:0 14px}
+.level:active,.topic:active{transform:translate(2px,2px)}
+.stars{color:var(--gold);letter-spacing:2px;font-size:20px}
+.stars .off{color:var(--dim)}
+
+/* 遊戲畫面：橫放時鍵盤在右邊，直放時鍵盤在下面 */
+#play{display:grid;grid-template-columns:1fr minmax(260px,34vw);gap:14px}
+@media (max-aspect-ratio:1/1){ #play{grid-template-columns:1fr;grid-template-rows:1fr auto} }
+.stage{position:relative;min-height:0;min-width:0;border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);overflow:hidden}
+.scene{position:absolute;inset:0;transition:background .8s}
+.scene::before{content:"";position:absolute;left:0;right:0;top:0;height:62%;pointer-events:none;opacity:.9;
+  background-image:radial-gradient(2px 2px at 8% 18%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 23% 40%,#fff 50%,transparent 51%),radial-gradient(3px 3px at 37% 12%,#FFF6CC 50%,transparent 51%),radial-gradient(2px 2px at 52% 33%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 66% 9%,#fff 50%,transparent 51%),radial-gradient(3px 3px at 79% 28%,#FFF6CC 50%,transparent 51%),radial-gradient(2px 2px at 91% 15%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 45% 52%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 15% 58%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 86% 50%,#fff 50%,transparent 51%);animation:twinkle 2.4s ease-in-out infinite alternate}
+.scene[data-th="1"]::before{opacity:.35}
+@keyframes twinkle{to{filter:brightness(.6)}}
+.scene .far{position:absolute;left:0;right:0;bottom:18%;height:34%;transition:background .8s;clip-path:polygon(0 100%,0 70%,6% 70%,6% 52%,12% 52%,12% 64%,20% 64%,20% 40%,27% 40%,27% 60%,36% 60%,36% 48%,44% 48%,44% 66%,55% 66%,55% 36%,61% 36%,61% 58%,70% 58%,70% 46%,78% 46%,78% 62%,88% 62%,88% 42%,94% 42%,94% 66%,100% 66%,100% 100%)}
+.scene .ground{position:absolute;left:0;right:0;bottom:0;height:18%;border-top:4px solid var(--ink);transition:background .8s;background-image:repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.1) 46px 50px)}
+.keeper{position:absolute;left:3%;bottom:15%;width:clamp(70px,13vh,116px);z-index:3;transition:transform .12s}
+.keeper.dash{transform:translateY(-8px) scale(1.06)}
+.keeper.hurt{animation:hurt .5s}
+@keyframes hurt{25%,75%{transform:translateX(-10px);filter:brightness(1.8) saturate(0)}50%{transform:translateX(8px)}}
+.meteor{position:absolute;left:0;top:0;z-index:4;display:grid;justify-items:center;will-change:transform}
+.meteor svg{width:clamp(58px,10vh,90px);display:block;animation:sway .6s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.meteor.poof svg{animation:poof .35s forwards}
+.meteor.poof .eq{animation:poofeq .35s forwards}
+@keyframes poof{to{transform:scale(1.7) rotate(25deg);opacity:0}}
+@keyframes poofeq{to{transform:scale(1.2);opacity:0}}
+.eq{font:600 clamp(28px,5.4vh,46px)/1.1 var(--f-num);background:#fff;border:3px solid var(--ink);border-radius:14px;padding:2px 14px;margin-bottom:4px;box-shadow:0 4px 0 rgba(0,0,0,.25);white-space:nowrap;font-variant-numeric:tabular-nums}
+.eq.hit{background:#DDF5E7;border-color:var(--good);color:var(--good)}
+.eq.match{box-shadow:0 0 0 4px var(--hl),0 4px 0 rgba(0,0,0,.25)}
+.landed{position:absolute;z-index:6;transform:translateX(-50%);font:600 clamp(26px,4.6vh,40px) var(--f-num);background:#FFF1F1;color:var(--bad);border:3px solid var(--bad);border-radius:14px;padding:0 12px;white-space:nowrap;pointer-events:none;animation:landed 2.4s forwards}
+@keyframes landed{0%{opacity:0;transform:translate(-50%,10px)}10%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0}}
+.zap{position:absolute;z-index:5;height:6px;border-radius:3px;background:linear-gradient(90deg,#FACC15,#fff);transform-origin:0 50%;pointer-events:none;animation:zap .25s forwards}
+@keyframes zap{to{opacity:0}}
+.pts{position:absolute;z-index:6;font:600 26px var(--f-num);color:var(--mid);background:#fff;border:2px solid var(--ink);border-radius:10px;padding:0 8px;animation:pts .9s forwards;pointer-events:none;transform:translateX(-50%)}
+@keyframes pts{to{transform:translate(-50%,-50px);opacity:0}}
+.flash{position:absolute;inset:0;z-index:6;pointer-events:none;animation:fl .45s}
+@keyframes fl{from{background:rgba(229,72,77,.5)}to{background:transparent}}
+.stagebig{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);z-index:8;font:700 clamp(26px,5.5vh,44px) var(--f-display);color:#fff;background:var(--ink);border:4px solid var(--hl);border-radius:20px;padding:4px 26px;white-space:nowrap;opacity:0;pointer-events:none}
+.stagebig.go{animation:stagein 1.6s ease-out forwards}
+@keyframes stagein{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%)}}
+.cover{position:absolute;inset:0;background:rgba(27,40,54,.86);z-index:9;display:grid;place-items:center;align-content:center;gap:12px;color:#fff;text-align:center;padding:16px}
+.cover h2{font-size:32px}
+.cover p{font-size:18px;font-weight:700;max-width:520px}
+.count{font:600 80px/1 var(--f-num)}
+
+/* 數字鍵盤（平板用手指點） */
+.padbox{display:flex;flex-direction:column;gap:10px;min-height:0}
+.ans{flex:none;display:flex;align-items:center;justify-content:center;gap:10px;background:#FBFDFF;border:4px solid var(--ink);border-radius:16px;box-shadow:0 4px 0 var(--ink);min-height:clamp(64px,11vh,96px);font:600 clamp(40px,8vh,68px)/1 var(--f-num);font-variant-numeric:tabular-nums}
+.ans .ph{font:900 18px var(--f-body);color:var(--ink-soft)}
+.ans.bad{border-color:var(--bad);box-shadow:0 4px 0 var(--bad);background:#FFF1F1;color:var(--bad);animation:shake .3s}
+.ans.ok{border-color:var(--good);box-shadow:0 4px 0 var(--good);background:#DDF5E7;color:var(--good)}
+@keyframes shake{25%,75%{transform:translateX(-8px)}50%{transform:translateX(8px)}}
+.pad{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,minmax(56px,1fr));gap:10px}
+.pad button{font:600 clamp(30px,6vmin,54px)/1 var(--f-num);border:3px solid var(--ink);border-radius:18px;background:var(--card);box-shadow:4px 4px 0 var(--ink);cursor:pointer;touch-action:manipulation}
+.pad button.fn{font:900 clamp(18px,3vmin,24px) var(--f-body);background:var(--wash)}
+.pad button.down{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);background:var(--hl)}
+.tip{flex:none;text-align:center;font-weight:900;font-size:14px;color:var(--ink-soft);min-height:1.5em}
+@media (max-aspect-ratio:1/1){
+  .padbox{display:grid;grid-template-columns:minmax(150px,30%) 1fr;align-items:stretch;gap:12px}
+  .ans{min-height:0}
+  .pad{grid-template-rows:repeat(4,clamp(54px,7.2vh,84px))}
+  .tip{grid-column:1/-1;order:-1}
+}
+
+/* 結果 */
+.res{display:grid;gap:14px;justify-items:center;text-align:center;width:min(640px,100%);margin:0 auto}
+.res h2{font-size:34px}
+.res .stars{font-size:46px}
+.res .big{font:600 28px var(--f-num)}
+.miss{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.miss span{font:600 22px var(--f-num);background:#FFF1F1;border:2px solid var(--bad);border-radius:10px;padding:0 10px}
+.miss span b{color:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="tag">+−</span><h1>加減法流星雨</h1><span class="ver" id="ver">v1.0</span></div>
+    <div class="hud" id="hud" hidden></div>
+    <div class="row" style="justify-content:flex-end">
+      <a class="btn sm" id="backBtn" href="index.html">← 回到上一頁</a>
+      <button class="btn sm" id="quitBtn" type="button" hidden>結束這一局</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 首頁 -->
+    <section id="home">
+      <p class="lead">流星上有加減法算式，在流星掉到地上以前，用數字鍵盤點出答案，就能打碎它！</p>
+      <div class="step"><i>1</i>選題目</div>
+      <div class="topics" id="topics"></div>
+      <div class="step"><i>2</i>選等級，開始玩</div>
+      <div class="levels" id="levels"></div>
+    </section>
+
+    <!-- 遊戲 -->
+    <section id="play" hidden>
+      <div class="stage" id="stage">
+        <div class="scene" id="scene"><div class="far"></div><div class="ground"></div></div>
+        <div class="keeper" id="keeper"></div>
+        <div id="layer"></div>
+        <div class="stagebig" id="stagebig"></div>
+        <div class="cover" id="cover" hidden></div>
+      </div>
+      <div class="padbox">
+        <div class="tip" id="tip">點數字鍵盤輸入答案（不用按確定）</div>
+        <div class="ans" id="ans"><span class="ph">答案</span></div>
+        <div class="pad" id="pad">
+          <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
+          <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
+          <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
+          <button type="button" data-k="C" class="fn">清除</button><button type="button" data-k="0">0</button><button type="button" data-k="B" class="fn">⌫ 退格</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 結果 -->
+    <section id="result" hidden>
+      <div class="res card" id="res"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+/* ---------- 題目 ---------- */
+const add = (a, b) => ({t: `${a} + ${b}`, a: a + b});
+const sub = (a, b) => ({t: `${a} − ${b}`, a: a - b});
+const TOPICS = {
+  add10:{name:'10以內的加法', eg:'3 + 5', gen(){ const s = ri(2, 10), a = ri(1, s - 1); return add(a, s - a); }},
+  sub10:{name:'10以內的減法', eg:'9 − 4', gen(){ const a = ri(2, 10), b = ri(1, a - 1); return sub(a, b); }},
+  mix10:{name:'10以內加減混合', eg:'6 + 3、8 − 5', gen(){ return Math.random() < .5 ? TOPICS.add10.gen() : TOPICS.sub10.gen(); }},
+  /* 20以內：七成是進位／退位的題目，三成是十幾加減個位（不進位、不退位） */
+  add20:{name:'20以內的加法', eg:'8 + 7、12 + 5', gen(){
+    if (Math.random() < .7){ const a = ri(2, 9), b = ri(Math.max(2, 11 - a), 9); return add(a, b); }
+    const a = ri(10, 18), b = ri(1, 9 - a % 10 || 1); return Math.random() < .5 ? add(a, b) : add(b, a); }},
+  sub20:{name:'20以內的減法', eg:'15 − 8、17 − 4', gen(){
+    if (Math.random() < .7){ const a = ri(11, 18), b = ri(a % 10 + 1, 9); return sub(a, b); }
+    const a = ri(11, 19), b = ri(1, a % 10); return sub(a, b); }},
+  mix20:{name:'20以內加減混合', eg:'9 + 6、14 − 7', gen(){ return Math.random() < .5 ? TOPICS.add20.gen() : TOPICS.sub20.gen(); }},
+};
+
+/* ---------- 等級 ----------
+   time＝流星從天上掉到地上要幾秒（每一小關一個數字，越後面越快）；multi＝同時最多幾顆流星；gap＝兩顆流星之間至少隔幾秒 */
+const LEVELS = {
+  novice:{name:'新手', color:'#8FE0AE', goal:15, lives:3, time:[16,15,14],          multi:[1,1,1],       gap:3, desc:'一次一顆，掉得很慢'},
+  brave: {name:'勇者', color:'#7CC4FF', goal:20, lives:3, time:[14,13,12,11],       multi:[1,1,2,2],     gap:4, desc:'後面會同時有 2 顆流星'},
+  master:{name:'大師', color:'#FF9EC4', goal:25, lives:3, time:[12,11,10,9.5,9],    multi:[1,2,2,2,2],   gap:3, desc:'掉得比較快，常常 2 顆一起來'},
+};
+const THEMES = [
+  {name:'傍晚的天空', sky:'linear-gradient(#F59E42,#7C5BA8)', far:'#4B3F72', ground:'#3F6B45'},
+  {name:'滿天星斗',   sky:'linear-gradient(#0F1B3D,#2B3F7A)', far:'#1E2B55', ground:'#2F4A3A'},
+  {name:'流星雨來了', sky:'linear-gradient(#1A1040,#4A2B7A)', far:'#2A1B55', ground:'#34405A'},
+  {name:'極光之夜',   sky:'linear-gradient(#062B2B,#1E6B5E 45%,#5B3A8A)', far:'#0E3B3B', ground:'#2E4A44'},
+  {name:'最後的流星群', sky:'linear-gradient(#050814,#3B1D3F)', far:'#140A1F', ground:'#2B2B3A'},
+];
+
+/* ---------- 圖 ---------- */
+function meteorSVG(th){
+  const C = [['#F59E0B','#FDE68A'],['#60A5FA','#DBEAFE'],['#C084FC','#F3E8FF'],['#34D399','#D1FAE5'],['#F43F5E','#FFE4E6']][th - 1];
+  return `<svg viewBox="0 0 100 110" aria-hidden="true">
+    <path d="M30 70 Q18 30 34 4 Q42 34 50 22 Q56 40 66 6 Q84 34 70 70 Z" fill="${C[0]}" opacity=".85"/>
+    <path d="M38 70 Q32 44 42 26 Q48 46 54 36 Q58 50 64 30 Q72 50 62 70 Z" fill="${C[1]}"/>
+    <circle cx="50" cy="78" r="24" fill="#6B5B4E" stroke="#1B2836" stroke-width="4"/>
+    <circle cx="41" cy="72" r="5" fill="#4A3F36"/><circle cx="58" cy="86" r="6" fill="#4A3F36"/><circle cx="60" cy="69" r="3" fill="#4A3F36"/></svg>`;
+}
+const KEEPER_SVG = `<svg viewBox="0 0 100 110" aria-hidden="true"><ellipse cx="50" cy="104" rx="30" ry="5" fill="rgba(0,0,0,.25)"/>
+  <path d="M30 62 Q50 52 70 62 L74 98 Q50 104 26 98 Z" fill="#3B82F6" stroke="#1B2836" stroke-width="4"/>
+  <circle cx="50" cy="40" r="22" fill="#FFE0BD" stroke="#1B2836" stroke-width="4"/>
+  <path d="M27 36 Q30 14 50 14 Q70 14 73 36 Q62 26 50 28 Q38 26 27 36 Z" fill="#5B3A1E" stroke="#1B2836" stroke-width="3"/>
+  <circle cx="42" cy="42" r="3.5" fill="#1B2836"/><circle cx="58" cy="42" r="3.5" fill="#1B2836"/>
+  <path d="M43 51 Q50 56 57 51" fill="none" stroke="#1B2836" stroke-width="3" stroke-linecap="round"/>
+  <line x1="70" y1="74" x2="86" y2="30" stroke="#1B2836" stroke-width="5" stroke-linecap="round"/>
+  <path d="M86 14 L90 25 L101 25 L92 32 L95 43 L86 36 L77 43 L80 32 L71 25 L82 25 Z" fill="#FACC15" stroke="#1B2836" stroke-width="3"/></svg>`;
+$('#keeper').innerHTML = KEEPER_SVG;
+
+/* ---------- 紀錄（只存在這台平板的瀏覽器裡） ---------- */
+const STORE = 'cg-meteor-math-v1';
+let REC = {};
+try{ REC = JSON.parse(localStorage.getItem(STORE)) || {}; }catch(e){ REC = {}; }
+const saveRec = () => { try{ localStorage.setItem(STORE, JSON.stringify(REC)); }catch(e){} };
+const recOf = (tp, lv) => ((REC[tp] || {})[lv]) || {stars:0, plays:0};
+let topic = 'add10';
+try{ topic = localStorage.getItem(STORE + '-topic') || 'add10'; }catch(e){}
+if (!TOPICS[topic]) topic = 'add10';
+const starHTML = n => [1,2,3].map(i => `<span class="${i <= n ? '' : 'off'}">★</span>`).join('');
+
+function drawHome(){
+  $('#topics').innerHTML = Object.entries(TOPICS).map(([k, t]) =>
+    `<button type="button" class="topic${k === topic ? ' on' : ''}" data-tp="${k}" aria-pressed="${k === topic}"><b>${t.name}</b><span class="eg">${t.eg}</span></button>`).join('');
+  $('#levels').innerHTML = Object.entries(LEVELS).map(([k, L]) => {
+    const r = recOf(topic, k);
+    return `<button type="button" class="level" data-lv="${k}"><span class="band" style="background:${L.color}"></span><b>${L.name}</b>
+      <small>打碎 ${L.goal} 顆流星・${L.desc}</small><span class="stars">${starHTML(r.stars)}</span></button>`;
+  }).join('');
+}
+$('#topics').addEventListener('click', e => {
+  const b = e.target.closest('[data-tp]'); if (!b) return;
+  topic = b.dataset.tp; try{ localStorage.setItem(STORE + '-topic', topic); }catch(err){}
+  drawHome();
+});
+$('#levels').addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) start(b.dataset.lv); });
+
+function show(id){
+  for (const s of ['home','play','result']) $('#' + s).hidden = s !== id;
+  const playing = id === 'play';
+  $('#hud').hidden = !playing; $('#quitBtn').hidden = !playing; $('#backBtn').hidden = playing;
+  $('#ver').hidden = playing;
+}
+
+/* ---------- 遊戲 ---------- */
+let G = null;
+function start(lv){
+  const L = LEVELS[lv];
+  G = {lv, L, tp:topic, hits:0, lives:L.lives, stage:1, ms:[], input:'', clock:0, lastSpawn:-99, recent:[], miss:[], run:false, paused:false, raf:0, prev:0, ended:false, badT:0};
+  $('#layer').innerHTML = '';
+  setInput('');
+  show('play');
+  setTheme(1); hud();
+  const per = Math.ceil(L.goal / L.time.length);
+  cover(`<h2>${TOPICS[topic].name}・${L.name}</h2><p>流星上有算式，算出答案後，用右邊的數字鍵盤點出來就能打碎它（不用按確定）。<br>打碎 ${L.goal} 顆就過關；流星掉到地上會扣 1 條命，點錯不扣命。</p><button type="button" class="btn primary" id="goBtn" style="font-size:22px;padding:10px 26px">開始！</button>`);
+  $('#goBtn').addEventListener('click', () => countdown(() => { G.run = true; G.prev = performance.now(); loop(G.prev); stageBig(`第 1 關・${THEMES[0].name}`); }));
+  G.per = per;
+}
+function cover(html){ const c = $('#cover'); c.innerHTML = html; c.hidden = !html; }
+function countdown(done){
+  let n = 3; cover(`<div class="count">${n}</div>`);
+  const g = G;
+  const t = setInterval(() => { if (G !== g || g.ended){ clearInterval(t); return; } n--; if (n > 0) cover(`<div class="count">${n}</div>`); else { clearInterval(t); cover(''); done(); } }, 700);
+}
+function setTheme(th){
+  const T = THEMES[th - 1], sc = $('#scene');
+  sc.dataset.th = th; sc.style.background = T.sky;
+  sc.querySelector('.far').style.background = T.far; sc.querySelector('.ground').style.backgroundColor = T.ground;
+}
+function hud(){
+  if (!G) return;
+  $('#hud').innerHTML = `<span class="hud-item"><span class="hud-l">等級</span><b class="t">${G.L.name}</b></span>
+    <span class="hud-item"><span class="hud-l">第</span><b>${G.stage}</b><span class="hud-l">關</span></span>
+    <span class="hud-item"><span class="hud-l">打碎</span><b>${G.hits}/${G.L.goal}</b></span>
+    <span class="hud-item"><span class="hearts">${Array.from({length:G.L.lives}, (_, i) => `<span class="${i < G.lives ? '' : 'off'}">♥</span>`).join('')}</span></span>`;
+}
+function stageBig(txt){ const b = $('#stagebig'); b.textContent = txt; b.classList.remove('go'); void b.offsetWidth; b.classList.add('go'); }
+
+/* 新的流星：畫面上的答案不能重複，也不能一個是另一個的開頭（例如 1 和 12），這樣點完數字就知道是哪一顆 */
+function newQ(){
+  const ans = G.ms.map(m => String(m.q.a));
+  for (let t = 0; t < 60; t++){
+    const q = TOPICS[G.tp].gen(), s = String(q.a);
+    if (G.recent.includes(q.t) && t < 40) continue;
+    if (ans.some(a => a.startsWith(s) || s.startsWith(a))) continue;
+    G.recent.push(q.t); if (G.recent.length > 8) G.recent.shift();
+    return q;
+  }
+  return null;
+}
+function spawn(){
+  const q = newQ(); if (!q) return;
+  const st = $('#stage'), W = st.clientWidth, H = st.clientHeight;
+  const el = document.createElement('div'); el.className = 'meteor';
+  el.innerHTML = `<div class="eq">${q.t}</div>${meteorSVG(G.stage)}`;
+  $('#layer').appendChild(el);
+  const w = el.offsetWidth, h = el.offsetHeight;
+  /* 左右位置：避開主角，也避開別的流星 */
+  const minX = Math.min(W * .22 + w / 2, W - w / 2 - 6), maxX = W - w / 2 - 8;
+  let x = ri(minX, Math.max(minX, maxX));
+  for (let t = 0; t < 20; t++){ x = ri(minX, Math.max(minX, maxX)); if (G.ms.every(m => Math.abs(m.x - x) > w + 12)) break; }
+  const m = {q, el, x, w, h, born:G.clock, dur:G.L.time[G.stage - 1] * (G.ms.length ? 1.1 : 1), y0:-h * .35, y1:H * .84 - h};
+  G.ms.push(m); G.lastSpawn = G.clock;
+  place(m, 0);
+}
+function place(m, p){ m.el.style.transform = `translate(${m.x - m.w / 2}px,${m.y0 + (m.y1 - m.y0) * p}px)`; }
+
+function loop(now){
+  const g = G;
+  if (!g || g.ended) return;
+  const dt = Math.min(.1, (now - G.prev) / 1000); G.prev = now;
+  if (G.run && !G.paused){
+    G.clock += dt;
+    const multi = G.L.multi[G.stage - 1];
+    if (!G.ms.length || (G.ms.length < multi && G.clock - G.lastSpawn >= G.L.gap)) spawn();
+    for (const m of [...G.ms]){
+      const p = (G.clock - m.born) / m.dur;
+      if (p >= 1) land(m); else place(m, p);
+      if (g.ended) return;
+    }
+  }
+  g.raf = requestAnimationFrame(loop);
+}
+function removeM(m){ G.ms = G.ms.filter(o => o !== m); }
+
+function land(m){
+  removeM(m); m.el.remove();
+  G.miss.push(m.q);
+  const st = $('#stage'), tag = document.createElement('div');
+  tag.className = 'landed'; tag.style.left = m.x + 'px'; tag.style.bottom = '20%';
+  tag.textContent = `${m.q.t} = ${m.q.a}`;
+  st.appendChild(tag); setTimeout(() => tag.remove(), 2500);
+  const f = document.createElement('div'); f.className = 'flash'; st.appendChild(f); setTimeout(() => f.remove(), 500);
+  const k = $('#keeper'); k.classList.remove('hurt'); void k.offsetWidth; k.classList.add('hurt');
+  G.lives--; hud();
+  if (G.input && !G.ms.some(o => String(o.q.a).startsWith(G.input))) setInput('');
+  if (G.lives <= 0) end(false);
+}
+
+function hit(m){
+  removeM(m);
+  const st = $('#stage'), sr = st.getBoundingClientRect(), kr = $('#keeper').getBoundingClientRect(), mr = m.el.getBoundingClientRect();
+  const x0 = kr.right - sr.left - kr.width * .12, y0 = kr.top - sr.top + kr.height * .2;
+  const x1 = mr.left - sr.left + mr.width / 2, y1 = mr.bottom - sr.top - mr.height * .25;
+  const z = document.createElement('div'); z.className = 'zap';
+  z.style.left = x0 + 'px'; z.style.top = y0 + 'px'; z.style.width = Math.hypot(x1 - x0, y1 - y0) + 'px';
+  z.style.transform = `rotate(${Math.atan2(y1 - y0, x1 - x0)}rad)`;
+  st.appendChild(z); setTimeout(() => z.remove(), 260);
+  m.el.querySelector('.eq').classList.add('hit'); m.el.querySelector('.eq').textContent = `${m.q.t} = ${m.q.a}`;
+  m.el.classList.add('poof'); setTimeout(() => m.el.remove(), 380);
+  const pts = document.createElement('div'); pts.className = 'pts'; pts.textContent = '+1';
+  pts.style.left = x1 + 'px'; pts.style.top = (mr.top - sr.top) + 'px'; st.appendChild(pts); setTimeout(() => pts.remove(), 900);
+  const k = $('#keeper'); k.classList.add('dash'); setTimeout(() => k.classList.remove('dash'), 150);
+  G.hits++;
+  if (G.hits >= G.L.goal){ hud(); G.run = false; const g = G; return setTimeout(() => { if (G === g && !g.ended) end(true); }, 500); }
+  const ns = Math.min(G.L.time.length, 1 + Math.floor(G.hits / G.per));
+  if (ns !== G.stage){ G.stage = ns; setTheme(ns); stageBig(`第 ${ns} 關・${THEMES[ns - 1].name}`); }
+  hud();
+}
+
+/* ---------- 輸入 ---------- */
+function setInput(v, cls){
+  if (G) G.input = v;
+  const a = $('#ans');
+  a.className = 'ans' + (cls ? ' ' + cls : '');
+  a.innerHTML = v ? v : '<span class="ph">答案</span>';
+  if (G) for (const m of G.ms){ const e = m.el.querySelector('.eq'); e.classList.toggle('match', !!v && String(m.q.a).startsWith(v)); }
+}
+function press(k){
+  if (!G || !G.run || G.paused || G.ended || G.badT) return;
+  if (k === 'C') return setInput('');
+  if (k === 'B') return setInput(G.input.slice(0, -1));
+  const v = (G.input + k).replace(/^0(?=\d)/, '');
+  const m = G.ms.find(o => String(o.q.a) === v);
+  if (m){ setInput(v, 'ok'); hit(m); setTimeout(() => { if (G && G.input === v) setInput(''); }, 280); return; }
+  if (G.ms.some(o => String(o.q.a).startsWith(v))) return setInput(v);
+  /* 點錯了：不扣命，紅色晃一下後清掉 */
+  setInput(v, 'bad'); $('#tip').textContent = '再算一次看看！';
+  G.badT = setTimeout(() => { if (!G) return; G.badT = 0; setInput(''); $('#tip').textContent = '點數字鍵盤輸入答案（不用按確定）'; }, 550);
+}
+$('#pad').addEventListener('pointerdown', e => {
+  const b = e.target.closest('[data-k]'); if (!b) return;
+  e.preventDefault();
+  b.classList.add('down'); setTimeout(() => b.classList.remove('down'), 120);
+  press(b.dataset.k);
+});
+document.addEventListener('keydown', e => {
+  if (!G || $('#play').hidden) return;
+  if (/^[0-9]$/.test(e.key)) press(e.key);
+  else if (e.key === 'Backspace') { e.preventDefault(); press('B'); }
+  else if (e.key === 'Escape' || e.key === 'Delete') press('C');
+});
+
+/* 離開畫面（切到別的 App、關螢幕）就暫停 */
+function pause(){
+  if (!G || !G.run || G.paused || G.ended) return;
+  G.paused = true;
+  cover(`<h2>休息一下</h2><p>流星停住了。</p><button type="button" class="btn primary" id="resumeBtn" style="font-size:22px;padding:10px 26px">點這裡繼續</button>`);
+  $('#resumeBtn').addEventListener('click', () => { cover(''); G.paused = false; G.prev = performance.now(); });
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+
+$('#quitBtn').addEventListener('click', () => {
+  if (!G) return;
+  if (!G.run){ stop(); G = null; drawHome(); show('home'); return; }
+  pause();
+  if (!G.paused) return;
+  cover(`<h2>要結束這一局嗎？</h2><div class="row"><button type="button" class="btn primary" id="keepBtn" style="font-size:20px">繼續玩</button><button type="button" class="btn" id="stopBtn" style="font-size:20px">結束，回選單</button></div>`);
+  $('#keepBtn').addEventListener('click', () => { cover(''); G.paused = false; G.prev = performance.now(); });
+  $('#stopBtn').addEventListener('click', () => { stop(); G = null; drawHome(); show('home'); });
+});
+function stop(){ if (!G) return; G.ended = true; cancelAnimationFrame(G.raf); clearTimeout(G.badT); $('#layer').innerHTML = ''; cover(''); }
+
+function end(win){
+  const g = G; stop();
+  const stars = win ? g.lives : 0;
+  const r = recOf(g.tp, g.lv); r.plays++; r.stars = Math.max(r.stars, stars);
+  (REC[g.tp] = REC[g.tp] || {})[g.lv] = r; saveRec();
+  const miss = g.miss.length ? `<div><b>要再練習的題目</b>（流星掉到地上的）</div><div class="miss">${g.miss.map(q => `<span>${q.t} = <b>${q.a}</b></span>`).join('')}</div>` : '';
+  $('#res').innerHTML = `<h2>${win ? '🏆 過關了！' : '流星掉太多了'}</h2>
+    <div class="stars">${starHTML(stars)}</div>
+    <div class="big">打碎 ${g.hits} / ${g.L.goal} 顆</div>
+    <p class="lead">${TOPICS[g.tp].name}・${g.L.name}${win ? (stars === 3 ? '・一條命都沒少，太厲害了！' : '・沒掉命就能拿 3 顆星') : '・再試一次，你可以的！'}</p>
+    ${miss}
+    <div class="row"><button type="button" class="btn primary" id="againBtn" style="font-size:20px">再玩一次</button><button type="button" class="btn" id="menuBtn" style="font-size:20px">回選單</button></div>`;
+  $('#againBtn').addEventListener('click', () => { topic = g.tp; start(g.lv); });
+  $('#menuBtn').addEventListener('click', () => { drawHome(); show('home'); });
+  G = null; show('result');
+}
+
+drawHome(); show('home');
+</script>
+</body>
+</html>
