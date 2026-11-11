@@ -4,75 +4,44 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>課堂遊戲</title>
-<style>
-:root{--paper:#E3EDF2;--grid:#D0DEE6;--ink:#1B2836;--soft:#4C5D6E;--card:#fff;--hl:#FFE066}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;padding:24px 16px}
-.wrap{max-width:720px;margin:0 auto;display:grid;gap:18px}
-h1{margin:0;font-size:32px;display:flex;align-items:center;gap:10px}
-.tag{background:var(--hl);border:3px solid var(--ink);border-radius:10px;padding:0 8px;box-shadow:3px 3px 0 var(--ink);font-size:22px;transform:rotate(-4deg)}
-a.game{display:flex;align-items:center;gap:16px;text-decoration:none;color:var(--ink);background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);padding:18px}
-a.game:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
-.ic{flex:none;width:64px;height:64px;border:3px solid var(--ink);border-radius:16px;background:#DCEEFF;display:grid;place-items:center;font-size:30px;font-weight:900}
-.t{font-size:26px;font-weight:900}
-.d{font-size:16px;color:var(--soft);font-weight:700}
-.cat{display:grid;gap:14px;background:rgba(255,255,255,.55);border:3px dashed var(--soft);border-radius:22px;padding:14px 14px 18px}
-.cat h2{margin:0;font-size:24px;display:flex;align-items:center;gap:8px}
-.cat h2::before{content:'';width:10px;height:26px;border-radius:4px;background:var(--hl);border:2px solid var(--ink)}
-</style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 <div class="wrap">
-  <h1><span class="tag">+−×</span>課堂遊戲</h1>
-  <section class="cat">
-    <h2>加減法</h2>
-    <a class="game" href="math.html">
-      <span class="ic">+−</span>
-      <span><span class="t">加減法小練習</span><br><span class="d">20以內加減法</span></span>
-    </a>
-    <a class="game" href="plusnminus.html">
-      <span class="ic">( )</span>
-      <span><span class="t">列式練習</span><br><span class="d">依題意列式與驗算</span></span>
-    </a>
+  <div class="top"><h1><span class="tag">+−×</span>課堂遊戲</h1></div>
+
+  <section class="group">
+    <h2>自己練習 <small>平板、手機、電腦，打開就能練</small></h2>
+    <div class="cats">
+      <a class="cat" id="addsub" href="cat-addsub.html">
+        <span class="ic">+−</span>
+        <span class="t">加減法</span>
+        <span class="d">加減法小練習、列式練習</span>
+      </a>
+      <a class="cat" id="mul" href="cat-mul.html">
+        <span class="ic">×</span>
+        <span class="t">乘法</span>
+        <span class="d">認識乘法、乘法小練習</span>
+      </a>
+      <a class="cat" id="tablet" href="cat-tablet.html">
+        <span class="ic">🎮</span>
+        <span class="t">平板小遊戲</span>
+        <span class="d">加減法流星雨</span>
+      </a>
+    </div>
   </section>
-  <section class="cat">
-    <h2>大屏專區</h2>
-    <a class="game" href="big-mul.html#race">
-      <span class="ic">🏁</span>
-      <span><span class="t">乘法賽跑</span><br><span class="d">教室大屏 2～3 方對抗，答對往前跑，先到終點的贏</span></span>
-    </a>
-    <a class="game" href="big-mul.html#meteor">
-      <span class="ic">☄</span>
-      <span><span class="t">乘法流星雨對戰</span><br><span class="d">教室大屏 2～3 方對抗，限時內打碎最多流星的贏</span></span>
-    </a>
-    <a class="game" href="big-mul.html#stack">
-      <span class="ic">▤</span>
-      <span><span class="t">乘法疊疊樂</span><br><span class="d">教室大屏 2～3 方對抗，答對疊一塊積木，先疊到目標的贏</span></span>
-    </a>
-    <a class="game" href="big-mul.html#mole">
-      <span class="ic">🔨</span>
-      <span><span class="t">乘法打地鼠</span><br><span class="d">教室大屏 2～3 方對抗，敲出拿著正確答案的地鼠</span></span>
-    </a>
-  </section>
-  <section class="cat">
-    <h2>小遊戲區</h2>
-    <a class="game" href="meteor-math.html">
-      <span class="ic">☄</span>
-      <span><span class="t">加減法流星雨</span><br><span class="d">算出流星上的加減法，點數字打碎它（平板用）</span></span>
-    </a>
-  </section>
-  <section class="cat">
-    <h2>乘法</h2>
-    <a class="game" href="mulpic.html">
-      <span class="ic">🍎</span>
-      <span><span class="t">認識乘法</span><br><span class="d">看圖、文字題列式，答案的單位，被乘數・乘數・積</span></span>
-    </a>
-    <a class="game" href="mul.html">
-      <span class="ic">×</span>
-      <span><span class="t">乘法小練習</span><br><span class="d">九九乘法 2～9 的乘法，把亮燈表點亮</span></span>
-    </a>
+
+  <section class="group">
+    <h2>上課用 <small>教室大屏，2～3 方同時對抗</small></h2>
+    <div class="cats">
+      <a class="cat" id="big" href="cat-big.html">
+        <span class="ic">📺</span>
+        <span class="t">大屏專區</span>
+        <span class="d">認識乘法（看圖列式）、乘法心算大會戰</span>
+      </a>
+    </div>
   </section>
 </div>
+<script src="site.js"></script>
 </body>
 </html>

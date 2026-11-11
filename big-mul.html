@@ -58,6 +58,8 @@ main>section{flex:1;min-height:0}
 .gcard b{font:700 36px var(--f-display);display:block}
 .gcard small{font-size:21px;font-weight:700;color:var(--ink-soft);line-height:1.45;display:block}
 .gcard .who{display:inline-block;margin-top:6px;font:700 18px var(--f-body);background:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:0 12px}
+.gcard .who.goal{background:#FFF1C7}
+.gcard .who.time{background:#DDF0FF}
 .gcard.on{background:#FFF6C7;box-shadow:0 0 0 6px var(--gold),6px 6px 0 var(--ink)}
 .panel{background:var(--card);border:4px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:18px 26px;display:grid;gap:14px;align-content:start;flex:1}
 .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -74,6 +76,16 @@ main>section{flex:1;min-height:0}
 .nm input{font:700 26px var(--f-body);border:0;background:transparent;width:100%;min-width:0;color:var(--ink);outline:none}
 .nm.off{opacity:.3}
 .hint{font:700 20px var(--f-body);color:var(--ink-soft);line-height:1.5;margin:0}
+/* 自己設定數字：上下箭頭，或直接用鍵盤打 */
+.stepper{display:flex;align-items:center;gap:0;border:4px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:3px 3px 0 var(--ink);background:#fff}
+.stepper button{font:900 22px var(--f-body);width:52px;height:50px;border:0;background:var(--paper);padding:0}
+.stepper button:active{background:var(--hl)}
+.stepper input{font:600 32px var(--f-num);width:84px;height:50px;text-align:center;border:0;border-left:4px solid var(--ink);border-right:4px solid var(--ink);color:var(--ink);background:#fff;outline:none;-moz-appearance:textfield;appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.stepper input:focus{background:#FFF8D6}
+.stepper.on{box-shadow:0 0 0 4px var(--gold),3px 3px 0 var(--ink)}
+.stepper.off input{color:var(--ink-soft)}
+.own{font:700 22px var(--f-body);color:var(--ink-soft);margin-left:6px}
 .hint kbd{font:600 18px var(--f-num);border:2px solid var(--ink-soft);border-radius:6px;padding:0 6px;background:var(--card)}
 .startrow{display:flex;align-items:center;gap:20px;justify-content:flex-end}
 .warnmsg{font:700 24px var(--f-body);color:var(--bad)}
@@ -178,11 +190,49 @@ main>section{flex:1;min-height:0}
 .n3 .mole .mn{font-size:54px}
 .mole .mb{width:130px;height:118px;display:block}
 .n3 .mole .mb{width:110px;height:100px}
-.mole.hit{animation:bonk .4s}
 .mole.hit .mn{background:#D4F5E2;border-color:var(--good);color:var(--good)}
 .mole.bad .mn{background:#FFE1E2;border-color:var(--bad);color:var(--bad)}
 .mole.right .mn{background:var(--hl);animation:beat .6s infinite}
-@keyframes bonk{30%{transform:scaleY(.8) translateY(10%)}}
+
+/* 認識乘法（看圖列式）：圖＋□×□，不用算出積 */
+.cq{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;padding:8px 10px 40px}
+.cpic{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:12px;max-width:100%;--e:40px}
+.cbox{border:4px solid var(--ink);border-radius:16px;padding:6px 8px;display:grid;gap:0 2px;justify-content:center;align-content:center}
+.cbox i{font-style:normal;font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;font-size:var(--e);line-height:1.15em;height:1.15em;width:1.15em;text-align:center;display:block;overflow:hidden}
+.u-plate{background:#FFF4E0;border-radius:50%/40%;padding:10px 24px}
+.u-bag{background:#F3E8FF;border-radius:10px 10px 24px 24px}
+.u-box{background:#E8F4FF;border-radius:8px}
+.u-basket{background:#FDEBD3;border-radius:6px 6px 28px 28px}
+.u-bowl{background:#FFE8EC;border-radius:8px 8px 40px 40px}
+.c-concept .qline{font-size:96px}
+.c-concept .slot{min-width:1.15em}
+.c-concept .slot.focus{background:#FFF8D6;box-shadow:0 0 0 6px rgba(255,224,102,.75)}
+.zone.c-concept.g-stack .zq{height:300px}
+.zone.c-concept.g-mole .zq{height:330px}
+.zone.c-concept.g-stack .qline,.zone.c-concept.g-mole .qline{font-size:80px}
+.zone.c-concept .zmsg{bottom:4px;font-size:26px}
+.c-concept .mole .mn{font-size:52px;padding:0 12px}
+.n3 .c-concept .mole .mn,.n3.c-concept .mole .mn{font-size:44px}
+.met.cm{width:240px;height:200px}
+.met.cm svg{width:76px;margin-left:-38px}
+.met.cm .mq{top:62px;bottom:auto}
+.mpic{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:5px;background:#fff;border:4px solid var(--ink);border-radius:14px;padding:6px;box-shadow:3px 3px 0 var(--ink);max-width:240px;margin:0 auto}
+.mpic b{display:grid;gap:2px;padding:3px;border:3px solid var(--ink);border-radius:9px;background:#FFF4E0}
+.mpic b i{width:10px;height:10px;border-radius:50%;background:#E5484D;display:block}
+.met.hot .mpic{background:var(--hl)}
+.ansbar .op{font:600 56px var(--f-num);color:var(--ink-soft)}
+.c-concept .ansbar .slot{min-width:96px}
+
+/* 打地鼠的木槌（和 info-class 字母打地鼠同一張圖）：先往後舉 → 快速落下 → 敲到時地鼠壓扁、冒星星、畫面小震 → 彈回 */
+.field{position:relative}
+.hammer{position:absolute;z-index:6;pointer-events:none;transform-origin:50% 93%;opacity:0;transition:opacity .15s;filter:drop-shadow(0 6px 5px rgba(0,0,0,.45))}
+.hammer.on{opacity:1;transition:none}
+.mole .mb{transform-origin:50% 100%}
+.mole.hit .mb{animation:squash .35s forwards}
+@keyframes squash{to{transform:scaleY(.22) scaleX(1.3)}}
+.mole.hit .mn{transition:opacity .2s .15s;opacity:0}
+.star{position:absolute;z-index:7;pointer-events:none;transform:translate(-50%,-50%);font:900 70px/1 var(--f-display);color:#FDE047;-webkit-text-stroke:3px #1B2836;animation:star .38s ease-out forwards}
+@keyframes star{from{transform:translate(-50%,-50%) scale(.4);opacity:1}to{transform:translate(-50%,-50%) scale(1.6);opacity:0}}
 
 /* 換人提醒：只蓋住那一隊 */
 .zhead .zp{font:700 24px var(--f-body);background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:999px;padding:0 12px;white-space:nowrap}
@@ -267,7 +317,7 @@ main>section{flex:1;min-height:0}
 <body>
 <div id="stage">
   <header class="bar">
-    <div class="brand"><span class="tag">×</span><h1 id="title">乘法大屏對抗</h1><span class="ver">教師大屏 v1.2</span></div>
+    <div class="brand"><span class="tag" id="tag">×</span><h1 id="title">乘法心算大會戰</h1><span class="ver">教師大屏 v2.0</span></div>
     <div class="spacer"></div>
     <div class="timer" id="timer" hidden>3:00</div>
     <button class="btn" id="soundBtn" type="button">🔊 聲音</button>
@@ -275,7 +325,7 @@ main>section{flex:1;min-height:0}
     <button class="btn" id="pauseBtn" type="button" hidden>⏸ 暫停</button>
     <button class="btn warn" id="endBtn" type="button" hidden>結束</button>
     <button class="btn" id="histBtn" type="button">📋 比賽紀錄</button>
-    <a class="btn" id="backBtn" href="index.html">← 回到上一頁</a>
+    <a class="btn" id="backBtn" href="cat-big.html#big-calc">← 回到上一頁</a>
   </header>
 
   <main>
@@ -289,7 +339,7 @@ main>section{flex:1;min-height:0}
         <h2 class="h2"><i>2</i>設定</h2>
         <div class="panel">
           <div class="row"><span class="lab">比賽方式</span><div class="seg" id="modeSeg"></div><span class="lab" style="width:auto;margin-left:36px">幾方對抗</span><div class="seg" id="nSeg"></div></div>
-          <div class="row" style="align-items:flex-start"><span class="lab" style="padding-top:8px">乘法範圍</span>
+          <div class="row" style="align-items:flex-start"><span class="lab" style="padding-top:8px" id="tabLab">乘法範圍</span>
             <div style="display:grid;gap:10px;flex:1">
               <div class="seg" id="tabSeg"></div>
               <div class="seg"><span class="hint" style="align-self:center">快速選：</span>
@@ -298,14 +348,17 @@ main>section{flex:1;min-height:0}
                 <button class="quick" type="button" data-q="6,7">6、7</button>
                 <button class="quick" type="button" data-q="8,9">8、9</button>
                 <button class="quick" type="button" data-q="2,3,4,5,6,7,8,9">2～9 全部</button>
-                <button class="quick" type="button" data-q="1,2,3,4,5,6,7,8,9">1～9 全部</button>
+                <button class="quick" type="button" data-q="1,2,3,4,5,6,7,8,9" id="q19">1～9 全部</button>
               </div>
             </div>
           </div>
-          <div class="row" id="goalRow"><span class="lab" id="goalLab">終點</span><div class="seg" id="goalSeg"></div></div>
-          <div class="row"><span class="lab">時間</span><div class="seg" id="timeSeg"></div></div>
-          <div class="row"><span class="lab">換人提醒</span><div class="seg" id="swapSeg"></div><span class="hint">同一隊輪流上場作答</span></div>
-          <div class="row"><span class="lab">成員座號</span><div class="seg" id="seatSeg"></div><span class="hint">開始前，各隊用數字鍵盤輸入座號</span></div>
+          <div class="row" id="goalRow"><span class="lab" id="goalLab">終點</span><div class="seg" id="goalSeg"></div>
+            <span class="own">自己訂</span><div class="stepper" data-k="goal"><button type="button" data-step="-1">▼</button><input type="number" inputmode="numeric" data-in="goal"><button type="button" data-step="1">▲</button></div><span class="own" id="goalUnit">題</span></div>
+          <div class="row" id="timeRow"><span class="lab">時間</span><div class="seg" id="timeSeg"></div>
+            <span class="own">自己訂</span><div class="stepper" data-k="time"><button type="button" data-step="-5">▼</button><input type="number" inputmode="numeric" data-in="time"><button type="button" data-step="5">▲</button></div><span class="own">秒</span></div>
+          <div class="row" id="swapRow"><span class="lab">換人提醒</span><div class="seg" id="swapSeg"></div>
+            <span class="own">每</span><div class="stepper" data-k="swap"><button type="button" data-step="-1">▼</button><input type="number" inputmode="numeric" data-in="swap"><button type="button" data-step="1">▲</button></div><span class="own">題換人</span></div>
+          <div class="row" id="seatRow"><span class="lab">成員座號</span><div class="seg" id="seatSeg"></div><span class="hint">開始前，各隊用數字鍵盤輸入座號</span></div>
           <div class="row"><span class="lab">名字</span><div class="names" id="names"></div><datalist id="pastNames"></datalist></div>
           <p class="hint">名字、座號、設定都會記在這台電腦，下次打開會自動帶出上一次的內容。點數字作答，不用按確定；同一題錯 2 次會公布答案、換下一題。老師鍵盤：<kbd>空白鍵</kbd> 暫停　<kbd>F</kbd> 全螢幕</p>
           <div class="startrow"><span class="warnmsg" id="warn"></span><button class="btn primary big" id="startBtn" type="button">開始比賽 ▶</button></div>
@@ -359,16 +412,35 @@ const TEAMS = [
   {c:'#3A9FEF', m:'#93CBF6', l:'#DDF0FF', team:'藍隊', solo:'藍方'},
   {c:'#1FA963', m:'#7BD6A3', l:'#DDF6E8', team:'綠隊', solo:'綠方'},
 ];
-const GAMES = {
-  race:  {name:'乘法賽跑', desc:'答對一題往前跑一格，先跑到終點的贏！', ns:[2,3],
-          goal:{label:'終點', unit:'題', opts:[10,15,20], def:15}, times:[120,180,300], defTime:180},
-  meteor:{name:'乘法流星雨', desc:'各自守住自己的天空，時間到，打碎最多流星的贏！', ns:[2,3],
-          goal:null, times:[60,90,120,180], defTime:90},
-  stack: {name:'乘法疊疊樂', desc:'答對一題疊一塊積木，先疊到最高的贏！', ns:[2,3],
-          goal:{label:'疊到', unit:'塊', opts:[10,15,20], def:15}, times:[120,180,300], defTime:180},
-  mole:  {name:'乘法打地鼠', desc:'看題目，敲出拿著正確答案的地鼠！', ns:[2,3],
-          goal:{label:'目標', unit:'隻', opts:[10,15,20], def:15}, times:[120,180,300], defTime:180},
+/* 兩個主題（大屏專區 → 主題 → 四種玩法） */
+const TOPICS = {
+  calc:   {name:'乘法心算大會戰', tag:'×', back:'cat-big.html#big-calc'},
+  concept:{name:'認識乘法', tag:'🍎', back:'cat-big.html#big-concept'},
 };
+/* 玩法分兩類：目的型（誰先達到目標）、限時型（時間內分數最多） */
+const KIND_TXT = {goal:'🎯 目的型：先達到目標的贏', time:'⏱ 限時型：時間內最多的贏'};
+const GOAL_OPTS = [10, 15, 20], GOAL_MIN = 5, GOAL_MAX = 30;
+const TIME_OPTS = [30, 45, 60, 90], TIME_MIN = 10, TIME_MAX = 300;
+const SWAP_OPTS = [3, 5, 7], SWAP_MIN = 1, SWAP_MAX = 20;
+const GAMES = {
+  race:  {name:'乘法賽跑', kind:'goal', ns:[2,3], goal:{label:'終點', unit:'題', def:15},
+          desc:{calc:'答對一題往前跑一格，先跑到終點的贏！', concept:'看圖寫出被乘數和乘數，答對往前跑一格，先到終點的贏！'}},
+  stack: {name:'乘法疊疊樂', kind:'goal', ns:[2,3], goal:{label:'疊到', unit:'塊', def:15},
+          desc:{calc:'答對一題疊一塊積木，先疊到目標的贏！', concept:'看圖寫出被乘數和乘數，答對疊一塊積木，先疊到目標的贏！'}},
+  meteor:{name:'乘法流星雨', kind:'time', ns:[2,3], defTime:60,
+          desc:{calc:'各自守住自己的天空，時間到，打碎最多流星的贏！', concept:'流星上有圖，打出「被乘數、乘數」打碎它，時間到，打碎最多的贏！'}},
+  mole:  {name:'乘法打地鼠', kind:'time', ns:[2,3], defTime:60,
+          desc:{calc:'敲出拿著正確答案的地鼠，時間到，敲最多隻的贏！', concept:'看圖，敲出拿著正確算式的地鼠，時間到，敲最多隻的贏！'}},
+};
+/* 認識乘法的圖：c＝一份的單位、n＝東西、u＝單位（和「認識乘法」練習頁一樣） */
+const PIC_THINGS = [
+  {c:'盤', n:'蘋果', u:'個', e:'🍎', cls:'u-plate'},
+  {c:'袋', n:'糖果', u:'個', e:'🍬', cls:'u-bag'},
+  {c:'盒', n:'餅乾', u:'片', e:'🍪', cls:'u-box'},
+  {c:'籃', n:'橘子', u:'個', e:'🍊', cls:'u-basket'},
+  {c:'碗', n:'草莓', u:'顆', e:'🍓', cls:'u-bowl'},
+];
+const CB_MIN = 2, CB_MAX = 5;   // 認識乘法：乘數（有幾份）2～5，和練習頁一樣
 const LOCK_WRONG = 900;   // 答錯停幾毫秒
 const LOCK_SHOW = 1600;   // 錯 2 次公布答案停幾毫秒
 const LOCK_METEOR = 600;  // 流星雨按錯停幾毫秒
@@ -377,23 +449,32 @@ const MAX_SEATS = 15;     // 每一隊最多幾個座號
 const MAX_HIST = 60;      // 比賽紀錄最多留幾筆
 
 /* ---------- 設定和紀錄（記在這台電腦的瀏覽器，不會因為重新整理而不見） ---------- */
-const S = {game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], goal:{race:15, stack:15, mole:15}, time:{race:180, meteor:90, stack:180, mole:180},
+const S = {topic:'calc', game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], ctables:[2,3,4,5,6,7,8,9], goal:{race:15, stack:15}, time:{meteor:60, mole:60},
   names:['','',''], sound:true, swap:5, seats:true, members:[[],[],[]], pastNames:[]};
 try { Object.assign(S, JSON.parse(localStorage.getItem('bigmul.v1') || '{}')); } catch (e) {}
+const clampInt = (v, lo, hi) => Math.min(hi, Math.max(lo, Math.round(+v)));
+const okInt = (v, lo, hi) => Number.isFinite(+v) && +v >= lo && +v <= hi;
 if (S.game === 'tower') S.game = 'stack';
 if (!GAMES[S.game]) S.game = 'race';
+if (!TOPICS[S.topic]) S.topic = 'calc';
+if (!Array.isArray(S.ctables) || !S.ctables.length) S.ctables = [2,3,4,5,6,7,8,9];
+S.goal = Object.assign({}, S.goal); S.time = Object.assign({}, S.time);
 for (const k in GAMES){
-  if (GAMES[k].goal && !GAMES[k].goal.opts.includes(S.goal[k])) S.goal[k] = GAMES[k].goal.def;
-  if (!GAMES[k].times.includes(S.time[k])) S.time[k] = GAMES[k].defTime;
+  const g = GAMES[k];
+  if (g.kind === 'goal' && !okInt(S.goal[k], GOAL_MIN, GOAL_MAX)) S.goal[k] = g.goal.def;
+  if (g.kind === 'time' && !okInt(S.time[k], TIME_MIN, TIME_MAX)) S.time[k] = g.defTime;
 }
-if (![0, 3, 5].includes(S.swap)) S.swap = 5;
+if (S.swap !== 0 && !okInt(S.swap, SWAP_MIN, SWAP_MAX)) S.swap = 5;
 if (!Array.isArray(S.members) || S.members.length < 3) S.members = [[],[],[]];
 if (!Array.isArray(S.pastNames)) S.pastNames = [];
 const save = () => { try { localStorage.setItem('bigmul.v1', JSON.stringify(S)); } catch (e) {} };
 let H = [];
 try { H = JSON.parse(localStorage.getItem('bigmul.hist') || '[]'); if (!Array.isArray(H)) H = []; } catch (e) { H = []; }
 const saveH = () => { try { localStorage.setItem('bigmul.hist', JSON.stringify(H)); } catch (e) {} };
-const h = location.hash.slice(1); if (GAMES[h]) S.game = h; else if (h === 'tower') S.game = 'stack';
+/* 網址：big-mul.html#concept（認識乘法）、#calc（乘法心算大會戰）；舊的 #race、#meteor… 還是可以用（心算） */
+{ const h = location.hash.slice(1);
+  if (TOPICS[h]) S.topic = h;
+  else if (GAMES[h] || h === 'tower'){ S.topic = 'calc'; S.game = h === 'tower' ? 'stack' : h; } }
 
 /* ---------- 縮放：固定 1920×1080 的畫面，等比例放到螢幕上 ---------- */
 function fit(){ const s = Math.min(innerWidth / 1920, innerHeight / 1080); $('#stage').style.transform = `translate(-50%,-50%) scale(${s})`; }
@@ -472,48 +553,97 @@ const GAME_PIC = {
 /* ---------- 設定畫面 ---------- */
 const nameOf = i => (S.names[i] || '').trim() || TEAMS[i][S.mode];
 const tablesText = t => t.length === 8 && !t.includes(1) ? '2～9' : t.length === 9 ? '1～9' : t.join('、');
+const tabsOf = () => S.topic === 'concept' ? S.ctables : S.tables;
+const setTabs = t => { if (S.topic === 'concept') S.ctables = t.filter(x => x >= 2); else S.tables = t; };
+const isTeam = () => S.mode === 'team';
+const secText = v => `${v} 秒`;
+/* 自己訂的數字：▲▼ 或直接打字（打字的時候先不要重畫，免得游標跑掉） */
+const STEP = {
+  goal:{get:() => S.goal[S.game], set:v => { S.goal[S.game] = clampInt(v, GOAL_MIN, GOAL_MAX); }, lo:GOAL_MIN, hi:GOAL_MAX},
+  time:{get:() => S.time[S.game], set:v => { S.time[S.game] = clampInt(v, TIME_MIN, TIME_MAX); }, lo:TIME_MIN, hi:TIME_MAX},
+  swap:{get:() => S.swap, set:v => { S.swap = clampInt(v, SWAP_MIN, SWAP_MAX); }, lo:SWAP_MIN, hi:SWAP_MAX},
+};
+function drawSteppers(){
+  for (const k in STEP){
+    const inp = document.querySelector(`[data-in="${k}"]`), v = STEP[k].get();
+    if (document.activeElement !== inp) inp.value = v ? v : '';
+    inp.placeholder = k === 'swap' ? '–' : '';
+    const opts = k === 'goal' ? GOAL_OPTS : k === 'time' ? TIME_OPTS : SWAP_OPTS;
+    inp.closest('.stepper').classList.toggle('on', !!v && !opts.includes(v));
+    inp.closest('.stepper').classList.toggle('off', !v);
+  }
+}
 function drawLobby(){
-  const g = GAMES[S.game];
+  const g = GAMES[S.game], tp = TOPICS[S.topic];
   if (!g.ns.includes(S.n)) S.n = g.ns[0];
   $('#games').innerHTML = Object.entries(GAMES).map(([k, v]) => `
     <button class="gcard ${k === S.game ? 'on' : ''}" type="button" data-g="${k}">
       <span class="pic">${GAME_PIC[k]}</span>
-      <span><b>${v.name}</b><small>${v.desc}</small><span class="who">${v.ns.map(n => n + ' 方').join('、')}對抗</span></span>
+      <span><b>${v.name}</b><small>${v.desc[S.topic]}</small><span class="who ${v.kind}">${KIND_TXT[v.kind]}</span></span>
     </button>`).join('');
   $('#modeSeg').innerHTML = [['team','小組賽'],['solo','個人賽']].map(([k, t]) => `<button class="opt ${S.mode === k ? 'on' : ''}" type="button" data-mode="${k}">${t}</button>`).join('');
   $('#nSeg').innerHTML = [2, 3].map(n => `<button class="opt num ${S.n === n ? 'on' : ''}" type="button" data-n="${n}" ${g.ns.includes(n) ? '' : 'disabled'}>${n}</button>`).join('');
-  $('#tabSeg').innerHTML = [1,2,3,4,5,6,7,8,9].map(t => `<button class="opt num ${S.tables.includes(t) ? 'on' : ''}" type="button" data-t="${t}">${t}</button>`).join('')
-    + '<span class="hint" style="align-self:center">的乘法</span>';
-  $('#goalRow').hidden = !g.goal;
-  if (g.goal){
-    $('#goalLab').textContent = g.goal.label;
-    $('#goalSeg').innerHTML = g.goal.opts.map(v => `<button class="opt ${S.goal[S.game] === v ? 'on' : ''}" type="button" data-goal="${v}">${v} ${g.goal.unit}</button>`).join('');
+  const tabs = tabsOf(), concept = S.topic === 'concept';
+  $('#tabLab').textContent = concept ? '被乘數' : '乘法範圍';
+  $('#q19').hidden = concept;
+  $('#tabSeg').innerHTML = [1,2,3,4,5,6,7,8,9].map(t => `<button class="opt num ${tabs.includes(t) ? 'on' : ''}" type="button" data-t="${t}" ${concept && t < 2 ? 'disabled' : ''}>${t}</button>`).join('')
+    + `<span class="hint" style="align-self:center">${concept ? `（1 份有幾個）；乘數（有幾份）是 ${CB_MIN}～${CB_MAX}` : '的乘法'}</span>`;
+  $('#goalRow').hidden = g.kind !== 'goal';
+  $('#timeRow').hidden = g.kind !== 'time';
+  if (g.kind === 'goal'){
+    $('#goalLab').textContent = g.goal.label; $('#goalUnit').textContent = g.goal.unit;
+    $('#goalSeg').innerHTML = GOAL_OPTS.map(v => `<button class="opt ${S.goal[S.game] === v ? 'on' : ''}" type="button" data-goal="${v}">${v} ${g.goal.unit}</button>`).join('');
+  } else {
+    $('#timeSeg').innerHTML = TIME_OPTS.map(v => `<button class="opt ${S.time[S.game] === v ? 'on' : ''}" type="button" data-time="${v}">${secText(v)}</button>`).join('');
   }
-  $('#timeSeg').innerHTML = g.times.map(v => `<button class="opt ${S.time[S.game] === v ? 'on' : ''}" type="button" data-time="${v}">${v % 60 ? v + ' 秒' : v / 60 + ' 分鐘'}</button>`).join('');
-  $('#swapSeg').innerHTML = [[0,'不提醒'],[3,'每 3 題'],[5,'每 5 題']].map(([v, t]) => `<button class="opt ${S.swap === v ? 'on' : ''}" type="button" data-swap="${v}">${t}</button>`).join('');
+  /* 個人賽：一方只有一個人，不用換人、不用輸入座號 */
+  $('#swapRow').hidden = !isTeam(); $('#seatRow').hidden = !isTeam();
+  $('#swapSeg').innerHTML = [[0,'不提醒'], ...SWAP_OPTS.map(v => [v, `每 ${v} 題`])].map(([v, t]) => `<button class="opt ${S.swap === v ? 'on' : ''}" type="button" data-swap="${v}">${t}</button>`).join('');
   $('#seatSeg').innerHTML = [[1,'要輸入'],[0,'跳過']].map(([v, t]) => `<button class="opt ${+S.seats === v ? 'on' : ''}" type="button" data-seats="${v}">${t}</button>`).join('');
+  drawSteppers();
   $('#names').innerHTML = TEAMS.map((t, i) => `<label class="nm ${i < S.n ? '' : 'off'}" style="--c:${t.c};--l:${t.l}"><span class="dot"></span>
     <input data-name="${i}" maxlength="8" list="pastNames" value="${esc(S.names[i] || '')}" placeholder="${t[S.mode]}" ${i < S.n ? '' : 'disabled'}></label>`).join('');
   $('#pastNames').innerHTML = S.pastNames.map(n => `<option value="${esc(n)}">`).join('');
-  $('#warn').textContent = S.tables.length ? '' : '請至少選一個乘法';
-  $('#startBtn').textContent = S.seats ? '下一步：輸入座號 ▶' : '開始比賽 ▶';
-  $('#title').textContent = '乘法大屏對抗';
+  $('#warn').textContent = tabs.length ? '' : (concept ? '請至少選一個被乘數' : '請至少選一個乘法');
+  $('#startBtn').textContent = isTeam() && S.seats ? '下一步：輸入座號 ▶' : '開始比賽 ▶';
+  $('#title').textContent = tp.name; $('#tag').textContent = tp.tag;
+  $('#backBtn').href = tp.back;
+  document.title = tp.name + '｜大屏';
 }
 $('#lobby').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.g){ S.game = b.dataset.g; history.replaceState(null, '', '#' + S.game); }
+  if (b.dataset.g) S.game = b.dataset.g;
   else if (b.dataset.mode) S.mode = b.dataset.mode;
   else if (b.dataset.n) S.n = +b.dataset.n;
-  else if (b.dataset.t){ const t = +b.dataset.t; S.tables = S.tables.includes(t) ? S.tables.filter(x => x !== t) : [...S.tables, t].sort(); }
-  else if (b.dataset.q) S.tables = b.dataset.q.split(',').map(Number);
+  else if (b.dataset.t){ const t = +b.dataset.t, tb = tabsOf(); setTabs(tb.includes(t) ? tb.filter(x => x !== t) : [...tb, t].sort()); }
+  else if (b.dataset.q) setTabs(b.dataset.q.split(',').map(Number));
   else if (b.dataset.goal) S.goal[S.game] = +b.dataset.goal;
   else if (b.dataset.time) S.time[S.game] = +b.dataset.time;
   else if (b.dataset.swap) S.swap = +b.dataset.swap;
   else if (b.dataset.seats) S.seats = b.dataset.seats === '1';
-  else if (b.id === 'startBtn'){ if (S.tables.length){ if (S.seats) showMembers(); else start(true); } return; }
+  else if (b.dataset.step){
+    const k = b.closest('.stepper').dataset.k, st = STEP[k], cur = st.get();
+    const d = +b.dataset.step, base = cur || (d > 0 ? st.lo - d : st.lo);   // 換人提醒從「不提醒」按 ▲ → 1
+    st.set(Math.round((base + d) / Math.abs(d)) * Math.abs(d) || st.lo);
+  }
+  else if (b.id === 'startBtn'){ if (tabsOf().length){ if (isTeam() && S.seats) showMembers(); else start(true); } return; }
   else return;
   save(); drawLobby();
 });
+/* 直接打字：打的時候就記下來，離開欄位（或按 Enter）時再檢查範圍 */
+$('#lobby').addEventListener('input', e => {
+  const k = e.target.dataset.in; if (!k) return;
+  const st = STEP[k], v = e.target.value;
+  if (okInt(v, st.lo, st.hi)){ st.set(v); save(); const keep = e.target; drawLobby(); keep.focus(); }
+});
+$('#lobby').addEventListener('change', e => {
+  const k = e.target.dataset.in; if (!k) return;
+  const st = STEP[k], v = e.target.value;
+  if (v === '' && k === 'swap') S.swap = 0;
+  else if (v !== '' && Number.isFinite(+v)) st.set(v);
+  save(); e.target.blur(); drawLobby();
+});
+$('#lobby').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.dataset.in) e.target.blur(); });
 $('#names').addEventListener('input', e => { const i = e.target.dataset.name; if (i != null){ S.names[+i] = e.target.value; save(); } });
 
 /* ---------- 輸入成員座號（每一隊一個數字鍵盤，會記住上一次的座號） ---------- */
@@ -568,22 +698,47 @@ $('#members').addEventListener('click', e => {
 });
 
 /* ---------- 題目 ---------- */
+/* 題目：key＝要按的數字（心算是積；認識乘法是「被乘數、乘數」兩個數字），mole＝地鼠拿的答案 */
 function newQ(prev){
   let q;
-  for (let k = 0; k < 20; k++){
-    const a = pick(S.tables), b = ri(1, 9);
-    q = {a, b, ans:a * b, t:`${a}×${b}`};
+  for (let k = 0; k < 30; k++){
+    if (G.topic === 'concept'){
+      const a = pick(S.ctables), b = ri(CB_MIN, CB_MAX);
+      if (a === b && k < 25) continue;                  // 被乘數和乘數一樣，就看不出前後有沒有放對
+      q = {a, b, ans:a * b, t:`${a}×${b}`, label:`${a}×${b}`, key:`${a}${b}`, mole:`${a}×${b}`, th:pick(PIC_THINGS)};
+    } else {
+      const a = pick(S.tables), b = ri(1, 9);
+      q = {a, b, ans:a * b, t:`${a}×${b}`, label:`${a}×${b}=${a * b}`, key:String(a * b), mole:String(a * b)};
+    }
     if (!prev || q.t !== prev.t) break;
   }
   return q;
 }
-/* 打地鼠的錯誤選項：先用最容易搞混的（多一份、少一份），不夠再補 */
+/* 打地鼠的錯誤選項：先用最容易搞混的，不夠再補
+   心算：多一份、少一份；認識乘法：前後放反（最常見）、多一份、少一份 */
 function distractors(q){
+  const out = [];
+  if (G.topic === 'concept'){
+    const ok = (a, b) => a >= 1 && a <= 9 && b >= 1 && b <= 9;
+    const first = q.a !== q.b ? [[q.b, q.a]] : [];
+    const near = shuffle([[q.a, q.b + 1], [q.a, q.b - 1], [q.a + 1, q.b], [q.a - 1, q.b], [q.b, q.a + 1], [q.b + 1, q.a]]);
+    for (const [a, b] of [...first, ...near]){ const t = `${a}×${b}`; if (ok(a, b) && t !== q.mole && !out.includes(t)){ out.push(t); if (out.length === 3) break; } }
+    return out;
+  }
   const near = shuffle([q.a * (q.b + 1), q.a * (q.b - 1), (q.a + 1) * q.b, (q.a - 1) * q.b]);
   const more = shuffle([q.ans + 1, q.ans - 1, q.ans + 10, q.ans - 10, q.a * (q.b + 2), q.b * (q.a + 2), q.a + q.b]);
-  const out = [];
-  for (const v of [...near, ...more]) if (v > 0 && v !== q.ans && v < 100 && !out.includes(v)) { out.push(v); if (out.length === 3) break; }
+  for (const v of [...near, ...more]) if (v > 0 && v !== q.ans && v < 100 && !out.includes(String(v))) { out.push(String(v)); if (out.length === 3) break; }
   return out;
+}
+/* 認識乘法的圖：b 份，每份 a 個 */
+function picHTML(q){
+  const cols = q.a <= 5 ? q.a : Math.ceil(q.a / 2);
+  return Array.from({length:q.b}, () => `<div class="cbox ${q.th.cls}" style="grid-template-columns:repeat(${cols},auto)">${`<i>${q.th.e}</i>`.repeat(q.a)}</div>`).join('');
+}
+/* 流星上的小圖：用圓點，比較小也看得清楚 */
+function miniPic(q){
+  const cols = q.a <= 5 ? q.a : Math.ceil(q.a / 2);
+  return `<div class="mpic">${Array.from({length:q.b}, () => `<b style="grid-template-columns:repeat(${cols},10px)">${'<i></i>'.repeat(q.a)}</b>`).join('')}</div>`;
 }
 
 /* ---------- 遊戲 ---------- */
@@ -597,13 +752,16 @@ const show = id => { SECTIONS.forEach(s => $('#' + s).hidden = s !== id);
 function start(skipSeats){
   stop();
   const kind = S.game, gm = GAMES[kind];
-  G = {kind, n:S.n, goal:gm.goal ? S.goal[kind] : 0, time:S.time[kind], swap:S.swap, t:0, last:0, paused:true, ended:false, zones:[]};
+  if (!isTeam()) skipSeats = true;
+  G = {kind, topic:S.topic, n:S.n, goal:gm.kind === 'goal' ? S.goal[kind] : 0, time:gm.kind === 'time' ? S.time[kind] : 0,
+    swap:isTeam() ? S.swap : 0, t:0, last:0, paused:true, ended:false, zones:[]};
+  G.mw = G.topic === 'concept' ? 240 : 200; G.mh = G.topic === 'concept' ? 200 : 150;
   for (let i = 0; i < G.n; i++){
     const nm = (S.names[i] || '').trim();
     if (nm){ S.pastNames = [nm, ...S.pastNames.filter(x => x !== nm)].slice(0, 12); }
   }
   save();
-  $('#title').textContent = gm.name;
+  $('#title').textContent = `${gm.name}・${TOPICS[G.topic].name}`;
   $('#pauseBtn').textContent = '⏸ 暫停'; $('#endBtn').textContent = '結束';
   $('#game').className = 'n' + G.n;
   $('#zones').style.setProperty('--n', G.n);
@@ -614,14 +772,17 @@ function start(skipSeats){
     const z = {i, name:nameOf(i), c:T.c, m:T.m, l:T.l, score:0, right:0, wrong:0, misses:[], times:[], q:null, qT:0, input:'', lock:0, miss:0,
       mets:[], nextSpawn:0, t:0, done:0, turn:0, swap:false, per:{}, members:skipSeats ? [] : [...S.members[i]]};
     const el = document.createElement('div');
-    el.className = 'zone g-' + kind; el.style.cssText = `--c:${T.c};--l:${T.l}`;
-    const qbox = `<div class="zq"><div class="qline"></div><div class="zmsg"></div></div>`;
+    el.className = `zone g-${kind} c-${G.topic}`; el.style.cssText = `--c:${T.c};--l:${T.l}`;
+    const qbox = G.topic === 'concept'
+      ? `<div class="zq"><div class="cq"><div class="cpic"></div><div class="qline"></div></div><div class="zmsg"></div></div>`
+      : `<div class="zq"><div class="qline"></div><div class="zmsg"></div></div>`;
+    const ans = G.topic === 'concept' ? `<span class="lbl">被乘數</span><span class="slot s1"></span><span class="op">×</span><span class="slot s2"></span><span class="lbl">乘數</span>` : `<span class="lbl">答案</span><span class="slot"></span>`;
     const body = kind === 'meteor'
-      ? `<div class="sky"><div class="ground"></div></div><div class="ansbar"><span class="lbl">答案</span><span class="slot"></span></div>`
+      ? `<div class="sky"><div class="ground"></div></div><div class="ansbar">${ans}</div>`
       : kind === 'stack'
       ? `<div class="stackbox"><div class="top"><span>目標 ${G.goal} 塊</span></div><div class="blocks"></div><div class="climber">${critter(T.c)}</div><div class="gnd"></div></div>${qbox}`
       : kind === 'mole'
-      ? `${qbox}<div class="field">${('<div class="hole"><div class="pit"></div><div class="mwrap"><button class="mole" type="button" tabindex="-1"><span class="mn"></span><span class="mb">' + moleSVG() + '</span></button></div></div>').repeat(6)}</div>`
+      ? `${qbox}<div class="field">${('<div class="hole"><div class="pit"></div><div class="mwrap"><button class="mole" type="button" tabindex="-1"><span class="mn"></span><span class="mb">' + moleSVG() + '</span></button></div></div>').repeat(6)}<img class="hammer" src="assets/hammer.png" alt=""></div>`
       : qbox;
     const pad = kind === 'mole' ? '' : `<div class="pad">${[1,2,3,4,5,6,7,8,9,0].map(k => `<button class="key" type="button" data-k="${k}">${k}</button>`).join('')}<button class="key del" type="button" data-k="del">⌫<br>擦掉</button></div>`;
     el.innerHTML = `<div class="zhead"><span class="zn">${esc(z.name)}</span><span class="zp" hidden></span><span class="zs"></span></div>${body}${pad}`;
@@ -637,6 +798,7 @@ function start(skipSeats){
     });
     $('#zones').appendChild(el);
     z.el = el; z.slot = el.querySelector('.slot'); z.sky = el.querySelector('.sky');
+    if (kind === 'meteor'){ clearSlot(z); }
     G.zones.push(z);
   }
   drawScene();
@@ -647,7 +809,7 @@ function start(skipSeats){
   if (kind === 'stack') G.zones.forEach(z => { const t = z.el.querySelector('.stackbox'); z.bh = Math.floor((t.offsetHeight - 30 - 100) / G.goal);
     t.style.setProperty('--bh', z.bh + 'px'); t.querySelector('.top').style.bottom = (30 + z.bh * G.goal) + 'px'; buildStack(z); });
   G.zones.forEach(z => { hudZ(z); showPlayer(z); });
-  $('#timer').textContent = fmt(G.time); $('#timer').classList.remove('hurry');
+  $('#timer').textContent = fmt(G.time); $('#timer').classList.remove('hurry');   // 目的型沒有時間限制：從 0:00 往上數
   countdown(() => {
     G.paused = false; G.last = performance.now();
     if (kind === 'mole') G.zones.forEach(z => moleUp(z));
@@ -689,11 +851,13 @@ function loop(now){
   if (!G.paused){
     G.t += dt;
     G.zones.forEach(z => { if (!z.swap) z.t += dt; });   // 換人的時候，這一隊的時間（流星、作答秒數）先停住
-    const left = G.time - G.t;
-    $('#timer').textContent = fmt(left);
-    $('#timer').classList.toggle('hurry', left <= 10);
     if (G.kind === 'meteor') G.zones.forEach(z => { if (!z.swap) meteorTick(z); });
-    if (left <= 0){ finish(); return; }
+    if (G.time){   // 限時型：倒數，時間到就結束
+      const left = G.time - G.t;
+      $('#timer').textContent = fmt(left);
+      $('#timer').classList.toggle('hurry', left <= 10);
+      if (left <= 0){ finish(); return; }
+    } else $('#timer').textContent = fmt(Math.floor(G.t));   // 目的型：碼表
   }
   G.raf = requestAnimationFrame(loop);
 }
@@ -736,11 +900,19 @@ function press(z, k){
   else if (z.input.length < 2) z.input += k;
   if (G.kind === 'meteor') return meteorInput(z);
   renderQ(z);
-  if (z.input.length >= String(z.q.ans).length) judge(z);
+  if (z.input.length >= z.q.key.length) judge(z);
+}
+/* 答錯的提示：認識乘法要說出「哪裡錯」 */
+function wrongTip(q, input, final){
+  if (G.topic !== 'concept') return final ? `答案是 ${q.ans}，換下一題` : '再想一想！';
+  const th = q.th;
+  if (final) return `答案是 ${q.a}×${q.b}：1 ${th.c}有 ${q.a} ${th.u}，有 ${q.b} ${th.c}`;
+  if (input === `${q.b}${q.a}`) return `前後放反了！× 前面寫「1 ${th.c}有幾${th.u}」`;
+  return `數一數：1 ${th.c}有幾${th.u}？有幾${th.c}？`;
 }
 function judge(z){
   const q = z.q;
-  if (+z.input === q.ans){
+  if (z.input === q.key){
     z.right++; credit(z, true); z.times.push(z.t - z.qT); z.lock = performance.now() + 350;
     renderQ(z, 'ok'); flash(z); SND.ok();
     progress(z);
@@ -750,21 +922,40 @@ function judge(z){
     z.wrong++; z.miss++; z.misses.push(q); credit(z, false); SND.no();
     z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
     if (z.miss >= 2){
-      z.lock = performance.now() + LOCK_SHOW; z.input = String(q.ans);
-      renderQ(z, 'show', `答案是 ${q.ans}，換下一題`);
+      z.lock = performance.now() + LOCK_SHOW; z.input = q.key;
+      renderQ(z, 'show', wrongTip(q, '', true));
       z.el.classList.add('locked');
       setTimeout(() => { if (!G || G.ended) return; z.el.classList.remove('locked'); z.q = newQ(q); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); doneQ(z); }, LOCK_SHOW);
     } else {
       z.lock = performance.now() + LOCK_WRONG;
-      renderQ(z, 'no', '再想一想！');
+      renderQ(z, 'no', wrongTip(q, z.input, false));
       z.el.classList.add('locked');
       setTimeout(() => { if (!G || G.ended) return; z.el.classList.remove('locked'); z.input = ''; renderQ(z); }, LOCK_WRONG);
     }
   }
 }
 function renderQ(z, cls = '', msg = ''){
-  z.el.querySelector('.qline').innerHTML = `<span>${z.q.a}</span><span class="op">×</span><span>${z.q.b}</span><span class="op">=</span><span class="slot ${cls}">${z.input || (G.kind === 'mole' ? '?' : '&nbsp;')}</span>`;
+  const q = z.q, blank = G.kind === 'mole' ? '?' : '&nbsp;';
+  if (G.topic === 'concept'){
+    if (z.picQ !== q){ z.picQ = q; const p = z.el.querySelector('.cpic'); p.innerHTML = picHTML(q); fitPic(z); setTimeout(() => { if (G && z.q === q) fitPic(z); }, 300); }
+    const v = z.input, f = !cls && G.kind !== 'mole' ? v.length : -1;   // 下一個要填的格子亮起來
+    z.el.querySelector('.qline').innerHTML = [0, 1].map(i => `<span class="slot ${cls} ${i === f ? 'focus' : ''}">${v[i] || blank}</span>`).join('<span class="op">×</span>');
+  } else
+  z.el.querySelector('.qline').innerHTML = `<span>${q.a}</span><span class="op">×</span><span>${q.b}</span><span class="op">=</span><span class="slot ${cls}">${z.input || blank}</span>`;
   const m = z.el.querySelector('.zmsg'); m.textContent = msg; m.className = 'zmsg' + (cls === 'no' || cls === 'show' ? ' bad' : '');
+}
+/* 圖太大放不下：把東西一點一點縮小，直到放得下 */
+function fitPic(z){
+  const box = z.el.querySelector('.zq'), cq = z.el.querySelector('.cq'), p = z.el.querySelector('.cpic');
+  let e = G.n === 3 ? 38 : 46;
+  if (z.q.a > 5 && z.q.b > 3) e -= 6;
+  const ql = z.el.querySelector('.qline');
+  for (let k = 0; k < 12; k++){
+    p.style.setProperty('--e', e + 'px');
+    const need = p.offsetHeight + ql.offsetHeight + 10 + 48;   // 圖＋□×□＋間隔＋上下留白（下面要放提示字）
+    if (need <= box.clientHeight && p.scrollWidth <= box.clientWidth - 16) break;
+    e = Math.round(e * .9);
+  }
 }
 function flash(z, x, y){
   z.el.classList.remove('flash'); void z.el.offsetWidth; z.el.classList.add('flash');
@@ -781,7 +972,7 @@ function progress(z){
 function hudZ(z){
   const s = z.el.querySelector('.zs');
   if (G.goal) s.innerHTML = `${z.score}<small> / ${G.goal}</small>`;
-  else s.innerHTML = `<small>擊碎</small>${z.score}`;
+  else s.innerHTML = `<small>${G.kind === 'mole' ? '敲到' : '擊碎'}</small>${z.score}`;
 }
 
 /* ---------- 賽跑 ---------- */
@@ -824,10 +1015,10 @@ function buildStack(z, add){
 /* ---------- 打地鼠：6 個洞，4 隻地鼠拿著答案，只有 1 隻是對的 ---------- */
 function moleUp(z){
   if (!G || G.ended) return;
-  const opts = shuffle([z.q.ans, ...distractors(z.q)]);
+  const opts = shuffle([z.q.mole, ...distractors(z.q)]);
   const holes = shuffle([0, 1, 2, 3, 4, 5]).slice(0, opts.length);
   const ms = z.el.querySelectorAll('.mole');
-  ms.forEach(m => { m.className = 'mole'; });
+  ms.forEach(m => { m.className = 'mole'; m.style.visibility = ''; });
   holes.forEach((hI, k) => {
     const m = ms[hI]; m.dataset.v = opts[k]; m.querySelector('.mn').textContent = opts[k];
     setTimeout(() => { if (G && !G.ended) m.classList.add('up'); }, 60 + k * 90);
@@ -838,37 +1029,70 @@ function nextMole(z, prev){
   moleDown(z);
   setTimeout(() => { if (!G || G.ended) return; z.q = newQ(prev); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); moleUp(z); doneQ(z); }, 260);
 }
+/* 木槌（參考 info-class 字母打地鼠）：握把底端放在地鼠旁邊，往下轉 70 度剛好敲到地鼠頭上；右邊那一排從左邊敲 */
+const HAMMER_HIT_MS = 160;
+function hammerHit(z, m, impact){
+  const f = z.el.querySelector('.field'), h = f.querySelector('.hammer'), hole = m.closest('.hole');
+  const idx = [...f.querySelectorAll('.hole')].indexOf(hole), flip = idx % 3 === 2;
+  const x = hole.offsetLeft + hole.offsetWidth / 2, y = hole.offsetTop + hole.offsetHeight * .38;
+  const H = hole.offsetHeight * .72, W = H * .645, r = H * .67, rad = 70 * Math.PI / 180;
+  const px = x + (flip ? -1 : 1) * r * Math.sin(rad), py = y + r * Math.cos(rad);
+  Object.assign(h.style, {width:W + 'px', height:H + 'px', left:(px - W / 2) + 'px', top:(py - H * .93) + 'px'});
+  const fx = flip ? 'scaleX(-1) ' : '';
+  h.classList.add('on'); clearTimeout(h._t);
+  const hit = () => {
+    impact();
+    const st = document.createElement('div'); st.className = 'star'; st.textContent = '✦';
+    st.style.left = x + 'px'; st.style.top = y + 'px'; f.appendChild(st); setTimeout(() => st.remove(), 400);
+    if (f.animate) f.animate([{transform:'translate(0,0)'}, {transform:'translate(3px,4px)'}, {transform:'translate(-3px,-2px)'}, {transform:'translate(0,0)'}], {duration:120});
+  };
+  if (h.animate){
+    (h.getAnimations ? h.getAnimations() : []).forEach(a => a.cancel());
+    const a = h.animate([{transform:fx + 'rotate(15deg)', easing:'ease-out'}, {transform:fx + 'rotate(38deg)', offset:.3, easing:'cubic-bezier(.6,0,1,1)'},
+      {transform:fx + 'rotate(-72deg)', offset:.53, easing:'ease-out'}, {transform:fx + 'rotate(-64deg)', offset:.68, easing:'ease-in-out'}, {transform:fx + 'rotate(15deg)'}], {duration:300});
+    if (a.ready) a.ready.then(() => setTimeout(hit, HAMMER_HIT_MS)); else setTimeout(hit, HAMMER_HIT_MS);
+  } else setTimeout(hit, HAMMER_HIT_MS);
+  h._t = setTimeout(() => h.classList.remove('on'), 520);
+}
+const thud = () => { tone(150, .09, 'square', .14); tone(70, .14, 'sine', .22); };
 function whack(z, m){
   if (!G || G.ended || G.paused || z.swap || performance.now() < z.lock) return;
-  const q = z.q, v = +m.dataset.v;
-  if (v === q.ans){
-    z.right++; credit(z, true); z.times.push(z.t - z.qT); z.lock = performance.now() + 700;
-    m.classList.add('hit'); z.input = String(v); renderQ(z, 'ok'); SND.ok();
-    const r = m.getBoundingClientRect(), b = z.el.getBoundingClientRect(), s = b.width / z.el.offsetWidth;
-    flash(z, (r.left - b.left) / s + 20, (r.top - b.top) / s - 40);
+  const q = z.q, v = m.dataset.v;
+  if (v === q.mole){
+    z.right++; credit(z, true); z.times.push(z.t - z.qT); z.lock = performance.now() + 750;
+    z.input = q.key; renderQ(z, 'ok');
+    hammerHit(z, m, () => {
+      m.classList.add('hit'); thud(); SND.ok();
+      const r = m.getBoundingClientRect(), b = z.el.getBoundingClientRect(), s = b.width / z.el.offsetWidth;
+      flash(z, (r.left - b.left) / s + 20, (r.top - b.top) / s - 40);
+    });
     progress(z);
     if (G.ended) return;
-    setTimeout(() => nextMole(z, q), 450);
+    setTimeout(() => nextMole(z, q), 620);
   } else {
-    z.wrong++; z.miss++; z.misses.push(q); credit(z, false); SND.no();
-    m.classList.add('bad'); setTimeout(() => m.classList.remove('up'), 400);
-    z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
+    z.wrong++; z.miss++; z.misses.push(q); credit(z, false);
+    z.lock = performance.now() + 250;
+    hammerHit(z, m, () => {
+      thud(); SND.no(); m.classList.add('bad'); setTimeout(() => m.classList.remove('up'), 380);
+      z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
+    });
     if (z.miss >= 2){
-      z.lock = performance.now() + LOCK_SHOW; z.input = String(q.ans);
-      renderQ(z, 'show', `答案是 ${q.ans}，換下一題`);
-      z.el.querySelectorAll('.mole.up').forEach(o => { if (+o.dataset.v === q.ans) o.classList.add('right'); });
+      z.lock = performance.now() + LOCK_SHOW; z.input = q.key;
+      renderQ(z, 'show', wrongTip(q, '', true));
+      setTimeout(() => z.el.querySelectorAll('.mole.up').forEach(o => { if (o.dataset.v === q.mole) o.classList.add('right'); }), 200);
       setTimeout(() => { if (G && !G.ended) nextMole(z, q); }, LOCK_SHOW);
     } else {
       z.lock = performance.now() + LOCK_WRONG;
-      renderQ(z, 'no', '再想一想！');
+      const tip = G.topic === 'concept' ? wrongTip(q, v.replace('×', ''), false) : '再想一想！';
+      renderQ(z, 'no', tip);
       setTimeout(() => { if (G && !G.ended && z.q === q){ z.input = ''; renderQ(z); } }, LOCK_WRONG);
     }
   }
 }
 
 /* ---------- 流星雨（用每一隊自己的時間，換人時流星會停住） ---------- */
-const MW = 200, MH = 150;
 function meteorTick(z){
+  const MH = G.mh;
   const p = Math.min(1, G.t / G.time);
   const dur = 10 - 4 * p;          // 掉到地上要幾秒：10 秒慢慢變成 6 秒
   const gap = 2.8 - 1.2 * p;       // 多久來一顆
@@ -885,34 +1109,44 @@ function meteorTick(z){
   }
 }
 function spawn(z, dur){
+  const MW = G.mw, MH = G.mh;
   const slots = Math.max(2, Math.floor(z.skyW / (MW + 10)));
   const sw = z.skyW / slots;
   const busy = new Set(z.mets.filter(m => m.y < z.skyH * .45).map(m => m.slot));
   const free = [...Array(slots).keys()].filter(s => !busy.has(s));
   if (!free.length) return false;
-  const used = z.mets.map(m => String(m.q.ans));
+  /* 畫面上的流星：答案不能一樣，也不能一個是另一個的開頭（點完數字就自動判斷）；認識乘法也不能有前後顛倒的 */
+  const used = z.mets.map(m => m.q.key);
   let q = null;
   for (let k = 0; k < 40; k++){
-    const c = newQ(), s = String(c.ans);
-    if (used.every(u => !u.startsWith(s) && !s.startsWith(u))){ q = c; break; }
+    const c = newQ(), s = c.key, rev = `${c.b}${c.a}`;
+    if (used.every(u => !u.startsWith(s) && !s.startsWith(u) && (G.topic !== 'concept' || u !== rev))){ q = c; break; }
   }
   if (!q) return false;
   const slot = pick(free);
   const m = {q, slot, born:z.t, dur, x:Math.round(slot * sw + (sw - MW) / 2), y:-MH};
-  m.el = document.createElement('div'); m.el.className = 'met';
-  m.el.innerHTML = `${meteorSVG()}<div class="mq"><span>${q.a}×${q.b}</span></div>`;
+  m.el = document.createElement('div'); m.el.className = G.topic === 'concept' ? 'met cm' : 'met';
+  m.el.innerHTML = `${meteorSVG()}<div class="mq">${G.topic === 'concept' ? miniPic(q) : `<span>${q.a}×${q.b}</span>`}</div>`;
   m.el.style.transform = `translate(${m.x}px,${m.y}px)`;
   z.sky.appendChild(m.el); z.mets.push(m);
   return true;
 }
-function clearSlot(z){ z.slot.className = 'slot'; z.slot.innerHTML = '&nbsp;'; }
+/* 流星雨的答案格：心算是一格；認識乘法是「□×□」兩格 */
+function ansShow(z, cls, v){
+  if (G.topic === 'concept'){
+    const a = z.el.querySelector('.s1'), b = z.el.querySelector('.s2');
+    a.className = `slot s1 ${cls} ${!cls && v.length === 0 ? 'focus' : ''}`; b.className = `slot s2 ${cls} ${!cls && v.length === 1 ? 'focus' : ''}`;
+    a.innerHTML = v[0] || '&nbsp;'; b.innerHTML = v[1] || '&nbsp;';
+  } else { z.slot.className = 'slot ' + cls; z.slot.innerHTML = v || '&nbsp;'; }
+}
+function clearSlot(z){ ansShow(z, '', ''); }
 function meteorInput(z){
   const v = z.input;
-  z.mets.forEach(m => m.el.classList.toggle('hot', !!v && String(m.q.ans).startsWith(v)));
-  const hitM = z.mets.find(m => String(m.q.ans) === v);
+  z.mets.forEach(m => m.el.classList.toggle('hot', !!v && m.q.key.startsWith(v)));
+  const hitM = z.mets.find(m => m.q.key === v);
   if (hitM){
     z.right++; z.score++; credit(z, true); hudZ(z); SND.ok();
-    z.slot.className = 'slot ok'; z.slot.textContent = v;
+    ansShow(z, 'ok', v);
     z.mets = z.mets.filter(m => m !== hitM);
     hitM.el.style.setProperty('--at', `translate(${hitM.x}px,${hitM.y}px)`); hitM.el.classList.add('boom');
     setTimeout(() => hitM.el.remove(), 400);
@@ -922,24 +1156,24 @@ function meteorInput(z){
     doneQ(z);
     return;
   }
-  if (v && !z.mets.some(m => String(m.q.ans).startsWith(v))){
+  if (v && !z.mets.some(m => m.q.key.startsWith(v))){
     z.wrong++; credit(z, false); SND.no();
-    z.slot.className = 'slot no'; z.slot.textContent = v;
+    ansShow(z, 'no', v);
     z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
     z.lock = performance.now() + LOCK_METEOR; z.el.classList.add('locked');
     setTimeout(() => { if (!G || G.ended) return; z.input = ''; z.el.classList.remove('locked'); clearSlot(z); z.mets.forEach(m => m.el.classList.remove('hot')); }, LOCK_METEOR);
     return;
   }
-  z.slot.className = 'slot'; z.slot.innerHTML = v || '&nbsp;';
+  ansShow(z, '', v);
 }
 function landM(z, m){
   z.mets = z.mets.filter(o => o !== m); m.el.remove();
   z.misses.push(m.q); SND.land();
   const t = document.createElement('div'); t.className = 'landed';
-  t.textContent = `${m.q.a}×${m.q.b}=${m.q.ans}`;
+  t.textContent = m.q.label;
   t.style.left = Math.max(6, Math.min(z.skyW - 200, m.x)) + 'px';
   z.sky.appendChild(t); setTimeout(() => t.remove(), 1800);
-  if (z.input && !z.mets.some(o => String(o.q.ans).startsWith(z.input))){ z.input = ''; clearSlot(z); }
+  if (z.input && !z.mets.some(o => o.q.key.startsWith(z.input))){ z.input = ''; clearSlot(z); }
 }
 
 /* ---------- 結果 ---------- */
@@ -958,17 +1192,16 @@ function finish(){
   const head = winners.length === Z.length ? '平手！大家都很厲害'
     : winners.length > 1 ? `${winners.map(o => esc(o.z.name)).join('、')} 並列第一！`
     : `${esc(winners[0].z.name)} 獲勝！`;
-  const reached = Z.some(z => G.goal && z.score >= G.goal);
-  const why = G.manual ? '老師結束了這一局'
-    : G.kind === 'race' ? (reached ? '先跑到終點' : '時間到，跑最遠的贏')
-    : G.kind === 'stack' ? (reached ? '先疊到目標' : '時間到，疊最高的贏')
-    : G.kind === 'mole' ? (reached ? '先敲到目標數' : '時間到，敲最多隻的贏')
+  const why = G.manual ? (G.goal ? '老師結束了這一局，比一比誰最接近目標' : '老師結束了這一局')
+    : G.kind === 'race' ? `先跑到終點（用了 ${fmt(G.t)}）`
+    : G.kind === 'stack' ? `先疊到目標（用了 ${fmt(G.t)}）`
+    : G.kind === 'mole' ? '時間到，敲最多隻的贏'
     : '時間到，打碎最多流星的贏';
   const misses = z => { const seen = new Map(); z.misses.forEach(q => seen.set(q.t, q)); return [...seen.values()].slice(-8); };
   const unit = {race:'答對題數', stack:'疊了幾塊', mole:'敲到幾隻', meteor:'擊碎流星'}[G.kind];
 
   /* 存進比賽紀錄 */
-  H.unshift({at:Date.now(), game:G.kind, tables:[...S.tables], time:G.time, goal:G.goal, manual:!!G.manual, played:Math.round(G.t),
+  H.unshift({at:Date.now(), game:G.kind, topic:G.topic, tables:[...(G.topic === 'concept' ? S.ctables : S.tables)], time:G.time, goal:G.goal, manual:!!G.manual, played:Math.round(G.t),
     teams:order.map(({z, rank}) => ({name:z.name, color:z.i, rank, score:z.score, right:z.right, wrong:z.wrong, members:z.members, per:z.per}))});
   if (H.length > MAX_HIST) H.length = MAX_HIST;
   saveH();
@@ -989,7 +1222,7 @@ function finish(){
           </div>
           ${pc ? `<div class="miss"><h4>每一位同學</h4><div class="pcs">${pc}</div></div>` : ''}
           <div class="miss"><h4>${G.kind === 'meteor' ? '沒打到、要再練習的題目' : '答錯、要再練習的題目'}</h4>
-            ${!tot && !ms.length ? '<div class="none" style="color:var(--ink-soft)">這一局還沒有作答</div>' : ms.length ? `<div class="chips">${ms.map(q => `<span>${q.a}×${q.b}=${q.ans}</span>`).join('')}</div>` : '<div class="none">全部都對，太棒了！</div>'}</div>
+            ${!tot && !ms.length ? '<div class="none" style="color:var(--ink-soft)">這一局還沒有作答</div>' : ms.length ? `<div class="chips">${ms.map(q => `<span>${q.label}</span>`).join('')}</div>` : '<div class="none">全部都對，太棒了！</div>'}</div>
         </div></div>`; }).join('')}</div>
     <div class="rbtns"><button class="btn primary big" type="button" id="againBtn">再玩一次</button><button class="btn big" type="button" id="setBtn">回到設定</button></div>`;
   G.lastSkip = !Z.some(z => z.members.length);
@@ -1009,7 +1242,7 @@ function drawHist(){
     const d = new Date(r.at), g = GAMES[r.game] || {name:'乘法蓋高樓'};
     const when = `${d.getMonth() + 1}/${d.getDate()}（${WD[d.getDay()]}）${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     return `<div class="hrec">
-      <div class="hmeta"><b>${when}</b><span class="hg">${esc(g.name)}</span><span>${tablesText(r.tables)} 的乘法</span><span>玩了 ${fmt(r.played)}</span>${r.manual ? '<span>老師提前結束</span>' : ''}</div>
+      <div class="hmeta"><b>${when}</b><span class="hg">${esc(g.name)}</span><span>${r.topic === 'concept' ? `認識乘法・被乘數 ${tablesText(r.tables)}` : `心算・${tablesText(r.tables)} 的乘法`}</span><span>玩了 ${fmt(r.played)}</span>${r.manual ? '<span>老師提前結束</span>' : ''}</div>
       <div class="hteams" style="--n:${r.teams.length}">${r.teams.map(t => {
         const T = TEAMS[t.color] || TEAMS[0], tot = t.right + t.wrong, pc = perChips(t.per || {}, t.members);
         return `<div class="ht" style="--c:${T.c};--l:${T.l}">${medal(t.rank, 'sm')}<b>${esc(t.name)}</b><span class="hs">${t.score}${r.goal ? ' / ' + r.goal : ''}・答對 ${tot ? Math.round(t.right / tot * 100) : 0}%</span>
