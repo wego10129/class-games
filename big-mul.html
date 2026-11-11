@@ -61,7 +61,7 @@ main>section{flex:1;min-height:0}
 .gcard .who.goal{background:#FFF1C7}
 .gcard .who.time{background:#DDF0FF}
 .gcard.on{background:#FFF6C7;box-shadow:0 0 0 6px var(--gold),6px 6px 0 var(--ink)}
-.panel{background:var(--card);border:4px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:18px 26px;display:grid;gap:14px;align-content:start;flex:1}
+.panel{background:var(--card);border:4px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:16px 26px;display:grid;gap:12px;align-content:start;flex:1}
 .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .lab{font:900 26px var(--f-body);width:150px;flex:none}
 .seg{display:flex;gap:10px;flex-wrap:wrap}
@@ -278,7 +278,7 @@ main>section{flex:1;min-height:0}
 .pc b{font:600 22px var(--f-num)}
 
 /* ---------- 輸入成員座號 ---------- */
-#members{display:flex;flex-direction:column;gap:16px}
+#members{display:flex;flex-direction:column;gap:16px;position:relative}
 .mtop{display:flex;align-items:center;gap:18px}
 .mtop h2{margin:0;font:700 44px var(--f-display)}
 #mzones{flex:1;min-height:0;display:grid;gap:20px;grid-template-columns:repeat(var(--n),1fr)}
@@ -299,6 +299,32 @@ main>section{flex:1;min-height:0}
 .pad.seat .key.add{font:900 30px var(--f-body);background:var(--hl)}
 .mbtns{flex:none;display:flex;justify-content:flex-end;gap:20px}
 
+/* ---------- 出題：精熟練習、各隊同題 ---------- */
+.opt.weak.on{background:#FFD7A8}
+.weakline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 0 164px}
+.weakline .wq{font:600 24px var(--f-num);background:#FFF1F1;border:3px solid var(--bad);border-radius:10px;padding:0 10px}
+.fixed{font:600 30px var(--f-num);border:4px solid var(--ink);border-radius:14px;background:var(--hl);padding:2px 16px}
+
+/* ---------- 精熟練習：先一起複習 ---------- */
+#review{display:flex;flex-direction:column;gap:16px}
+#rvlist{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;align-content:start;padding:4px 10px 10px 4px}
+.rv{background:var(--card);border:5px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;font:inherit;min-height:200px}
+.rv .rq{font:600 72px/1 var(--f-num)}
+.rv .ra{font:600 72px/1 var(--f-num);color:var(--good)}
+.rv .rpic{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;--e:26px}
+.rv .rtip{font:700 22px var(--f-body);color:var(--ink-soft)}
+.rv .rcnt{font:700 20px var(--f-body);color:var(--bad)}
+.rv.open{background:#F1FBF5}
+
+/* ---------- 自動分組 ---------- */
+.mz .zhead .clr+.clr{margin-left:8px}
+.grp{position:absolute;inset:0;z-index:30;background:rgba(27,40,54,.6);display:grid;place-items:center}
+.grp .box{background:#fff;border:5px solid var(--ink);border-radius:26px;box-shadow:8px 8px 0 var(--ink);padding:24px 32px;display:grid;gap:16px;width:1400px;max-width:96%}
+.grp h3{margin:0;font:700 46px var(--f-display)}
+.seatgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:10px}
+.seatgrid button{font:600 34px var(--f-num);border:4px solid var(--ink);border-radius:14px;background:#fff;box-shadow:3px 3px 0 var(--ink);padding:4px 0}
+.seatgrid button.away{background:var(--dim);color:var(--ink-soft);text-decoration:line-through;box-shadow:none}
+
 /* ---------- 比賽紀錄 ---------- */
 #hist{display:flex;flex-direction:column;gap:16px}
 #hlist{flex:1;min-height:0;overflow:auto;display:grid;gap:14px;align-content:start;padding:0 10px 10px 0}
@@ -317,7 +343,7 @@ main>section{flex:1;min-height:0}
 <body>
 <div id="stage">
   <header class="bar">
-    <div class="brand"><span class="tag" id="tag">×</span><h1 id="title">乘法心算大會戰</h1><span class="ver">教師大屏 v2.0</span></div>
+    <div class="brand"><span class="tag" id="tag">×</span><h1 id="title">乘法心算大會戰</h1><span class="ver">教師大屏 v2.1</span></div>
     <div class="spacer"></div>
     <div class="timer" id="timer" hidden>3:00</div>
     <button class="btn" id="soundBtn" type="button">🔊 聲音</button>
@@ -352,6 +378,9 @@ main>section{flex:1;min-height:0}
               </div>
             </div>
           </div>
+          <div class="row" id="srcRow"><span class="lab">出題</span><div class="seg" id="srcSeg"></div></div>
+          <div class="weakline" id="weakLine"></div>
+          <div class="row"><span class="lab">各隊題目</span><div class="seg" id="sameSeg"></div><span class="hint">同一組：每一隊的第 1 題、第 2 題……都一樣，各自作答</span></div>
           <div class="row" id="goalRow"><span class="lab" id="goalLab">終點</span><div class="seg" id="goalSeg"></div>
             <span class="own">自己訂</span><div class="stepper" data-k="goal"><button type="button" data-step="-1">▼</button><input type="number" inputmode="numeric" data-in="goal"><button type="button" data-step="1">▲</button></div><span class="own" id="goalUnit">題</span></div>
           <div class="row" id="timeRow"><span class="lab">時間</span><div class="seg" id="timeSeg"></div>
@@ -368,12 +397,24 @@ main>section{flex:1;min-height:0}
 
     <!-- 輸入成員座號 -->
     <section id="members" hidden>
-      <div class="mtop"><h2>各隊輸入成員座號</h2><span class="hint">依照上場順序輸入。上一次的座號會自動帶出來，不用每次重打。</span></div>
+      <div class="mtop"><h2>各隊輸入成員座號</h2><span class="hint">依照上場順序輸入。上一次的座號會自動帶出來，不用每次重打。</span><span class="spacer"></span>
+        <button class="btn primary" type="button" id="mGroup">🎲 全班自動分組</button></div>
       <div id="mzones"></div>
+      <div class="grp" id="grp" hidden></div>
       <div class="mbtns">
         <button class="btn big" type="button" id="mBack">← 回到設定</button>
         <button class="btn big" type="button" id="mSkip">跳過，不輸入座號</button>
         <button class="btn primary big" type="button" id="mStart">開始比賽 ▶</button>
+      </div>
+    </section>
+
+    <!-- 精熟練習：先複習比較不熟的題目 -->
+    <section id="review" hidden>
+      <div class="mtop"><h2>精熟練習：這些題目比較不熟</h2><span class="hint">請帶著小朋友一起複習。點一下卡片看答案。</span></div>
+      <div id="rvlist"></div>
+      <div class="mbtns">
+        <button class="btn big" type="button" id="rvBack">← 回到設定</button>
+        <button class="btn primary big" type="button" id="rvGo">複習完畢，開始遊戲 ▶</button>
       </div>
     </section>
 
@@ -441,15 +482,18 @@ const PIC_THINGS = [
   {c:'碗', n:'草莓', u:'顆', e:'🍓', cls:'u-bowl'},
 ];
 const CB_MIN = 2, CB_MAX = 5;   // 認識乘法：乘數（有幾份）2～5，和練習頁一樣
+const CA = [2, 4, 5, 8];        // 認識乘法：被乘數固定 2、4、5、8（課本「乘法（一）」：2 和 5、4、8 的乘法）
+const WEAK_GAMES = 10;          // 精熟練習：看最近幾局
+const WEAK_MAX = 8;             // 精熟練習：最多列幾題
 const LOCK_WRONG = 900;   // 答錯停幾毫秒
 const LOCK_SHOW = 1600;   // 錯 2 次公布答案停幾毫秒
 const LOCK_METEOR = 600;  // 流星雨按錯停幾毫秒
 const SWAP_WAIT = 800;    // 換人視窗出現後，多久才能按「準備好了」（避免上一位順手按掉）
-const MAX_SEATS = 15;     // 每一隊最多幾個座號
+const MAX_SEATS = 20;     // 每一隊最多幾個座號
 const MAX_HIST = 60;      // 比賽紀錄最多留幾筆
 
 /* ---------- 設定和紀錄（記在這台電腦的瀏覽器，不會因為重新整理而不見） ---------- */
-const S = {topic:'calc', game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], ctables:[2,3,4,5,6,7,8,9], goal:{race:15, stack:15}, time:{meteor:60, mole:60},
+const S = {topic:'calc', game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], src:'normal', same:false, classN:28, goal:{race:15, stack:15}, time:{meteor:60, mole:60},
   names:['','',''], sound:true, swap:5, seats:true, members:[[],[],[]], pastNames:[]};
 try { Object.assign(S, JSON.parse(localStorage.getItem('bigmul.v1') || '{}')); } catch (e) {}
 const clampInt = (v, lo, hi) => Math.min(hi, Math.max(lo, Math.round(+v)));
@@ -457,7 +501,8 @@ const okInt = (v, lo, hi) => Number.isFinite(+v) && +v >= lo && +v <= hi;
 if (S.game === 'tower') S.game = 'stack';
 if (!GAMES[S.game]) S.game = 'race';
 if (!TOPICS[S.topic]) S.topic = 'calc';
-if (!Array.isArray(S.ctables) || !S.ctables.length) S.ctables = [2,3,4,5,6,7,8,9];
+if (!['normal', 'weak'].includes(S.src)) S.src = 'normal';
+if (!okInt(S.classN, 2, 40)) S.classN = 28;
 S.goal = Object.assign({}, S.goal); S.time = Object.assign({}, S.time);
 for (const k in GAMES){
   const g = GAMES[k];
@@ -553,8 +598,15 @@ const GAME_PIC = {
 /* ---------- 設定畫面 ---------- */
 const nameOf = i => (S.names[i] || '').trim() || TEAMS[i][S.mode];
 const tablesText = t => t.length === 8 && !t.includes(1) ? '2～9' : t.length === 9 ? '1～9' : t.join('、');
-const tabsOf = () => S.topic === 'concept' ? S.ctables : S.tables;
-const setTabs = t => { if (S.topic === 'concept') S.ctables = t.filter(x => x >= 2); else S.tables = t; };
+const tabsOf = () => S.topic === 'concept' ? CA : S.tables;
+const setTabs = t => { if (S.topic !== 'concept') S.tables = t; };
+/* 精熟練習：最近 WEAK_GAMES 局（同一個主題），答錯的次數多、答對比例不到 75% 的題目 */
+function weakList(topic){
+  const m = new Map();
+  H.filter(r => (r.topic || 'calc') === topic && Array.isArray(r.qs)).slice(0, WEAK_GAMES).forEach(r => r.qs.forEach(([a, b, ok, no]) => {
+    const k = a + '×' + b, o = m.get(k) || {a, b, ok:0, no:0}; o.ok += ok; o.no += no; m.set(k, o); }));
+  return [...m.values()].filter(o => o.no > 0 && o.ok / (o.ok + o.no) < .75).sort((x, y) => y.no - x.no || x.ok - y.ok).slice(0, WEAK_MAX);
+}
 const isTeam = () => S.mode === 'team';
 const secText = v => `${v} 秒`;
 /* 自己訂的數字：▲▼ 或直接打字（打字的時候先不要重畫，免得游標跑掉） */
@@ -585,9 +637,19 @@ function drawLobby(){
   $('#nSeg').innerHTML = [2, 3].map(n => `<button class="opt num ${S.n === n ? 'on' : ''}" type="button" data-n="${n}" ${g.ns.includes(n) ? '' : 'disabled'}>${n}</button>`).join('');
   const tabs = tabsOf(), concept = S.topic === 'concept';
   $('#tabLab').textContent = concept ? '被乘數' : '乘法範圍';
-  $('#q19').hidden = concept;
-  $('#tabSeg').innerHTML = [1,2,3,4,5,6,7,8,9].map(t => `<button class="opt num ${tabs.includes(t) ? 'on' : ''}" type="button" data-t="${t}" ${concept && t < 2 ? 'disabled' : ''}>${t}</button>`).join('')
-    + `<span class="hint" style="align-self:center">${concept ? `（1 份有幾個）；乘數（有幾份）是 ${CB_MIN}～${CB_MAX}` : '的乘法'}</span>`;
+  $('#tabSeg').innerHTML = concept
+    ? CA.map(t => `<span class="fixed">${t}</span>`).join('') + `<span class="hint" style="align-self:center">（1 份有幾個，課本「乘法（一）」）；乘數（有幾份）是 ${CB_MIN}～${CB_MAX}</span>`
+    : [1,2,3,4,5,6,7,8,9].map(t => `<button class="opt num ${tabs.includes(t) ? 'on' : ''}" type="button" data-t="${t}">${t}</button>`).join('') + '<span class="hint" style="align-self:center">的乘法</span>';
+  $('#q19').parentElement.hidden = concept;
+  /* 出題：一般／精熟練習（列出比較不熟的題目）；各隊題目：不同／同一組（公平） */
+  const weak = weakList(S.topic);
+  if (!weak.length && S.src === 'weak') S.src = 'normal';
+  $('#srcSeg').innerHTML = `<button class="opt ${S.src === 'normal' ? 'on' : ''}" type="button" data-src="normal">一般題目</button>`
+    + `<button class="opt weak ${S.src === 'weak' ? 'on' : ''}" type="button" data-src="weak" ${weak.length ? '' : 'disabled'}>🎯 進行精熟練習</button>`;
+  $('#sameSeg').innerHTML = [[0,'各隊不同'],[1,'同一組（公平）']].map(([v, t]) => `<button class="opt ${+S.same === v ? 'on' : ''}" type="button" data-same="${v}">${t}</button>`).join('');
+  $('#weakLine').innerHTML = weak.length
+    ? `<span class="hint">這些題目比較不熟：</span>${weak.map(o => `<span class="wq">${o.a}×${o.b}</span>`).join('')}`
+    : `<span class="hint">玩過幾局以後，答錯比較多的題目會列在這裡，可以進行精熟練習。</span>`;
   $('#goalRow').hidden = g.kind !== 'goal';
   $('#timeRow').hidden = g.kind !== 'time';
   if (g.kind === 'goal'){
@@ -604,7 +666,7 @@ function drawLobby(){
   $('#names').innerHTML = TEAMS.map((t, i) => `<label class="nm ${i < S.n ? '' : 'off'}" style="--c:${t.c};--l:${t.l}"><span class="dot"></span>
     <input data-name="${i}" maxlength="8" list="pastNames" value="${esc(S.names[i] || '')}" placeholder="${t[S.mode]}" ${i < S.n ? '' : 'disabled'}></label>`).join('');
   $('#pastNames').innerHTML = S.pastNames.map(n => `<option value="${esc(n)}">`).join('');
-  $('#warn').textContent = tabs.length ? '' : (concept ? '請至少選一個被乘數' : '請至少選一個乘法');
+  $('#warn').textContent = tabs.length ? '' : '請至少選一個乘法';
   $('#startBtn').textContent = isTeam() && S.seats ? '下一步：輸入座號 ▶' : '開始比賽 ▶';
   $('#title').textContent = tp.name; $('#tag').textContent = tp.tag;
   $('#backBtn').href = tp.back;
@@ -621,12 +683,14 @@ $('#lobby').addEventListener('click', e => {
   else if (b.dataset.time) S.time[S.game] = +b.dataset.time;
   else if (b.dataset.swap) S.swap = +b.dataset.swap;
   else if (b.dataset.seats) S.seats = b.dataset.seats === '1';
+  else if (b.dataset.src) S.src = b.dataset.src;
+  else if (b.dataset.same) S.same = b.dataset.same === '1';
   else if (b.dataset.step){
     const k = b.closest('.stepper').dataset.k, st = STEP[k], cur = st.get();
     const d = +b.dataset.step, base = cur || (d > 0 ? st.lo - d : st.lo);   // 換人提醒從「不提醒」按 ▲ → 1
     st.set(Math.round((base + d) / Math.abs(d)) * Math.abs(d) || st.lo);
   }
-  else if (b.id === 'startBtn'){ if (tabsOf().length){ if (isTeam() && S.seats) showMembers(); else start(true); } return; }
+  else if (b.id === 'startBtn'){ if (tabsOf().length){ if (isTeam() && S.seats) showMembers(); else go(true); } return; }
   else return;
   save(); drawLobby();
 });
@@ -657,7 +721,7 @@ function showMembers(){
   $('#mzones').style.setProperty('--n', S.n);
   $('#mzones').className = 'n' + S.n;
   $('#mzones').innerHTML = TEAMS.slice(0, S.n).map((t, i) => `<div class="mz" style="--c:${t.c};--l:${t.l}">
-    <div class="zhead"><span class="zn">${esc(nameOf(i))}</span><button class="clr" type="button" data-clr="${i}">全部清掉</button></div>
+    <div class="zhead"><span class="zn">${esc(nameOf(i))}</span><button class="clr" type="button" data-mix="${i}">🔀 打亂順序</button><button class="clr" type="button" data-clr="${i}">全部清掉</button></div>
     <div class="seats" id="seats${i}"></div>
     <div class="mrow"><span class="lbl">座號</span><span class="slot" id="mslot${i}">&nbsp;</span><span class="mmsg" id="mmsg${i}"></span></div>
     <div class="pad seat" data-i="${i}">${padKeys('<button class="key add" type="button" data-k="add">加入</button>')}</div>
@@ -692,28 +756,100 @@ $('#members').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.rm){ const [i, k] = b.dataset.rm.split(':').map(Number); S.members[i].splice(k, 1); save(); drawSeats(i); }
   else if (b.dataset.clr != null){ S.members[+b.dataset.clr] = []; save(); drawSeats(+b.dataset.clr); }
-  else if (b.id === 'mSkip') start(true);
-  else if (b.id === 'mStart') start(false);
+  else if (b.dataset.mix != null){ shuffle(S.members[+b.dataset.mix]); save(); drawSeats(+b.dataset.mix); }
+  else if (b.id === 'mGroup') showGroup();
+  else if (b.id === 'mSkip') go(true);
+  else if (b.id === 'mStart') go(false);
   else if (b.id === 'mBack'){ show('lobby'); drawLobby(); }
+});
+
+/* ---------- 全班自動分組：輸入全班人數，點掉請假的同學，隨機平均分成幾隊 ---------- */
+let AWAY = new Set();
+function showGroup(){
+  const g = $('#grp'); g.hidden = false;
+  const N = S.classN;
+  AWAY = new Set([...AWAY].filter(x => x <= N));
+  const here = N - AWAY.size;
+  g.innerHTML = `<div class="box">
+    <h3>全班自動分組</h3>
+    <div class="row"><span class="lab" style="width:auto">全班座號 1 到</span>
+      <div class="stepper" data-k="classN"><button type="button" data-cn="-1">▼</button><input type="number" inputmode="numeric" id="cnIn" value="${N}"><button type="button" data-cn="1">▲</button></div>
+      <span class="hint">號。點一下座號＝今天請假（不分組）</span></div>
+    <div class="seatgrid">${Array.from({length:N}, (_, k) => `<button type="button" data-away="${k + 1}" class="${AWAY.has(k + 1) ? 'away' : ''}">${k + 1}</button>`).join('')}</div>
+    <div class="startrow"><span class="hint">今天 ${here} 人，分成 ${S.n} 隊，每隊約 ${Math.ceil(here / S.n)} 人；各隊的上場順序也會打亂</span>
+      <button class="btn big" type="button" data-gx="close">取消</button><button class="btn primary big" type="button" data-gx="go">🎲 隨機分成 ${S.n} 隊</button></div></div>`;
+}
+$('#grp').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.away){ const k = +b.dataset.away; AWAY.has(k) ? AWAY.delete(k) : AWAY.add(k); showGroup(); }
+  else if (b.dataset.cn){ S.classN = clampInt(S.classN + +b.dataset.cn, 2, 40); save(); showGroup(); }
+  else if (b.dataset.gx === 'close') $('#grp').hidden = true;
+  else if (b.dataset.gx === 'go'){
+    const all = shuffle(Array.from({length:S.classN}, (_, k) => k + 1).filter(k => !AWAY.has(k)));
+    for (let i = 0; i < S.n; i++) S.members[i] = all.filter((_, k) => k % S.n === i).slice(0, MAX_SEATS);
+    save(); $('#grp').hidden = true; for (let i = 0; i < S.n; i++) drawSeats(i);
+  }
+});
+$('#grp').addEventListener('change', e => { if (e.target.id === 'cnIn'){ S.classN = clampInt(+e.target.value || S.classN, 2, 40); save(); showGroup(); } });
+
+/* ---------- 精熟練習：開始前先列出比較不熟的題目，老師帶著一起複習 ---------- */
+let RV_SKIP = true;
+function go(skipSeats){
+  if (S.src === 'weak' && weakList(S.topic).length) showReview(skipSeats);
+  else start(skipSeats);
+}
+function showReview(skipSeats){
+  RV_SKIP = skipSeats;
+  show('review'); $('#title').textContent = '精熟練習・' + TOPICS[S.topic].name;
+  const concept = S.topic === 'concept';
+  $('#rvlist').innerHTML = weakList(S.topic).map(o => {
+    const q = makeQ(o.a, o.b, S.topic);
+    return `<button class="rv" type="button">
+      ${concept ? `<div class="rpic">${picHTML(q)}</div>` : `<div class="rq">${o.a}×${o.b}</div>`}
+      <div class="rtip">點一下看答案</div>
+      <div class="ra" hidden>${concept ? `${o.a}×${o.b}` : `= ${o.a * o.b}`}</div>
+      <div class="rtip" hidden>${concept ? `1 ${q.th.c}有 ${o.a} ${q.th.u}，有 ${o.b} ${q.th.c}` : `${o.a} 個一數，數 ${o.b} 次`}</div>
+      <div class="rcnt">最近答錯 ${o.no} 次</div></button>`;
+  }).join('');
+}
+$('#review').addEventListener('click', e => {
+  const c = e.target.closest('.rv');
+  if (c){ const open = !c.classList.contains('open'); c.classList.toggle('open', open);
+    const t = c.querySelectorAll('.rtip'); t[0].hidden = open; t[1].hidden = !open; c.querySelector('.ra').hidden = !open; return; }
+  if (e.target.id === 'rvGo') start(RV_SKIP);
+  if (e.target.id === 'rvBack'){ show('lobby'); drawLobby(); }
 });
 
 /* ---------- 題目 ---------- */
 /* 題目：key＝要按的數字（心算是積；認識乘法是「被乘數、乘數」兩個數字），mole＝地鼠拿的答案 */
+function makeQ(a, b, topic){
+  return topic === 'concept'
+    ? {a, b, ans:a * b, t:`${a}×${b}`, label:`${a}×${b}`, key:`${a}${b}`, mole:`${a}×${b}`, th:pick(PIC_THINGS)}
+    : {a, b, ans:a * b, t:`${a}×${b}`, label:`${a}×${b}=${a * b}`, key:String(a * b), mole:String(a * b)};
+}
 function newQ(prev){
   let q;
   for (let k = 0; k < 30; k++){
-    if (G.topic === 'concept'){
-      const a = pick(S.ctables), b = ri(CB_MIN, CB_MAX);
+    if (G.weak) { const o = pick(G.weak); q = makeQ(o.a, o.b, G.topic); }   // 精熟練習：只出比較不熟的題目
+    else if (G.topic === 'concept'){
+      const a = pick(CA), b = ri(CB_MIN, CB_MAX);
       if (a === b && k < 25) continue;                  // 被乘數和乘數一樣，就看不出前後有沒有放對
-      q = {a, b, ans:a * b, t:`${a}×${b}`, label:`${a}×${b}`, key:`${a}${b}`, mole:`${a}×${b}`, th:pick(PIC_THINGS)};
-    } else {
-      const a = pick(S.tables), b = ri(1, 9);
-      q = {a, b, ans:a * b, t:`${a}×${b}`, label:`${a}×${b}=${a * b}`, key:String(a * b), mole:String(a * b)};
-    }
+      q = makeQ(a, b, 'concept');
+    } else q = makeQ(pick(S.tables), ri(1, 9), 'calc');
     if (!prev || q.t !== prev.t) break;
   }
   return q;
 }
+/* 各隊同一組題目（公平）：每一隊的第 1 題、第 2 題……都一樣，各自作答、不用等別隊 */
+function takeQ(z, prev){
+  if (!G.same) return newQ(prev);
+  if (!G.seq[z.qi]) G.seq[z.qi] = newQ(G.seq[z.qi - 1]);
+  const q = G.seq[z.qi++]; showQn(z); return q;
+}
+const peekQ = z => G.seq[z.qi] || (G.seq[z.qi] = newQ(G.seq[z.qi - 1]));
+function showQn(z){ const e = z.el && z.el.querySelector('.qn'); if (e) e.textContent = `第 ${z.qi} 題`; }
+/* 每一題答對、答錯幾次（存進比賽紀錄，精熟練習用） */
+function tally(z, q, ok){ const o = z.qs[q.t] || (z.qs[q.t] = [q.a, q.b, 0, 0]); o[ok ? 2 : 3]++; }
 /* 打地鼠的錯誤選項：先用最容易搞混的，不夠再補
    心算：多一份、少一份；認識乘法：前後放反（最常見）、多一份、少一份 */
 function distractors(q){
@@ -743,7 +879,7 @@ function miniPic(q){
 
 /* ---------- 遊戲 ---------- */
 let G = null;
-const SECTIONS = ['lobby', 'members', 'game', 'result', 'hist'];
+const SECTIONS = ['lobby', 'members', 'review', 'game', 'result', 'hist'];
 const show = id => { SECTIONS.forEach(s => $('#' + s).hidden = s !== id);
   const playing = id === 'game';
   $('#timer').hidden = !playing; $('#pauseBtn').hidden = !playing; $('#endBtn').hidden = !playing;
@@ -754,14 +890,15 @@ function start(skipSeats){
   const kind = S.game, gm = GAMES[kind];
   if (!isTeam()) skipSeats = true;
   G = {kind, topic:S.topic, n:S.n, goal:gm.kind === 'goal' ? S.goal[kind] : 0, time:gm.kind === 'time' ? S.time[kind] : 0,
-    swap:isTeam() ? S.swap : 0, t:0, last:0, paused:true, ended:false, zones:[]};
+    swap:isTeam() ? S.swap : 0, t:0, last:0, paused:true, ended:false, zones:[], same:S.same, seq:[],
+    weak:S.src === 'weak' && weakList(S.topic).length ? weakList(S.topic) : null};
   G.mw = G.topic === 'concept' ? 240 : 200; G.mh = G.topic === 'concept' ? 200 : 150;
   for (let i = 0; i < G.n; i++){
     const nm = (S.names[i] || '').trim();
     if (nm){ S.pastNames = [nm, ...S.pastNames.filter(x => x !== nm)].slice(0, 12); }
   }
   save();
-  $('#title').textContent = `${gm.name}・${TOPICS[G.topic].name}`;
+  $('#title').textContent = `${G.weak ? '精熟練習・' : ''}${gm.name}・${TOPICS[G.topic].name}`;
   $('#pauseBtn').textContent = '⏸ 暫停'; $('#endBtn').textContent = '結束';
   $('#game').className = 'n' + G.n;
   $('#zones').style.setProperty('--n', G.n);
@@ -769,7 +906,7 @@ function start(skipSeats){
   $('#zones').innerHTML = '';
   for (let i = 0; i < G.n; i++){
     const T = TEAMS[i];
-    const z = {i, name:nameOf(i), c:T.c, m:T.m, l:T.l, score:0, right:0, wrong:0, misses:[], times:[], q:null, qT:0, input:'', lock:0, miss:0,
+    const z = {i, name:nameOf(i), c:T.c, m:T.m, l:T.l, score:0, right:0, wrong:0, misses:[], qs:{}, qi:0, times:[], q:null, qT:0, input:'', lock:0, miss:0,
       mets:[], nextSpawn:0, t:0, done:0, turn:0, swap:false, per:{}, members:skipSeats ? [] : [...S.members[i]]};
     const el = document.createElement('div');
     el.className = `zone g-${kind} c-${G.topic}`; el.style.cssText = `--c:${T.c};--l:${T.l}`;
@@ -785,7 +922,7 @@ function start(skipSeats){
       ? `${qbox}<div class="field">${('<div class="hole"><div class="pit"></div><div class="mwrap"><button class="mole" type="button" tabindex="-1"><span class="mn"></span><span class="mb">' + moleSVG() + '</span></button></div></div>').repeat(6)}<img class="hammer" src="assets/hammer.png" alt=""></div>`
       : qbox;
     const pad = kind === 'mole' ? '' : `<div class="pad">${[1,2,3,4,5,6,7,8,9,0].map(k => `<button class="key" type="button" data-k="${k}">${k}</button>`).join('')}<button class="key del" type="button" data-k="del">⌫<br>擦掉</button></div>`;
-    el.innerHTML = `<div class="zhead"><span class="zn">${esc(z.name)}</span><span class="zp" hidden></span><span class="zs"></span></div>${body}${pad}`;
+    el.innerHTML = `<div class="zhead"><span class="zn">${esc(z.name)}</span>${G.same && kind !== 'meteor' ? '<span class="zp qn"></span>' : ''}<span class="zp pl" hidden></span><span class="zs"></span></div>${body}${pad}`;
     if (pad) el.querySelector('.pad').addEventListener('pointerdown', e => {
       const b = e.target.closest('.key'); if (!b) return;
       e.preventDefault();
@@ -805,7 +942,7 @@ function start(skipSeats){
   $('#scene').hidden = kind !== 'race';
   show('game');
   if (kind === 'meteor') G.zones.forEach(z => { z.skyW = z.sky.offsetWidth; z.skyH = z.sky.offsetHeight; });
-  else G.zones.forEach(z => { z.q = newQ(); renderQ(z); });
+  else G.zones.forEach(z => { z.q = takeQ(z); renderQ(z); });
   if (kind === 'stack') G.zones.forEach(z => { const t = z.el.querySelector('.stackbox'); z.bh = Math.floor((t.offsetHeight - 30 - 100) / G.goal);
     t.style.setProperty('--bh', z.bh + 'px'); t.querySelector('.top').style.bottom = (30 + z.bh * G.goal) + 'px'; buildStack(z); });
   G.zones.forEach(z => { hudZ(z); showPlayer(z); });
@@ -865,7 +1002,7 @@ function loop(now){
 /* ---------- 換人提醒 ---------- */
 const cur = z => z.members.length ? z.members[z.turn % z.members.length] : null;
 function showPlayer(z){
-  const p = cur(z), e = z.el.querySelector('.zp');
+  const p = cur(z), e = z.el.querySelector('.zp.pl');
   e.hidden = p == null; if (p != null) e.textContent = `${p} 號作答中`;
 }
 function credit(z, ok){
@@ -913,19 +1050,19 @@ function wrongTip(q, input, final){
 function judge(z){
   const q = z.q;
   if (z.input === q.key){
-    z.right++; credit(z, true); z.times.push(z.t - z.qT); z.lock = performance.now() + 350;
+    z.right++; credit(z, true); tally(z, q, true); z.times.push(z.t - z.qT); z.lock = performance.now() + 350;
     renderQ(z, 'ok'); flash(z); SND.ok();
     progress(z);
     if (G.ended) return;
-    setTimeout(() => { if (!G || G.ended) return; z.q = newQ(q); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); doneQ(z); }, 350);
+    setTimeout(() => { if (!G || G.ended) return; z.q = takeQ(z, q); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); doneQ(z); }, 350);
   } else {
-    z.wrong++; z.miss++; z.misses.push(q); credit(z, false); SND.no();
+    z.wrong++; z.miss++; z.misses.push(q); credit(z, false); tally(z, q, false); SND.no();
     z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
     if (z.miss >= 2){
       z.lock = performance.now() + LOCK_SHOW; z.input = q.key;
       renderQ(z, 'show', wrongTip(q, '', true));
       z.el.classList.add('locked');
-      setTimeout(() => { if (!G || G.ended) return; z.el.classList.remove('locked'); z.q = newQ(q); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); doneQ(z); }, LOCK_SHOW);
+      setTimeout(() => { if (!G || G.ended) return; z.el.classList.remove('locked'); z.q = takeQ(z, q); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); doneQ(z); }, LOCK_SHOW);
     } else {
       z.lock = performance.now() + LOCK_WRONG;
       renderQ(z, 'no', wrongTip(q, z.input, false));
@@ -1015,7 +1152,8 @@ function buildStack(z, add){
 /* ---------- 打地鼠：6 個洞，4 隻地鼠拿著答案，只有 1 隻是對的 ---------- */
 function moleUp(z){
   if (!G || G.ended) return;
-  const opts = shuffle([z.q.mole, ...distractors(z.q)]);
+  if (!z.q.opts) z.q.opts = distractors(z.q);   // 同一組題目時，各隊的地鼠拿一樣的數字
+  const opts = shuffle([z.q.mole, ...z.q.opts]);
   const holes = shuffle([0, 1, 2, 3, 4, 5]).slice(0, opts.length);
   const ms = z.el.querySelectorAll('.mole');
   ms.forEach(m => { m.className = 'mole'; m.style.visibility = ''; });
@@ -1027,7 +1165,7 @@ function moleUp(z){
 function moleDown(z){ z.el.querySelectorAll('.mole').forEach(m => m.classList.remove('up')); }
 function nextMole(z, prev){
   moleDown(z);
-  setTimeout(() => { if (!G || G.ended) return; z.q = newQ(prev); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); moleUp(z); doneQ(z); }, 260);
+  setTimeout(() => { if (!G || G.ended) return; z.q = takeQ(z, prev); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); moleUp(z); doneQ(z); }, 260);
 }
 /* 木槌（參考 info-class 字母打地鼠）：握把底端放在地鼠旁邊，往下轉 70 度剛好敲到地鼠頭上；右邊那一排從左邊敲 */
 const HAMMER_HIT_MS = 160;
@@ -1059,7 +1197,7 @@ function whack(z, m){
   if (!G || G.ended || G.paused || z.swap || performance.now() < z.lock) return;
   const q = z.q, v = m.dataset.v;
   if (v === q.mole){
-    z.right++; credit(z, true); z.times.push(z.t - z.qT); z.lock = performance.now() + 750;
+    z.right++; credit(z, true); tally(z, q, true); z.times.push(z.t - z.qT); z.lock = performance.now() + 750;
     z.input = q.key; renderQ(z, 'ok');
     hammerHit(z, m, () => {
       m.classList.add('hit'); thud(); SND.ok();
@@ -1070,7 +1208,7 @@ function whack(z, m){
     if (G.ended) return;
     setTimeout(() => nextMole(z, q), 620);
   } else {
-    z.wrong++; z.miss++; z.misses.push(q); credit(z, false);
+    z.wrong++; z.miss++; z.misses.push(q); credit(z, false); tally(z, q, false);
     z.lock = performance.now() + 250;
     hammerHit(z, m, () => {
       thud(); SND.no(); m.classList.add('bad'); setTimeout(() => m.classList.remove('up'), 380);
@@ -1118,10 +1256,9 @@ function spawn(z, dur){
   /* 畫面上的流星：答案不能一樣，也不能一個是另一個的開頭（點完數字就自動判斷）；認識乘法也不能有前後顛倒的 */
   const used = z.mets.map(m => m.q.key);
   let q = null;
-  for (let k = 0; k < 40; k++){
-    const c = newQ(), s = c.key, rev = `${c.b}${c.a}`;
-    if (used.every(u => !u.startsWith(s) && !s.startsWith(u) && (G.topic !== 'concept' || u !== rev))){ q = c; break; }
-  }
+  const fits = c => { const s = c.key, rev = `${c.b}${c.a}`; return used.every(u => !u.startsWith(s) && !s.startsWith(u) && (G.topic !== 'concept' || u !== rev)); };
+  if (G.same){ const c = peekQ(z); if (!fits(c)) return false; q = c; z.qi++; }   // 同一組題目：照順序來，下一顆和畫面上的衝突就晚一點再來
+  else for (let k = 0; k < 40; k++){ const c = newQ(); if (fits(c)){ q = c; break; } }
   if (!q) return false;
   const slot = pick(free);
   const m = {q, slot, born:z.t, dur, x:Math.round(slot * sw + (sw - MW) / 2), y:-MH};
@@ -1145,7 +1282,7 @@ function meteorInput(z){
   z.mets.forEach(m => m.el.classList.toggle('hot', !!v && m.q.key.startsWith(v)));
   const hitM = z.mets.find(m => m.q.key === v);
   if (hitM){
-    z.right++; z.score++; credit(z, true); hudZ(z); SND.ok();
+    z.right++; z.score++; credit(z, true); tally(z, hitM.q, true); hudZ(z); SND.ok();
     ansShow(z, 'ok', v);
     z.mets = z.mets.filter(m => m !== hitM);
     hitM.el.style.setProperty('--at', `translate(${hitM.x}px,${hitM.y}px)`); hitM.el.classList.add('boom');
@@ -1168,7 +1305,7 @@ function meteorInput(z){
 }
 function landM(z, m){
   z.mets = z.mets.filter(o => o !== m); m.el.remove();
-  z.misses.push(m.q); SND.land();
+  z.misses.push(m.q); tally(z, m.q, false); SND.land();
   const t = document.createElement('div'); t.className = 'landed';
   t.textContent = m.q.label;
   t.style.left = Math.max(6, Math.min(z.skyW - 200, m.x)) + 'px';
@@ -1201,7 +1338,8 @@ function finish(){
   const unit = {race:'答對題數', stack:'疊了幾塊', mole:'敲到幾隻', meteor:'擊碎流星'}[G.kind];
 
   /* 存進比賽紀錄 */
-  H.unshift({at:Date.now(), game:G.kind, topic:G.topic, tables:[...(G.topic === 'concept' ? S.ctables : S.tables)], time:G.time, goal:G.goal, manual:!!G.manual, played:Math.round(G.t),
+  H.unshift({at:Date.now(), game:G.kind, topic:G.topic, tables:[...(G.topic === 'concept' ? CA : S.tables)], weak:!!G.weak, same:!!G.same,
+    qs:Object.values(Z.reduce((m, z) => { for (const k in z.qs){ const o = m[k] || (m[k] = [z.qs[k][0], z.qs[k][1], 0, 0]); o[2] += z.qs[k][2]; o[3] += z.qs[k][3]; } return m; }, {})), time:G.time, goal:G.goal, manual:!!G.manual, played:Math.round(G.t),
     teams:order.map(({z, rank}) => ({name:z.name, color:z.i, rank, score:z.score, right:z.right, wrong:z.wrong, members:z.members, per:z.per}))});
   if (H.length > MAX_HIST) H.length = MAX_HIST;
   saveH();
@@ -1242,7 +1380,7 @@ function drawHist(){
     const d = new Date(r.at), g = GAMES[r.game] || {name:'乘法蓋高樓'};
     const when = `${d.getMonth() + 1}/${d.getDate()}（${WD[d.getDay()]}）${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     return `<div class="hrec">
-      <div class="hmeta"><b>${when}</b><span class="hg">${esc(g.name)}</span><span>${r.topic === 'concept' ? `認識乘法・被乘數 ${tablesText(r.tables)}` : `心算・${tablesText(r.tables)} 的乘法`}</span><span>玩了 ${fmt(r.played)}</span>${r.manual ? '<span>老師提前結束</span>' : ''}</div>
+      <div class="hmeta"><b>${when}</b><span class="hg">${esc(g.name)}</span><span>${r.topic === 'concept' ? `認識乘法・被乘數 ${tablesText(r.tables)}` : `心算・${tablesText(r.tables)} 的乘法`}</span>${r.weak ? '<span>🎯 精熟練習</span>' : ''}${r.same ? '<span>各隊同一組題目</span>' : ''}<span>玩了 ${fmt(r.played)}</span>${r.manual ? '<span>老師提前結束</span>' : ''}</div>
       <div class="hteams" style="--n:${r.teams.length}">${r.teams.map(t => {
         const T = TEAMS[t.color] || TEAMS[0], tot = t.right + t.wrong, pc = perChips(t.per || {}, t.members);
         return `<div class="ht" style="--c:${T.c};--l:${T.l}">${medal(t.rank, 'sm')}<b>${esc(t.name)}</b><span class="hs">${t.score}${r.goal ? ' / ' + r.goal : ''}・答對 ${tot ? Math.round(t.right / tot * 100) : 0}%</span>
