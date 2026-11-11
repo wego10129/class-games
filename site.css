@@ -1,0 +1,48 @@
+/* 首頁和分類頁共用的樣式 */
+:root{--paper:#E3EDF2;--grid:#D0DEE6;--ink:#1B2836;--soft:#4C5D6E;--card:#fff;--hl:#FFE066;--gold:#F2B400}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;padding:24px 16px 40px}
+.wrap{max-width:760px;margin:0 auto;display:grid;gap:18px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:32px;display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.tag{background:var(--hl);border:3px solid var(--ink);border-radius:10px;padding:0 8px;box-shadow:3px 3px 0 var(--ink);font-size:22px;transform:rotate(-4deg);white-space:nowrap}
+.back{font-size:18px;font-weight:900;color:var(--ink);text-decoration:none;background:var(--card);border:3px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);padding:6px 14px;white-space:nowrap}
+.back:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.lead{margin:0;font-size:18px;font-weight:700;color:var(--soft);line-height:1.6}
+
+/* 遊戲卡片 */
+a.game{display:flex;align-items:center;gap:16px;text-decoration:none;color:var(--ink);background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);padding:18px;scroll-margin:120px}
+a.game:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+.ic{flex:none;width:64px;height:64px;border:3px solid var(--ink);border-radius:16px;background:#DCEEFF;display:grid;place-items:center;font-size:30px;font-weight:900}
+.t{font-size:26px;font-weight:900}
+.d{font-size:16px;color:var(--soft);font-weight:700;line-height:1.5}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chips span{font-size:15px;font-weight:900;background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:0 10px;white-space:nowrap}
+.chips span.goal{background:#FFF1C7}
+.chips span.time{background:#DDF0FF}
+
+/* 首頁：分類方塊 */
+.group{display:grid;gap:12px}
+.group h2{margin:0;font-size:22px;display:flex;align-items:center;gap:8px}
+.group h2::before{content:'';width:10px;height:24px;border-radius:4px;background:var(--hl);border:2px solid var(--ink)}
+.group h2 small{font-size:16px;color:var(--soft)}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+a.cat{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:6px 16px;text-decoration:none;color:var(--ink);background:var(--card);border:3px solid var(--ink);border-radius:20px;box-shadow:5px 5px 0 var(--ink);padding:18px;scroll-margin:120px}
+a.cat:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+a.cat .ic{grid-row:1/3;width:76px;height:76px;font-size:36px}
+a.cat .t{font-size:28px}
+a.cat .d{align-self:start}
+
+/* 從遊戲頁按「回到上一頁」回來：剛剛按的那一張卡片閃一下 */
+.here{animation:here 1.2s ease-out 2}
+@keyframes here{0%{box-shadow:0 0 0 0 var(--gold),5px 5px 0 var(--ink)}40%{box-shadow:0 0 0 10px var(--gold),5px 5px 0 var(--ink)}100%{box-shadow:0 0 0 0 rgba(242,180,0,0),5px 5px 0 var(--ink)}}
+
+@media (max-width:600px){
+  h1{font-size:26px}
+  .t{font-size:22px}
+  a.cat .t{font-size:24px}
+  .ic{width:54px;height:54px;font-size:26px}
+  a.cat .ic{width:60px;height:60px;font-size:30px}
+}
+@media (prefers-reduced-motion:reduce){ .here{animation:none;outline:6px solid var(--gold)} }

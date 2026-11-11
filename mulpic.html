@@ -181,6 +181,26 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
 .r-stats div{border:2px solid var(--ink);border-radius:10px;padding:4px 14px;background:var(--wash);font-weight:700}
 .r-stats b{font-family:var(--f-num);font-size:22px;margin-left:6px}
 
+/* ---------- 題型預覽：點題型先看「這是在練什麼」，再開始 ---------- */
+.cover.pv{align-items:start;overflow:auto}
+.cover.pv>.card{max-width:860px;width:100%;text-align:left;justify-items:stretch;gap:14px;margin:auto 0}
+.pv-h{display:flex;align-items:center;gap:12px}
+.pv-h .ic{flex:none;width:56px;height:56px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;font-size:28px;background:#DCEEFF;font-family:var(--f-emoji)}
+.pv-h b{font-size:28px;display:block}
+.pv-h small{font-size:16px;font-weight:700;color:var(--ink-soft)}
+.pv-lab{font-weight:900;font-size:18px;color:var(--ink-soft);margin:0}
+.pv-ex{border:3px dashed var(--ink-soft);border-radius:16px;padding:12px;display:grid;gap:10px;justify-items:center;background:#FAFCFD;position:relative}
+.pv-ex::before{content:'範例';position:absolute;top:-14px;left:14px;font:900 15px var(--f-body);background:var(--hl);border:2px solid var(--ink);border-radius:999px;padding:0 10px}
+.pv-ex .line{font-size:clamp(18px,3.4vmin,28px)}
+.pv-ex .bl,.pv-ex .ub{cursor:default}
+.pv-steps{margin:0;padding-left:1.4em;display:grid;gap:4px;font-weight:700;font-size:18px;line-height:1.5}
+.pv-types{display:grid;gap:8px}
+.pv-types div{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px}
+.pv-types small{font-weight:700;color:var(--ink-soft);font-size:15px}
+.pv-btns{display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+.pv-btns .btn{font-size:20px;padding:10px 22px}
+.mode.last{box-shadow:0 0 0 5px var(--hl),4px 4px 0 var(--ink)}
+
 @media (max-aspect-ratio:1/1){
   .home{grid-template-columns:1fr}
   .game{grid-template-columns:1fr;grid-template-rows:1fr auto;gap:10px}
@@ -205,7 +225,7 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
   <header class="top">
     <div class="brand"><span class="tagk">×</span><h1 id="title">認識乘法</h1><span class="badge" id="verBadge"></span></div>
     <div class="row">
-      <a class="btn sm" id="backBtn" href="index.html">← 回到上一頁</a>
+      <a class="btn sm" id="backBtn" href="cat-mul.html#mulpic">← 回到上一頁</a>
       <button class="btn sm" id="homeBtn" type="button" hidden>回首頁</button>
     </div>
   </header>
@@ -237,6 +257,7 @@ main>[data-screen]{flex:1;min-height:0;display:flex;flex-direction:column;gap:12
   </main>
 </div>
 
+<div id="pvCover" class="cover pv" hidden><div class="card" id="pvCard"></div></div>
 <div id="clearCover" class="cover" hidden><div class="card">
   <div class="big">清除練習紀錄？</div>
   <p>這台裝置上「認識乘法」的紀錄會清除，清除後不能復原。（乘法小練習的燈號不會被清除）</p>
@@ -259,10 +280,14 @@ const STORE_KEY = 'mulpic1';          /* 瀏覽器儲存的鍵名（和乘法小
 
 /* 題型（依課本「認識乘法」練習園地） */
 const TYPES = [
-  {id:'pic',  ic:'🍎', name:'看圖列式',         d:'看圖說一說，再列式、寫答案和單位'},
-  {id:'word', ic:'📝', name:'文字題',           d:'讀題目，列式、寫答案和單位'},
-  {id:'add',  ic:'➕', name:'連加和倍',         d:'5＋5＋5 改寫成乘法，是 5 的幾倍'},
-  {id:'term', ic:'🔤', name:'被乘數・乘數・積', d:'認識算式裡每個數的名稱'},
+  {id:'pic',  ic:'🍎', name:'看圖列式',         d:'看圖說一說，再列式、寫答案和單位',
+   steps:['看圖數一數：1 份有幾個（被乘數）、有幾份（乘數）', '列出乘法算式，寫出積', '選答案的單位：問「幾個蘋果」，就答「個」，不是「盤」']},
+  {id:'word', ic:'📝', name:'文字題',           d:'讀題目，列式、寫答案和單位',
+   steps:['讀題目，找出每一份有幾個、有幾份（兩種說法都會出現）', '列出乘法算式，寫出積', '選答案的單位']},
+  {id:'add',  ic:'➕', name:'連加和倍',         d:'5＋5＋5 改寫成乘法，是 5 的幾倍',
+   steps:['數一數，有幾個一樣的數相加', '說出是幾的幾倍', '把連加改寫成乘法算式']},
+  {id:'term', ic:'🔤', name:'被乘數・乘數・積', d:'認識算式裡每個數的名稱',
+   steps:['× 前面是被乘數，× 後面是乘數，＝ 後面是積', '也會出現「4×6 比 4×5 多了幾個 4」的題目']},
 ];
 
 /* 看圖：c＝一份的單位、n＝東西、u＝答案的單位 */
@@ -395,14 +420,19 @@ document.addEventListener('pointerdown', () => Sound.init(), {passive:true});
 $('#verBadge').textContent = VERSION.name;
 
 /* ---------- 畫面切換 ---------- */
-let screen = 'home', G = null;
+let screen = 'home', G = null, lastType = '';
 function show(name){
   screen = name;
   document.querySelectorAll('[data-screen]').forEach(s => s.hidden = s.dataset.screen!==name);
   $('#homeBtn').hidden = name==='home';
   $('#backBtn').hidden = name!=='home';
   document.body.classList.toggle('zy-on', !!P.pref.zy);
-  if (name==='home') renderHome();
+  if (name==='home'){
+    renderHome();
+    /* 從練習回來：捲回剛剛選的題型，不要跳到最上面 */
+    const b = lastType && document.querySelector(`#home [data-type="${lastType}"]`);
+    if (b) setTimeout(() => b.scrollIntoView({block:'center'}), 0);
+  }
 }
 $('#homeBtn').addEventListener('click', () => { G = null; show('home'); });
 
@@ -432,8 +462,8 @@ function renderHome(){
     <div class="card">
       <div class="hello">選一種題型來練習！</div>
       <div class="modes">
-        ${TYPES.map(t => `<button class="mode" type="button" data-type="${t.id}"><span class="ic">${t.ic}</span><span>${t.name}<small>${t.d}</small></span></button>`).join('')}
-        <button class="mode mix" type="button" data-type="mix"><span class="ic">🎲</span><span>綜合練習<small>四種題型混在一起</small></span></button>
+        ${TYPES.map(t => `<button class="mode ${lastType===t.id?'last':''}" type="button" data-type="${t.id}"><span class="ic">${t.ic}</span><span>${t.name}<small>${t.d}</small></span></button>`).join('')}
+        <button class="mode mix ${lastType==='mix'?'last':''}" type="button" data-type="mix"><span class="ic">🎲</span><span>綜合練習<small>四種題型混在一起</small></span></button>
         ${P.done ? `<p class="dim">已經練了 ${P.done} 題，一次就答對 ${P.clean} 題</p>` : ''}
       </div>
       <div class="mine"><h3>我的練習設定</h3>
@@ -461,7 +491,7 @@ function renderHome(){
   </div>`;
 }
 $('#home').addEventListener('click', e => {
-  const t = e.target.closest('[data-type]'); if (t) return startRound(t.dataset.type);
+  const t = e.target.closest('[data-type]'); if (t) return openPreview(t.dataset.type);
   const b = e.target.closest('[data-pref]'); if (!b) return;
   const k = b.dataset.pref, v = b.dataset.v, pf = P.pref;
   if (k==='n') pf.n = +v;
@@ -581,6 +611,50 @@ function buildRound(type){
   });
   return list;
 }
+
+/* ---------- 題型預覽：先讓老師、學生看到這種題目長什麼樣子，再開始 ---------- */
+function exampleQ(type){
+  if (type==='term'){ let q; do { q = makeTerm(4, 3); } while (!q.label.includes('＝')); return q; }
+  return MAKERS[type](4, 3);
+}
+function exampleLine(L){
+  return `<div class="line">${L.toks.map(t => {
+    if (typeof t==='string') return `<span>${T(t)}</span>`;
+    if (t.k==='x') return '<span class="x">×</span>';
+    if (t.k==='show') return `<span class="shown">${t.v}</span>`;
+    if (t.k==='u') return `<span class="units"><span class="ub ok">${zy(t.want)}</span></span>`;
+    return `<span class="bl ok">${t.want}</span>`;
+  }).join('')}</div>`;
+}
+function openPreview(type){
+  lastType = type; Sound.tap();
+  let body;
+  if (type==='mix'){
+    body = `<p class="pv-lab">四種題型混在一起，一題換一種：</p>
+      <div class="pv-types">${TYPES.map(t => `<div><span class="ic" style="width:40px;height:40px;font-size:20px;border:3px solid var(--ink);border-radius:12px;display:grid;place-items:center;background:#DCEEFF;font-family:var(--f-emoji)">${t.ic}</span><span>${t.name}<br><small>${t.d}</small></span></div>`).join('')}</div>`;
+  } else {
+    const t = TYPES.find(x => x.id===type), q = exampleQ(type);
+    body = `<p class="pv-lab">這種題目長這樣（每一題一行一行寫）：</p>
+      <div class="pv-ex"><div class="prompt">${q.prompt.replace(' id="gPic"','')}</div><div class="lines">${q.lines.map(exampleLine).join('')}</div></div>
+      <p class="pv-lab">在練習：</p><ol class="pv-steps">${t.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
+  }
+  const ic = type==='mix' ? '🎲' : TYPES.find(x => x.id===type).ic;
+  $('#pvCard').innerHTML = `<div class="pv-h"><span class="ic">${ic}</span><span><b>${esc(TYPE_NAME(type))}</b><small>每局 ${P.pref.n} 題</small></span></div>
+    ${body}
+    <div class="pv-btns"><button class="btn" type="button" id="pvBack">← 換一種題型</button><button class="btn primary" type="button" id="pvGo">開始練習 ▶</button></div>`;
+  $('#pvCover').hidden = false; $('#pvCover').scrollTop = 0;
+}
+function closePreview(){ $('#pvCover').hidden = true; }
+$('#pvCover').addEventListener('click', e => {
+  if (e.target.id==='pvGo'){ closePreview(); startRound(lastType); }
+  else if (e.target.id==='pvBack' || e.target.id==='pvCover'){ closePreview(); renderHome(); }
+});
+document.addEventListener('keydown', e => {
+  if ($('#pvCover').hidden) return;
+  if (e.key==='Escape'){ closePreview(); renderHome(); }
+  else if (e.key==='Enter'){ e.preventDefault(); closePreview(); startRound(lastType); }
+});
+
 const TYPE_NAME = id => id==='mix' ? '綜合練習' : TYPES.find(t => t.id===id).name;
 function startRound(type){
   G = {q:buildRound(type), i:0, type};
