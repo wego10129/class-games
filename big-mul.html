@@ -380,7 +380,7 @@ main>section{flex:1;min-height:0}
           </div>
           <div class="row" id="srcRow"><span class="lab">出題</span><div class="seg" id="srcSeg"></div></div>
           <div class="weakline" id="weakLine"></div>
-          <div class="row"><span class="lab">各隊題目</span><div class="seg" id="sameSeg"></div><span class="hint">同一組：每一隊的第 1 題、第 2 題……都一樣，各自作答</span></div>
+          <div class="row"><span class="lab">各隊題目</span><div class="seg" id="sameSeg"></div><span class="hint">同步搶答：每一隊同時看到同一題，最快答對的得分，再一起換下一題</span></div>
           <div class="row" id="goalRow"><span class="lab" id="goalLab">終點</span><div class="seg" id="goalSeg"></div>
             <span class="own">自己訂</span><div class="stepper" data-k="goal"><button type="button" data-step="-1">▼</button><input type="number" inputmode="numeric" data-in="goal"><button type="button" data-step="1">▲</button></div><span class="own" id="goalUnit">題</span></div>
           <div class="row" id="timeRow"><span class="lab">時間</span><div class="seg" id="timeSeg"></div>
@@ -646,7 +646,7 @@ function drawLobby(){
   if (!weak.length && S.src === 'weak') S.src = 'normal';
   $('#srcSeg').innerHTML = `<button class="opt ${S.src === 'normal' ? 'on' : ''}" type="button" data-src="normal">一般題目</button>`
     + `<button class="opt weak ${S.src === 'weak' ? 'on' : ''}" type="button" data-src="weak" ${weak.length ? '' : 'disabled'}>🎯 進行精熟練習</button>`;
-  $('#sameSeg').innerHTML = [[0,'各隊不同'],[1,'同一組（公平）']].map(([v, t]) => `<button class="opt ${+S.same === v ? 'on' : ''}" type="button" data-same="${v}">${t}</button>`).join('');
+  $('#sameSeg').innerHTML = [[0,'各自作答'],[1,'同步搶答（公平）']].map(([v, t]) => `<button class="opt ${+S.same === v ? 'on' : ''}" type="button" data-same="${v}">${t}</button>`).join('');
   $('#weakLine').innerHTML = weak.length
     ? `<span class="hint">這些題目比較不熟：</span>${weak.map(o => `<span class="wq">${o.a}×${o.b}</span>`).join('')}`
     : `<span class="hint">玩過幾局以後，答錯比較多的題目會列在這裡，可以進行精熟練習。</span>`;
@@ -840,14 +840,38 @@ function newQ(prev){
   }
   return q;
 }
-/* 各隊同一組題目（公平）：每一隊的第 1 題、第 2 題……都一樣，各自作答、不用等別隊 */
-function takeQ(z, prev){
-  if (!G.same) return newQ(prev);
-  if (!G.seq[z.qi]) G.seq[z.qi] = newQ(G.seq[z.qi - 1]);
-  const q = G.seq[z.qi++]; showQn(z); return q;
+/* ---------- 同步搶答（公平）：每一隊同時看到同一題，最快答對的那一隊得分，大家一起換下一題 ---------- */
+function showQn(z){ const e = z.el && z.el.querySelector('.qn'); if (e) e.textContent = `第 ${G.sqi} 題`; }
+const takeQ = (z, prev) => newQ(prev);
+/* 有人搶先答對：其他隊停住，0.9 秒後一起換題 */
+function syncWin(w){
+  G.sqDone = true; w.lock = Infinity;
+  G.zones.forEach(z => {
+    if (z === w) return;
+    z.lock = Infinity; z.input = ''; z.el.classList.add('locked');
+    if (G.kind === 'mole') moleDown(z);
+    renderQ(z, '', `${w.name} 搶先答對！`);
+  });
+  setTimeout(syncNext, 900);
 }
-const peekQ = z => G.seq[z.qi] || (G.seq[z.qi] = newQ(G.seq[z.qi - 1]));
-function showQn(z){ const e = z.el && z.el.querySelector('.qn'); if (e) e.textContent = `第 ${z.qi} 題`; }
+/* 每一隊都答錯 2 次（或在換人）：公布答案，一起換題 */
+function syncCheckOut(){
+  if (G.sqDone || !G.zones.every(z => z.out || z.swap)) return;
+  G.sqDone = true;
+  G.zones.forEach(z => { z.lock = Infinity; z.input = z.q.key; renderQ(z, 'show', wrongTip(z.q, '', true));
+    if (G.kind === 'mole') z.el.querySelectorAll('.mole.up').forEach(o => { if (o.dataset.v === z.q.mole) o.classList.add('right'); }); });
+  setTimeout(syncNext, LOCK_SHOW);
+}
+function syncNext(){
+  if (!G || G.ended) return;
+  const prev = G.sq; G.sq = newQ(prev); G.sqi++; G.sqDone = false;
+  const go = () => {
+    if (!G || G.ended) return;
+    G.zones.forEach(z => { z.el.classList.remove('locked'); z.lock = 0; z.q = G.sq; z.qT = z.t; z.input = ''; z.miss = 0; z.out = false;
+      showQn(z); renderQ(z); if (G.kind === 'mole') moleUp(z); doneQ(z); });
+  };
+  if (G.kind === 'mole'){ G.zones.forEach(moleDown); setTimeout(go, 260); } else go();
+}
 /* 每一題答對、答錯幾次（存進比賽紀錄，精熟練習用） */
 function tally(z, q, ok){ const o = z.qs[q.t] || (z.qs[q.t] = [q.a, q.b, 0, 0]); o[ok ? 2 : 3]++; }
 /* 打地鼠的錯誤選項：先用最容易搞混的，不夠再補
@@ -890,7 +914,7 @@ function start(skipSeats){
   const kind = S.game, gm = GAMES[kind];
   if (!isTeam()) skipSeats = true;
   G = {kind, topic:S.topic, n:S.n, goal:gm.kind === 'goal' ? S.goal[kind] : 0, time:gm.kind === 'time' ? S.time[kind] : 0,
-    swap:isTeam() ? S.swap : 0, t:0, last:0, paused:true, ended:false, zones:[], same:S.same, seq:[],
+    swap:isTeam() ? S.swap : 0, t:0, last:0, paused:true, ended:false, zones:[], same:S.same, sq:null, sqi:1, sqDone:false, nextSpawn:0,
     weak:S.src === 'weak' && weakList(S.topic).length ? weakList(S.topic) : null};
   G.mw = G.topic === 'concept' ? 240 : 200; G.mh = G.topic === 'concept' ? 200 : 150;
   for (let i = 0; i < G.n; i++){
@@ -942,7 +966,7 @@ function start(skipSeats){
   $('#scene').hidden = kind !== 'race';
   show('game');
   if (kind === 'meteor') G.zones.forEach(z => { z.skyW = z.sky.offsetWidth; z.skyH = z.sky.offsetHeight; });
-  else G.zones.forEach(z => { z.q = takeQ(z); renderQ(z); });
+  else { if (G.same) G.sq = newQ(); G.zones.forEach(z => { z.q = G.same ? G.sq : newQ(); showQn(z); renderQ(z); }); }
   if (kind === 'stack') G.zones.forEach(z => { const t = z.el.querySelector('.stackbox'); z.bh = Math.floor((t.offsetHeight - 30 - 100) / G.goal);
     t.style.setProperty('--bh', z.bh + 'px'); t.querySelector('.top').style.bottom = (30 + z.bh * G.goal) + 'px'; buildStack(z); });
   G.zones.forEach(z => { hudZ(z); showPlayer(z); });
@@ -988,7 +1012,7 @@ function loop(now){
   if (!G.paused){
     G.t += dt;
     G.zones.forEach(z => { if (!z.swap) z.t += dt; });   // 換人的時候，這一隊的時間（流星、作答秒數）先停住
-    if (G.kind === 'meteor') G.zones.forEach(z => { if (!z.swap) meteorTick(z); });
+    if (G.kind === 'meteor'){ if (G.same) syncMeteorTick(); else G.zones.forEach(z => { if (!z.swap) meteorTick(z); }); }
     if (G.time){   // 限時型：倒數，時間到就結束
       const left = G.time - G.t;
       $('#timer').textContent = fmt(left);
@@ -1054,10 +1078,15 @@ function judge(z){
     renderQ(z, 'ok'); flash(z); SND.ok();
     progress(z);
     if (G.ended) return;
+    if (G.same) return syncWin(z);
     setTimeout(() => { if (!G || G.ended) return; z.q = takeQ(z, q); z.qT = z.t; z.input = ''; z.miss = 0; renderQ(z); doneQ(z); }, 350);
   } else {
     z.wrong++; z.miss++; z.misses.push(q); credit(z, false); tally(z, q, false); SND.no();
     z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
+    if (G.same && z.miss >= 2){   // 同步搶答：這一隊這題不能再答，等下一題
+      z.out = true; z.lock = Infinity; z.input = ''; z.el.classList.add('locked');
+      renderQ(z, 'no', '這一題等別隊，準備下一題'); syncCheckOut(); return;
+    }
     if (z.miss >= 2){
       z.lock = performance.now() + LOCK_SHOW; z.input = q.key;
       renderQ(z, 'show', wrongTip(q, '', true));
@@ -1152,9 +1181,9 @@ function buildStack(z, add){
 /* ---------- 打地鼠：6 個洞，4 隻地鼠拿著答案，只有 1 隻是對的 ---------- */
 function moleUp(z){
   if (!G || G.ended) return;
-  if (!z.q.opts) z.q.opts = distractors(z.q);   // 同一組題目時，各隊的地鼠拿一樣的數字
-  const opts = shuffle([z.q.mole, ...z.q.opts]);
-  const holes = shuffle([0, 1, 2, 3, 4, 5]).slice(0, opts.length);
+  /* 同步搶答時，各隊的地鼠拿一樣的答案、站在一樣的洞 */
+  if (!z.q.lay){ const o = shuffle([z.q.mole, ...distractors(z.q)]); z.q.lay = {opts:o, holes:shuffle([0, 1, 2, 3, 4, 5]).slice(0, o.length)}; }
+  const {opts, holes} = z.q.lay;
   const ms = z.el.querySelectorAll('.mole');
   ms.forEach(m => { m.className = 'mole'; m.style.visibility = ''; });
   holes.forEach((hI, k) => {
@@ -1206,6 +1235,7 @@ function whack(z, m){
     });
     progress(z);
     if (G.ended) return;
+    if (G.same) return syncWin(z);
     setTimeout(() => nextMole(z, q), 620);
   } else {
     z.wrong++; z.miss++; z.misses.push(q); credit(z, false); tally(z, q, false);
@@ -1214,6 +1244,10 @@ function whack(z, m){
       thud(); SND.no(); m.classList.add('bad'); setTimeout(() => m.classList.remove('up'), 380);
       z.el.classList.remove('shake'); void z.el.offsetWidth; z.el.classList.add('shake');
     });
+    if (G.same && z.miss >= 2){
+      z.out = true; z.lock = Infinity; renderQ(z, 'no', '這一題等別隊，準備下一題');
+      setTimeout(() => { if (G && z.out) moleDown(z); }, 420); syncCheckOut(); return;
+    }
     if (z.miss >= 2){
       z.lock = performance.now() + LOCK_SHOW; z.input = q.key;
       renderQ(z, 'show', wrongTip(q, '', true));
@@ -1247,26 +1281,44 @@ function meteorTick(z){
   }
 }
 function spawn(z, dur){
-  const MW = G.mw, MH = G.mh;
-  const slots = Math.max(2, Math.floor(z.skyW / (MW + 10)));
-  const sw = z.skyW / slots;
+  const r = pickMet(z); if (!r) return false;
+  addMet(z, r.q, r.slot, z.t, dur, null); return true;
+}
+/* 同步搶答：同一顆流星同時掉在每一隊的天空，誰先打碎誰得分，其他隊的那一顆也消失 */
+function syncMeteorTick(){
+  const z0 = G.zones[0], p = Math.min(1, G.t / G.time), dur = 10 - 4 * p, gap = 2.8 - 1.2 * p, max = z0.skyW > 700 ? 4 : 3;
+  if ((G.t >= G.nextSpawn || !z0.mets.length) && z0.mets.length < max){
+    const r = pickMet(z0);
+    if (r){ const g = {}; G.zones.forEach(z => addMet(z, r.q, r.slot, G.t, dur, g)); G.nextSpawn = G.t + gap; }
+  }
+  const yEnd = z0.skyH - 44 - G.mh + 30;
+  G.zones.forEach(z => { for (const m of [...z.mets]){
+    const k = (G.t - m.born) / m.dur;
+    m.y = -G.mh + (yEnd + G.mh) * k; m.el.style.transform = `translate(${m.x}px,${m.y}px)`;
+    if (k >= 1) landM(z, m);
+  } });
+}
+const slotsOf = z => Math.max(2, Math.floor(z.skyW / (G.mw + 10)));
+function pickMet(z){
+  const slots = slotsOf(z);
   const busy = new Set(z.mets.filter(m => m.y < z.skyH * .45).map(m => m.slot));
   const free = [...Array(slots).keys()].filter(s => !busy.has(s));
-  if (!free.length) return false;
+  if (!free.length) return null;
   /* 畫面上的流星：答案不能一樣，也不能一個是另一個的開頭（點完數字就自動判斷）；認識乘法也不能有前後顛倒的 */
   const used = z.mets.map(m => m.q.key);
   let q = null;
   const fits = c => { const s = c.key, rev = `${c.b}${c.a}`; return used.every(u => !u.startsWith(s) && !s.startsWith(u) && (G.topic !== 'concept' || u !== rev)); };
-  if (G.same){ const c = peekQ(z); if (!fits(c)) return false; q = c; z.qi++; }   // 同一組題目：照順序來，下一顆和畫面上的衝突就晚一點再來
-  else for (let k = 0; k < 40; k++){ const c = newQ(); if (fits(c)){ q = c; break; } }
-  if (!q) return false;
-  const slot = pick(free);
-  const m = {q, slot, born:z.t, dur, x:Math.round(slot * sw + (sw - MW) / 2), y:-MH};
+  for (let k = 0; k < 40; k++){ const c = newQ(); if (fits(c)){ q = c; break; } }
+  if (!q) return null;
+  return {q, slot:pick(free)};
+}
+function addMet(z, q, slot, born, dur, g){
+  const MW = G.mw, MH = G.mh, sw = z.skyW / slotsOf(z);
+  const m = {q, slot, born, dur, g, x:Math.round(slot * sw + (sw - MW) / 2), y:-MH};
   m.el = document.createElement('div'); m.el.className = G.topic === 'concept' ? 'met cm' : 'met';
   m.el.innerHTML = `${meteorSVG()}<div class="mq">${G.topic === 'concept' ? miniPic(q) : `<span>${q.a}×${q.b}</span>`}</div>`;
   m.el.style.transform = `translate(${m.x}px,${m.y}px)`;
   z.sky.appendChild(m.el); z.mets.push(m);
-  return true;
 }
 /* 流星雨的答案格：心算是一格；認識乘法是「□×□」兩格 */
 function ansShow(z, cls, v){
@@ -1288,6 +1340,14 @@ function meteorInput(z){
     hitM.el.style.setProperty('--at', `translate(${hitM.x}px,${hitM.y}px)`); hitM.el.classList.add('boom');
     setTimeout(() => hitM.el.remove(), 400);
     flash(z, hitM.x + 60, Math.max(20, hitM.y + 64));
+    if (hitM.g) G.zones.forEach(o => {   // 同步搶答：別隊天空裡的同一顆被搶走了
+      if (o === z) return;
+      const om = o.mets.find(x => x.g === hitM.g); if (!om) return;
+      o.mets = o.mets.filter(x => x !== om); om.el.style.opacity = '.25'; setTimeout(() => om.el.remove(), 300);
+      const t = document.createElement('div'); t.className = 'landed'; t.style.background = z.c; t.style.bottom = 'auto'; t.style.top = Math.max(10, om.y + 60) + 'px';
+      t.textContent = `${z.name} 搶到`; t.style.left = Math.max(6, Math.min(o.skyW - 200, om.x)) + 'px'; o.sky.appendChild(t); setTimeout(() => t.remove(), 1500);
+      if (o.input && !o.mets.some(x => x.q.key.startsWith(o.input))){ o.input = ''; clearSlot(o); }
+    });
     z.input = ''; z.lock = performance.now() + 200;
     setTimeout(() => { if (G && !G.ended && !z.input) clearSlot(z); }, 260);
     doneQ(z);
@@ -1380,7 +1440,7 @@ function drawHist(){
     const d = new Date(r.at), g = GAMES[r.game] || {name:'乘法蓋高樓'};
     const when = `${d.getMonth() + 1}/${d.getDate()}（${WD[d.getDay()]}）${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     return `<div class="hrec">
-      <div class="hmeta"><b>${when}</b><span class="hg">${esc(g.name)}</span><span>${r.topic === 'concept' ? `認識乘法・被乘數 ${tablesText(r.tables)}` : `心算・${tablesText(r.tables)} 的乘法`}</span>${r.weak ? '<span>🎯 精熟練習</span>' : ''}${r.same ? '<span>各隊同一組題目</span>' : ''}<span>玩了 ${fmt(r.played)}</span>${r.manual ? '<span>老師提前結束</span>' : ''}</div>
+      <div class="hmeta"><b>${when}</b><span class="hg">${esc(g.name)}</span><span>${r.topic === 'concept' ? `認識乘法・被乘數 ${tablesText(r.tables)}` : `心算・${tablesText(r.tables)} 的乘法`}</span>${r.weak ? '<span>🎯 精熟練習</span>' : ''}${r.same ? '<span>同步搶答</span>' : ''}<span>玩了 ${fmt(r.played)}</span>${r.manual ? '<span>老師提前結束</span>' : ''}</div>
       <div class="hteams" style="--n:${r.teams.length}">${r.teams.map(t => {
         const T = TEAMS[t.color] || TEAMS[0], tot = t.right + t.wrong, pc = perChips(t.per || {}, t.members);
         return `<div class="ht" style="--c:${T.c};--l:${T.l}">${medal(t.rank, 'sm')}<b>${esc(t.name)}</b><span class="hs">${t.score}${r.goal ? ' / ' + r.goal : ''}・答對 ${tot ? Math.round(t.right / tot * 100) : 0}%</span>
