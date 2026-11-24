@@ -1,7 +1,7 @@
 # 注音做法（認識乘法、列式練習共用）
 
 - 字型：Bpmf Zihi Kai Std（ButTaiwan bpmfvs 規格，SIL OFL 1.1），只把用到的字內嵌在網頁裡。
-  - 列式練習的字型叫 `PNM Bpmf`，認識乘法的叫 `MP Bpmf`，湊十工廠的叫 `M10 Bpmf`。
+  - 列式練習的字型叫 `PNM Bpmf`，認識乘法的叫 `MP Bpmf`，湊十工廠的叫 `M10 Bpmf`，乘法工廠的叫 `MM Bpmf`。
 - 破音字：在字的後面加異體字選擇子。U+E01E1 是第 2 個讀音，U+E01E2 是第 3 個讀音，以此類推。
   讀音順序以 bpmfvs 的 `phonetic/phonic_table_Z.txt` 為準，例如：數 → ㄕㄨˋ、ㄕㄨˇ…
 - 認識乘法的讀音表：`mulpic.html` 參數區的 `WORDS`（詞，處理破音字）和 `ZY`（單字）。
@@ -14,10 +14,10 @@
   pyftsubset BpmfZihiKaiStd_400Regular.ttf --text-file=chars.txt --unicodes=U+E01E0-E01E5,U+FF0C,U+FF1F,U+FF01,U+FF1A,U+300C,U+300D --flavor=woff2 --layout-features='*'
   ```
 
-## 湊十工廠 make10.html
-- 不要直接改 `make10.html`：改 `notes/make10.tpl.html`（字型和讀音順序是空位 `__FONT__`、`__BPMF__`），再跑：
+## 湊十工廠 make10.html、乘法工廠 mulmake.html
+- 不要直接改 `make10.html`、`mulmake.html`：改 `notes/make10.tpl.html`、`notes/mulmake.tpl.html`（字型和讀音順序是空位 `__FONT__`、`__BPMF__`），再跑：
   ```
   pip install fonttools brotli
-  python3 notes/build_make10.py notes/make10.tpl.html make10.html <bpmfvs>/phonetic/phonic_table_Z.txt BpmfZihiKaiStd_400Regular.ttf
+  python3 notes/build_zy.py notes/make10.tpl.html make10.html <bpmfvs>/phonetic/phonic_table_Z.txt BpmfZihiKaiStd_400Regular.ttf
   ```
-  程式會從 `ZY`、`WORDS` 收集用到的字、檢查讀音在字型裡、產生字型子集，填進網頁。
+  （乘法工廠把兩個檔名換成 mulmake）程式會從 `ZY`、`WORDS` 收集用到的字、檢查讀音在字型裡、產生字型子集，填進網頁。

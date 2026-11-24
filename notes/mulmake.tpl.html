@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>我的乘法工廠</title>
+<style>
+/*
+VOICE: 低年級學扶孩子的手作勞作，溫暖、不催促（和湊十工廠同一套）
+IDEA: 蠟筆畫的盤子和排排站，裝進孩子自己畫的角色
+PICTURE: 一盤一盤（或一排一排）的角色，下面跳出 2、4、6
+COLOUR and TYPE: 圖畫紙米色、深咖啡筆線、橘與藍綠；粗黑體大數字＋注音字型
+LAYOUT: 橫放左邊收集冊（每個乘法一個分頁）、右邊圖和算式；直放上下堆疊
+版本：v1.0（2026-11-24）
+*/
+/* 注音：Bpmf Zihi Kai Std（ButTaiwan bpmfvs 規格，SIL OFL 1.1），只保留這一頁用到的字。做法見 notes/zhuyin.md */
+@font-face{font-family:'MM Bpmf';src:url(data:font/woff2;base64,__FONT__) format('woff2');font-display:block}
+.zyt{font-family:'MM Bpmf','PingFang TC',serif;font-weight:400}
+:root{
+  color-scheme:light;
+  --paper:#fbf5e6; --ink:#3b2f2a; --orange:#f08a3c; --teal:#2f9e97; --yellow:#f7c948;
+  --soft:#fffdf7; --dash:#cdbf9c;
+  --card:min(9.4vmin,76px);
+  --wob:255px 18px 225px 18px / 18px 225px 18px 255px;
+  --wob2:18px 225px 18px 255px / 255px 18px 225px 18px;
+}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  background-color:var(--paper);
+  background-image:radial-gradient(rgba(120,90,50,.08) 1px,transparent 1.3px),radial-gradient(rgba(120,90,50,.05) 1px,transparent 1.3px);
+  background-size:18px 18px,27px 27px;background-position:0 0,9px 13px;
+  color:var(--ink);
+  font-family:"PingFang TC","Heiti TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  overflow:hidden;touch-action:manipulation;
+}
+button{font-family:inherit;color:inherit;touch-action:manipulation;cursor:pointer}
+svg{display:block}
+.n{font-family:"PingFang TC","Heiti TC",sans-serif;font-weight:900;color:var(--orange);font-size:1.5em;line-height:1;margin:0 .12em}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:3vmin;padding:2vmin}
+.screen.show{display:flex}
+.btn{border:3px solid var(--ink);border-radius:var(--wob2);background:var(--yellow);
+  font-size:clamp(24px,4.2vmin,34px);padding:.35em 1.1em;box-shadow:3px 4px 0 var(--ink);
+  display:inline-flex;align-items:center;gap:.4em;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translate(2px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn:disabled{opacity:.35;box-shadow:none}
+.btn svg{width:1.2em;height:1.2em;flex:none}
+.btn.white{background:#fff}
+.icon-btn{width:64px;height:64px;border:3px solid var(--ink);border-radius:var(--wob);background:#fff;
+  display:flex;align-items:center;justify-content:center;box-shadow:2px 3px 0 var(--ink);padding:0}
+.icon-btn svg{width:36px;height:36px}
+.icon-btn:active{transform:translate(2px,2px);box-shadow:none}
+.badge{border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;padding:.15em .7em;font-size:clamp(20px,3.4vmin,28px);white-space:nowrap}
+.backlink{position:absolute;top:14px;left:16px;font-size:18px;font-weight:800;color:var(--ink);text-decoration:none;
+  border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;padding:8px 14px}
+.title{font-size:clamp(34px,7vmin,58px);margin:0;letter-spacing:.04em;font-weight:400}
+.hero{width:min(58vmin,400px)}
+.draw-head{font-size:clamp(28px,5vmin,40px)}
+#pad{width:min(56vmin,400px);height:min(56vmin,400px);background:#fff;border:4px solid var(--ink);
+  border-radius:var(--wob);touch-action:none}
+.tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+.sw{width:56px;height:56px;border-radius:50%;border:3px solid var(--ink);padding:0}
+.sw.on{outline:5px solid var(--ink);outline-offset:3px}
+.row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center}
+
+/* 遊戲 */
+#play{justify-content:flex-start;gap:0;padding:10px 16px}
+.bar{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.me{width:64px;height:64px;border:3px solid var(--ink);border-radius:50%;background:#fff;flex:none;
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.me img{width:84%;height:84%;object-fit:contain}
+.prompt{flex:1;text-align:center;font-size:clamp(22px,3.6vmin,30px);line-height:1.6;min-height:2.6em;
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap}
+.stage{flex:1;width:100%;display:flex;align-items:center;justify-content:center;gap:4vmin}
+@media (orientation:portrait){.stage{flex-direction:column;gap:2.4vmin}}
+
+.bookbox{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.tab{border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;font-size:clamp(17px,2.8vmin,22px);padding:.1em .6em}
+.tab.on{background:var(--yellow)}
+.tab.full{background:#e6f5f3}
+.tab.on.full{background:var(--yellow)}
+.book{display:grid;grid-template-columns:repeat(3,var(--card));gap:10px;padding:14px;background:var(--soft);
+  border:3px solid var(--ink);border-radius:var(--wob);justify-content:center}
+.card{width:var(--card);height:calc(var(--card)*1.15);border:none;background:none;padding:0;perspective:700px}
+.inner{position:relative;width:100%;height:100%;transition:transform .7s;transform-style:preserve-3d}
+.card.got .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border:3px solid var(--ink);
+  border-radius:var(--wob2);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.front{background:#fff;font-size:calc(var(--card)*.3);font-weight:900;box-shadow:2px 3px 0 var(--ink);white-space:nowrap}
+.front.big{font-size:calc(var(--card)*.5)}
+.back{background:#e6f5f3;transform:rotateY(180deg);font-weight:900;font-size:calc(var(--card)*.22);line-height:1.15}
+.back img{width:42%;height:36%;object-fit:contain}
+.card.now .front{background:var(--yellow);transform:translateY(-4px)}
+.card:disabled{cursor:default}
+
+.right{display:flex;flex-direction:column;align-items:center;gap:1.8vmin}
+.pwrap{position:relative}
+.pic{width:min(60vmin,520px);height:min(42vmin,330px);background:#fff;border:4px solid var(--ink);border-radius:var(--wob);
+  position:relative;display:flex;align-items:center;justify-content:center;padding:10px}
+.groups{display:grid;gap:10px;justify-content:center;align-content:center}
+.grp{border:3px dashed var(--dash);background:#fffaf0;padding:0;display:grid;place-content:center;gap:2px;position:relative}
+.grp.plate{border-radius:50%}
+.grp.line{border-radius:12px;display:flex;align-items:center;justify-content:flex-start;padding:2px 6px;gap:3px}
+.grp.full{border-style:solid;border-color:var(--teal);background:#e6f5f3}
+.grp.hi{background:#fff3c4;border-color:var(--orange)}
+.grp img{width:100%;height:100%;object-fit:contain;animation:popin .25s ease-out}
+.grp.line img{flex:none}
+.tot{position:absolute;font-weight:900;color:var(--orange);font-size:min(4.2vmin,30px);-webkit-text-stroke:1px var(--ink);line-height:1}
+.grp.plate .tot{bottom:-.45em;right:-.2em;background:#fff;border:2px solid var(--ink);border-radius:999px;padding:.05em .3em;-webkit-text-stroke:0}
+.grp.line .tot{right:-2.1em;top:50%;transform:translateY(-50%);-webkit-text-stroke:0}
+.pic.happy img{animation:wiggle .45s ease-in-out 4}
+.lid{position:absolute;inset:-4px;border:4px solid var(--ink);border-radius:var(--wob);display:none;
+  align-items:center;justify-content:center;font-size:min(14vmin,110px);font-weight:900;color:#fff;
+  background:repeating-linear-gradient(-45deg,#e7a15f 0 18px,#f08a3c 18px 36px)}
+.lid.show{display:flex;animation:popin .25s ease-out}
+.count{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none;
+  font-size:min(16vmin,120px);font-weight:900;color:var(--orange);-webkit-text-stroke:3px var(--ink)}
+.count.show{display:flex}
+
+.eq{display:none;align-items:center;gap:.25em;font-size:min(7vmin,52px);font-weight:900}
+.eq.show{display:flex}
+.box{min-width:1.3em;height:1.3em;padding:0 .15em;border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;
+  display:flex;align-items:center;justify-content:center}
+.box.blank{border-style:dashed;background:#fffaf0}
+.box.active{border-color:var(--orange);border-style:solid;box-shadow:0 0 0 4px #fde3c8}
+.box.ok{background:#e6f5f3;border-style:solid;color:var(--teal)}
+.pad{display:flex;gap:5px;flex-wrap:nowrap;justify-content:center;visibility:hidden}
+.pad.show{visibility:visible}
+.num{width:min(6.2vmin,50px);height:min(8vmin,62px);border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;
+  font-size:min(5vmin,36px);font-weight:900;box-shadow:2px 3px 0 var(--ink);padding:0;display:flex;align-items:center;justify-content:center}
+.num svg{width:60%;height:60%}
+.num.ok{width:auto;padding:0 .4em;background:var(--yellow);font-size:min(3.4vmin,24px);font-weight:400;white-space:nowrap}
+.num:disabled{opacity:.3;box-shadow:none}
+.num:active{transform:translate(2px,2px);box-shadow:none}
+.again{display:none}
+
+.overlay{position:fixed;inset:0;background:rgba(59,47,42,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:5}
+.overlay.show{display:flex}
+.modal{position:relative;background:var(--paper);border:4px solid var(--ink);border-radius:var(--wob);
+  padding:28px 32px;max-width:680px;width:100%;max-height:96vh;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.x{position:absolute;top:10px;right:10px;width:52px;height:52px;border:3px solid var(--ink);border-radius:50%;
+  background:#fff;padding:0;display:flex;align-items:center;justify-content:center}
+.x svg{width:24px;height:24px}
+.modal h2{margin:0;font-size:clamp(28px,5vmin,40px);font-weight:400}
+.big-me{width:min(20vmin,130px);height:min(20vmin,130px);object-fit:contain;animation:wiggle .6s ease-in-out infinite}
+.eqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(7em,1fr));gap:4px 18px;width:100%;font-size:clamp(18px,3vmin,24px);font-weight:800}
+.stamp{display:none;border:4px solid #d0508a;color:#d0508a;border-radius:var(--wob2);padding:.2em .8em;
+  font-size:clamp(22px,3.8vmin,30px);transform:rotate(-4deg);background:#fff}
+.stamp.show{display:block}
+@keyframes popin{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg) translateY(-4px)}75%{transform:rotate(10deg) translateY(-4px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<section class="screen show" id="start">
+  <a class="backlink" href="cat-tablet.html#mulmake">← 回到上一頁</a>
+  <svg class="hero" viewBox="0 0 420 200" aria-hidden="true">
+    <g fill="#fff" stroke="#3b2f2a" stroke-width="5">
+      <ellipse cx="75" cy="105" rx="62" ry="58"/><ellipse cx="210" cy="100" rx="62" ry="58"/><ellipse cx="345" cy="105" rx="62" ry="58"/>
+    </g>
+    <g fill="#f08a3c" stroke="#3b2f2a" stroke-width="3">
+      <circle cx="55" cy="105" r="18"/><circle cx="95" cy="105" r="18"/>
+      <circle cx="190" cy="100" r="18"/><circle cx="230" cy="100" r="18"/>
+      <circle cx="325" cy="105" r="18"/><circle cx="365" cy="105" r="18"/>
+    </g>
+    <g font-family="sans-serif" font-weight="900" font-size="30" fill="#2f9e97" text-anchor="middle">
+      <text x="75" y="196">2</text><text x="210" y="196">4</text><text x="345" y="196">6</text>
+    </g>
+  </svg>
+  <h1 class="title" id="titleTx"></h1>
+  <div class="badge" id="lvStart"></div>
+  <button class="btn" id="goStart">
+    <svg viewBox="0 0 48 48"><path d="M16 10 L38 24 L16 38 Z" fill="currentColor" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg><span id="startTx"></span>
+  </button>
+</section>
+
+<section class="screen" id="draw">
+  <div class="draw-head" id="drawTx"></div>
+  <canvas id="pad"></canvas>
+  <div class="tools" id="tools"></div>
+  <div class="row">
+    <button class="icon-btn" id="clearPad" aria-label="擦掉重畫"><svg viewBox="0 0 48 48"><path d="M12 15h24M19 15v-4h10v4M15 15l2 24h14l2-24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="btn" id="doneDraw" disabled><svg viewBox="0 0 48 48"><path d="M10 25 L20 35 L38 13" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="doneTx"></span></button>
+  </div>
+</section>
+
+<section class="screen" id="play">
+  <div class="bar">
+    <div class="me"><img id="meImg" alt="我的角色"></div>
+    <div class="prompt" id="prompt"></div>
+    <div class="badge" id="lvPlay"></div>
+  </div>
+  <div class="stage">
+    <div class="bookbox"><div class="tabs" id="tabs"></div><div class="book" id="book"></div></div>
+    <div class="right">
+      <div class="pwrap">
+        <div class="pic" id="pic"><div class="groups" id="groups"></div></div>
+        <div class="lid" id="lid">?</div>
+        <div class="count" id="count"></div>
+      </div>
+      <div class="eq" id="eq"></div>
+      <div class="pad" id="pad2"></div>
+      <button class="btn again" id="again"></button>
+    </div>
+  </div>
+</section>
+
+<div class="overlay" id="doneBox">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="x" id="closeDone" aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M5 5L19 19M19 5L5 19" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></button>
+    <img class="big-me" id="bigMe" alt="">
+    <h2 id="doneTitle"></h2>
+    <div class="eqs" id="eqs"></div>
+    <div class="stamp" id="stamp"></div>
+    <div class="row">
+      <button class="btn" id="playAgain"></button>
+      <button class="btn white" id="redraw"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+{
+/* ---------- 設定：網址參數（老師用 mulmake-qr.html 產生 QR Code）----------
+   t＝練哪些乘法（被乘數，1～9，逗號分開，預設 2,5）
+   m＝乘數範圍（有幾盤／幾排），預設 2-5，和大屏「認識乘法」一樣；可以到 1-9
+   v＝擺法：mix（盤子、排排站輪流，預設）、plate（盤子）、row（排排站）
+   level＝等級 1～5 */
+const Q = new URLSearchParams(location.search);
+const LV = Math.min(5, Math.max(1, parseInt(Q.get('level'), 10) || 1));
+let TABLES = (Q.get('t') || '2,5').split(',').map(Number).filter(x => x >= 1 && x <= 9);
+TABLES = [...new Set(TABLES)].sort((a,b) => a-b); if (!TABLES.length) TABLES = [2,5];
+let [MLO, MHI] = (Q.get('m') || '2-5').split('-').map(Number);
+if (!(MLO >= 1 && MLO <= 9)) MLO = 2; if (!(MHI >= 1 && MHI <= 9)) MHI = 5; if (MHI < MLO) [MLO, MHI] = [MHI, MLO];
+const VIEW = ['plate','row','mix'].includes(Q.get('v')) ? Q.get('v') : 'mix';
+const MULTS = Array.from({length: MHI - MLO + 1}, (_,i) => MLO + i);
+const COLORS = ['#7a4a24','#2b2b2b','#e0584a','#3a6fd8','#f2b33d'];
+
+/* ---------- 注音（同 mulpic.html、make10.html 的做法）---------- */
+const WORDS = {
+  '一個':'ㄧˊ ˙ㄍㄜ', '角色':'ㄐㄧㄠˇ ㄙㄜˋ', '數字':'ㄕㄨˋ ㄗˋ', '重畫':'ㄔㄨㄥˊ ㄏㄨㄚˋ', '挑戰':'ㄊㄧㄠˇ ㄓㄢˋ',
+  '跳著':'ㄊㄧㄠˋ ˙ㄓㄜ', '盤子':'ㄆㄢˊ ˙ㄗ',
+};
+const ZY = {
+  '我':'ㄨㄛˇ','的':'˙ㄉㄜ','工':'ㄍㄨㄥ','廠':'ㄔㄤˇ','開':'ㄎㄞ','始':'ㄕˇ','第':'ㄉㄧˋ','級':'ㄐㄧˊ','畫':'ㄏㄨㄚˋ','一':'ㄧ',
+  '個':'ㄍㄜˋ','你':'ㄋㄧˇ','好':'ㄏㄠˇ','了':'˙ㄌㄜ','選':'ㄒㄩㄢˇ','張':'ㄓㄤ','卡':'ㄎㄚˇ','再':'ㄗㄞˋ','有':'ㄧㄡˇ','幾':'ㄐㄧˇ',
+  '對':'ㄉㄨㄟˋ','要':'ㄧㄠˋ','看':'ㄎㄢˋ','圖':'ㄊㄨˊ','記':'ㄐㄧˋ','住':'ㄓㄨˋ','蓋':'ㄍㄞˋ','偷':'ㄊㄡ','下':'ㄒㄧㄚˋ','玩':'ㄨㄢˊ',
+  '可':'ㄎㄜˇ','以':'ㄧˇ','拿':'ㄋㄚˊ','給':'ㄍㄟˇ','老':'ㄌㄠˇ','師':'ㄕ','全':'ㄑㄩㄢˊ','部':'ㄅㄨˋ','都':'ㄉㄡ','收':'ㄕㄡ',
+  '集':'ㄐㄧˊ','算':'ㄙㄨㄢˋ','等':'ㄉㄥˇ','於':'ㄩˊ','次':'ㄘˋ','乘':'ㄔㄥˊ','法':'ㄈㄚˇ','每':'ㄇㄟˇ','盤':'ㄆㄢˊ','排':'ㄆㄞˊ',
+  '放':'ㄈㄤˋ','點':'ㄉㄧㄢˇ','滿':'ㄇㄢˇ','共':'ㄍㄨㄥˋ','多':'ㄉㄨㄛ','前':'ㄑㄧㄢˊ','後':'ㄏㄡˋ','反':'ㄈㄢˇ','列':'ㄌㄧㄝˋ',
+  '出':'ㄔㄨ','式':'ㄕˋ','寫':'ㄒㄧㄝˇ','在':'ㄗㄞˋ','面':'ㄇㄧㄢˋ','答':'ㄉㄚˊ','案':'ㄢˋ','確':'ㄑㄩㄝˋ','定':'ㄉㄧㄥˋ',
+};
+const BPMF = __BPMF__;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isHan = ch => /[㐀-鿿]/.test(ch);
+function yiTone(next){
+  if (!next || !next.py) return 'ㄧ';
+  const p = next.py, t = p[p.length-1];
+  return t === 'ˋ' || p[0] === '˙' ? 'ㄧˊ' : 'ㄧˋ';
+}
+function zy(str){
+  const ch = [...String(str)], seq = [];
+  for (let i = 0; i < ch.length;){
+    let hit = null;
+    for (let L = 3; L >= 2 && !hit; L--){ const w = ch.slice(i, i+L).join(''); if (w.length === L && WORDS[w]) hit = [w, WORDS[w].split(' ')]; }
+    if (hit){ [...hit[0]].forEach((c,k) => seq.push({c, py:hit[1][k]})); i += [...hit[0]].length; continue; }
+    const c = ch[i]; seq.push({c, py: isHan(c) ? ZY[c] || null : null}); i++;
+  }
+  seq.forEach((x,i) => { if (x.c === '一') x.py = yiTone(seq[i+1]); });
+  return '<span class="zyt">' + seq.map(x => {
+    if (!x.py) return esc(x.c);
+    const k = (BPMF[x.c] || []).indexOf(x.py);
+    return k > 0 ? x.c + String.fromCodePoint(0xE01E0 + k) : x.c;
+  }).join('') + '</span>';
+}
+const T = s => String(s).split(/(\{[^}]*\})/).map(p => p[0] === '{' ? `<span class="n">${esc(p.slice(1,-1))}</span>` : (p ? zy(p) : '')).join('');
+const $ = s => document.querySelector(s);
+const put = (sel, s) => { $(sel).innerHTML = T(s); };
+put('#titleTx', '我的乘法工廠'); put('#startTx', '開始'); put('#drawTx', '畫一個你的角色'); put('#doneTx', '畫好了');
+put('#lvStart', `第{${LV}}級`); put('#lvPlay', `第{${LV}}級`);
+put('#again', '再玩一次'); put('#playAgain', '再玩一次'); put('#redraw', '重畫角色'); put('#doneTitle', '全部都收集好了！');
+put('#stamp', '可以挑戰下一級了！拿給老師看');
+
+let actx = null;
+function pop(f){
+  try{
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f*1.5, t+.08);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.22, t+.01); g.gain.exponentialRampToValueAtTime(.0001, t+.16);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+.17);
+  }catch(e){}
+}
+function show(id){ document.querySelectorAll('.screen').forEach(s => s.classList.toggle('show', s.id === id)); }
+const say = s => put('#prompt', s);
+
+/* ---------- 畫角色（同湊十工廠）---------- */
+const cv = $('#pad'), ctx = cv.getContext('2d');
+const LW = 14;
+let dpr = 1, color = COLORS[0], drawing = false, strokes = 0, bb = null, cssW = 0, charURL = null;
+$('#tools').innerHTML = COLORS.map((c,i) =>
+  `<button class="sw${i===0?' on':''}" data-c="${c}" style="background:${c}" aria-label="顏色"></button>`).join('');
+$('#tools').addEventListener('click', e => {
+  const b = e.target.closest('.sw'); if (!b) return;
+  color = b.dataset.c;
+  document.querySelectorAll('.sw').forEach(s => s.classList.toggle('on', s === b));
+});
+function setupPad(){
+  const r = cv.getBoundingClientRect();
+  dpr = window.devicePixelRatio || 1; cssW = r.width;
+  cv.width = Math.round(r.width*dpr); cv.height = Math.round(r.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = LW;
+  clearPad();
+}
+function clearPad(){ ctx.clearRect(0,0,cv.width,cv.height); strokes = 0; bb = null; $('#doneDraw').disabled = true; }
+function grow(x,y){
+  if (!bb) bb = {x0:x,y0:y,x1:x,y1:y};
+  bb.x0 = Math.min(bb.x0,x); bb.y0 = Math.min(bb.y0,y); bb.x1 = Math.max(bb.x1,x); bb.y1 = Math.max(bb.y1,y);
+}
+function pt(e){ const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+cv.addEventListener('pointerdown', e => {
+  e.preventDefault(); cv.setPointerCapture(e.pointerId); drawing = true;
+  const [x,y] = pt(e); ctx.strokeStyle = color;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+.1,y+.1); ctx.stroke(); grow(x,y);
+});
+cv.addEventListener('pointermove', e => {
+  if (!drawing) return; e.preventDefault();
+  const [x,y] = pt(e); ctx.lineTo(x,y); ctx.stroke(); grow(x,y);
+});
+const endStroke = () => { if (!drawing) return; drawing = false; strokes++; $('#doneDraw').disabled = false; };
+cv.addEventListener('pointerup', endStroke);
+cv.addEventListener('pointercancel', endStroke);
+function exportChar(){
+  const p = LW, x0 = Math.max(0, bb.x0-p), y0 = Math.max(0, bb.y0-p);
+  const x1 = Math.min(cssW, bb.x1+p), y1 = Math.min(cssW, bb.y1+p);
+  const w = Math.max(1, x1-x0), h = Math.max(1, y1-y0);
+  const S = 256, out = document.createElement('canvas'); out.width = out.height = S;
+  const sc = Math.min(224/w, 224/h, 2.5), dw = w*sc, dh = h*sc;
+  out.getContext('2d').drawImage(cv, x0*dpr, y0*dpr, w*dpr, h*dpr, (S-dw)/2, (S-dh)/2, dw, dh);
+  return out.toDataURL('image/png');
+}
+function goDraw(){ show('draw'); setupPad(); }
+$('#clearPad').addEventListener('click', clearPad);
+$('#doneDraw').addEventListener('click', () => {
+  if (!strokes) return;
+  charURL = exportChar();
+  $('#meImg').src = charURL; $('#bigMe').src = charURL;
+  startRound();
+});
+
+/* ---------- 收集冊（每個乘法一個分頁） ---------- */
+const book = $('#book'), tabs = $('#tabs'), pic = $('#pic'), groups = $('#groups'), eq = $('#eq'), pad = $('#pad2'), lid = $('#lid'), count = $('#count');
+let collected = new Set(), tab = TABLES[0], cur = null, phase = 'pick', misses = 0, timers = [], viewFlip = Math.random() < .5;
+const key = (a,b) => a + 'x' + b;
+const total = () => TABLES.length * MULTS.length;
+const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
+function stopTimers(){ timers.forEach(clearTimeout); timers = []; }
+function img(){ const m = new Image(); m.src = charURL; m.alt = ''; return m; }
+
+function renderTabs(){
+  tabs.innerHTML = TABLES.map(t => {
+    const full = MULTS.every(b => collected.has(key(t,b)));
+    return `<button class="tab${t===tab?' on':''}${full?' full':''}" data-t="${t}">${T(`{${t}}的乘法`)}</button>`;
+  }).join('');
+  tabs.style.display = TABLES.length > 1 ? 'flex' : 'none';
+}
+function renderBook(){
+  book.innerHTML = MULTS.map(b => {
+    const a = tab, got = collected.has(key(a,b));
+    const front = LV === 3 ? `<div class="face front big">${a*b}</div>` : `<div class="face front">${a}×${b}</div>`;
+    return `<button class="card${got?' got':''}" data-b="${b}" ${got?'disabled':''} aria-label="${a}×${b}">
+      <div class="inner">${front}
+        <div class="face back"><img src="${charURL}" alt="">${a}×${b}<br>=${a*b}</div>
+      </div></button>`;
+  }).join('');
+}
+tabs.addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b || phase !== 'pick') return;
+  tab = +b.dataset.t; renderTabs(); renderBook();
+});
+
+/* ---------- 盤子／排排站 ---------- */
+function layout(){
+  const a = cur.a, b = cur.b, W = pic.clientWidth - 28, H = pic.clientHeight - 28;
+  const kids = [...groups.children];
+  if (cur.view === 'plate'){
+    const cols = b <= 3 ? b : b === 4 ? 2 : 3, rows = Math.ceil(b / cols);
+    const size = Math.floor(Math.min((W - (cols-1)*12) / cols, (H - (rows-1)*12) / rows));
+    const ic = Math.ceil(Math.sqrt(a)), ir = Math.ceil(a / ic);
+    const it = Math.floor(size * .62 / Math.max(ic, ir));
+    groups.style.gridTemplateColumns = `repeat(${cols}, ${size}px)`;
+    kids.forEach(g => { g.style.width = g.style.height = size + 'px'; g.style.gridTemplateColumns = `repeat(${ic}, ${it}px)`; g.style.gridAutoRows = it + 'px'; });
+  } else {
+    const rh = Math.floor((H - (b-1)*6) / b), it = Math.floor(Math.min(rh - 8, (W - 70 - a*3) / a));
+    groups.style.gridTemplateColumns = `${Math.min(W - 50, a*(it+3) + 16)}px`;
+    kids.forEach(g => { g.style.height = rh + 'px'; g.querySelectorAll('img').forEach(m => { m.style.width = m.style.height = it + 'px'; }); });
+    groups.dataset.it = it;
+  }
+}
+function buildGroups(filled){
+  const {a, b, view} = cur;
+  groups.style.gap = view === 'plate' ? '12px' : '6px';
+  groups.innerHTML = Array.from({length:b}, (_,i) => `<button class="grp ${view === 'plate' ? 'plate' : 'line'}" data-i="${i}" aria-label="${i+1}"></button>`).join('');
+  layout();
+  if (filled) [...groups.children].forEach(g => fillGroup(g, false));
+}
+function fillGroup(g, sound){
+  if (g.classList.contains('full')) return;
+  const it = cur.view === 'row' ? +groups.dataset.it : 0;
+  for (let k = 0; k < cur.a; k++){
+    const m = img(); if (it){ m.style.width = m.style.height = it + 'px'; }
+    g.appendChild(m);
+  }
+  g.classList.add('full');
+  if (sound) pop(560 + (+g.dataset.i)*50);
+}
+function showTot(i){
+  const g = groups.children[i]; if (!g || g.querySelector('.tot')) return;
+  const s = document.createElement('span'); s.className = 'tot'; s.textContent = (i+1) * cur.a; g.appendChild(s);
+}
+const showAllTot = () => { for (let i = 0; i < cur.b; i++) showTot(i); };
+const U = () => cur.view === 'plate' ? '盤' : '排';
+
+/* ---------- 算式與數字鍵 ---------- */
+pad.innerHTML = [1,2,3,4,5,6,7,8,9,0].map(k => `<button class="num" data-k="${k}">${k}</button>`).join('') +
+  `<button class="num" data-k="del" aria-label="擦掉"><svg viewBox="0 0 48 48"><path d="M18 12h22v24H18L6 24z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M23 19l10 10M33 19L23 29" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg></button>` +
+  `<button class="num ok" data-k="ok">${T('確定')}</button>`;
+let boxes = [], bi = 0, buf = '';
+function setEq(kind){                  /* kind：'prod'＝a × b = □；'expr'＝□ × □ = ? */
+  const {a, b} = cur;
+  if (kind === 'expr'){
+    eq.innerHTML = `<div class="box blank" id="b0"></div><span>×</span><div class="box blank" id="b1"></div><span>=</span><div class="box blank" id="b2"></div>`;
+    boxes = ['#b0','#b1'];
+  } else {
+    eq.innerHTML = `<div class="box">${a}</div><span>×</span><div class="box">${b}</div><span>=</span><div class="box blank" id="b2"></div>`;
+    boxes = ['#b2'];
+  }
+  bi = 0; buf = ''; eq.classList.add('show'); markActive();
+}
+function markActive(){ eq.querySelectorAll('.box').forEach(x => x.classList.remove('active')); const el = boxes[bi] && $(boxes[bi]); if (el) el.classList.add('active'); }
+function askProd(){ boxes = ['#b2']; bi = 0; buf = ''; $('#b2').textContent = ''; markActive(); okBtn(true); pad.classList.add('show'); }
+function okBtn(on){ pad.querySelector('[data-k="ok"]').disabled = !on; }
+pad.addEventListener('click', e => {
+  const b = e.target.closest('.num'); if (!b || b.disabled) return;
+  const k = b.dataset.k, box = boxes[bi] && $(boxes[bi]); if (!box) return;
+  if (phase === 'expr'){               /* 列式：每格一個數字，填完自動換下一格 */
+    if (k === 'del'){ if (bi > 0 && !box.textContent){ bi--; } $(boxes[bi]).textContent = ''; markActive(); return; }
+    if (k === 'ok' || k === '0') return;
+    box.textContent = k; pop(600);
+    if (bi === 0){ bi = 1; markActive(); } else checkExpr();
+    return;
+  }
+  if (k === 'del'){ buf = buf.slice(0,-1); box.textContent = buf; return; }
+  if (k === 'ok'){ if (buf) checkProd(+buf); return; }
+  if (buf.length >= 2) return;
+  buf = (buf === '0' ? '' : buf) + k; box.textContent = buf; pop(600);
+});
+
+/* ---------- 出題 ---------- */
+function clearAll(){
+  groups.innerHTML = ''; pic.classList.remove('happy'); lid.classList.remove('show'); count.classList.remove('show');
+  eq.classList.remove('show'); pad.classList.remove('show');
+}
+function startRound(){
+  stopTimers(); collected = new Set(); cur = null; phase = 'pick'; misses = 0; tab = TABLES[0];
+  renderTabs(); renderBook(); clearAll(); $('#again').style.display = 'none';
+  show('play'); say('選一張數字卡');
+}
+book.addEventListener('click', e => {
+  const c = e.target.closest('.card'); if (!c || phase !== 'pick') return;
+  const b = +c.dataset.b, a = tab; if (collected.has(key(a,b))) return;
+  viewFlip = !viewFlip;
+  cur = {a, b, view: VIEW === 'mix' ? (viewFlip ? 'plate' : 'row') : VIEW, k: 0, tries: 0};
+  c.classList.add('now'); clearAll(); phase = 'busy';
+  const u = U();
+  if (LV === 1){
+    buildGroups(false); phase = 'fill';
+    say(`每${u}放{${a}}個，要放{${b}}${u}，點一下${u === '盤' ? '盤子' : '每一排'}`);
+  } else if (LV === 2){
+    buildGroups(true); setEq('prod'); phase = 'skip'; cur.k = 0; askSkip();
+  } else if (LV === 3){
+    buildGroups(true); setEq('expr'); phase = 'expr'; okBtn(false); pad.classList.add('show');
+    say('看圖，列出算式');
+  } else if (LV === 4){
+    buildGroups(true); setEq('prod'); say('記住！');
+    let s = 3; count.textContent = s; count.classList.add('show');
+    const tick = () => {
+      s--;
+      if (s > 0){ count.textContent = s; later(tick, 1000); return; }
+      count.classList.remove('show'); lid.classList.add('show'); phase = 'prod'; askProd(); say('蓋住了，算出答案');
+    };
+    later(tick, 1000);
+  } else {
+    buildGroups(true); lid.classList.add('show'); setEq('prod'); phase = 'prod'; askProd(); say('算出答案');
+  }
+});
+groups.addEventListener('click', e => {
+  const g = e.target.closest('.grp'); if (!g || phase !== 'fill' || g.classList.contains('full')) return;
+  fillGroup(g, true);
+  if ([...groups.children].every(x => x.classList.contains('full'))){
+    setEq('prod'); phase = 'prod'; askProd(); say('一共有幾個？');
+  }
+});
+function askSkip(){                    /* 第 2 級：一盤一盤跳著算 */
+  const k = cur.k, u = U();
+  [...groups.children].forEach((g,i) => g.classList.toggle('hi', i === k));
+  boxes = ['#b2']; bi = 0; buf = ''; $('#b2').textContent = ''; markActive(); okBtn(true); pad.classList.add('show');
+  say(k === 0 ? `第{1}${u}有幾個？` : `前{${k+1}}${u}一共有幾個？`);
+}
+function checkProd(v){
+  const {a, b} = cur, u = U();
+  if (phase === 'skip'){
+    if (v === (cur.k+1) * a){
+      showTot(cur.k); pop(760 + cur.k*40); cur.k++;
+      if (cur.k < b) askSkip(); else { groups.querySelectorAll('.grp').forEach(g => g.classList.remove('hi')); win(); }
+    } else { misses++; buf = ''; $('#b2').textContent = ''; say(`每${u}多{${a}}個，再算算看`); if (cur.k > 0) showTot(cur.k - 1); }
+    return;
+  }
+  if (v === a*b) return win();
+  misses++; cur.tries++; buf = ''; $('#b2').textContent = '';
+  if (lid.classList.contains('show')){ lid.classList.remove('show'); say(LV === 4 ? '偷看一下，再算算看' : '看圖，再算算看'); }
+  else { showAllTot(); say('跳著算算看'); }
+}
+function checkExpr(){                  /* 第 3 級：看圖列式（被乘數 × 乘數） */
+  const {a, b} = cur, u = U(), x = +$('#b0').textContent, y = +$('#b1').textContent;
+  if ((x === a && y === b) || (a === b && x === a && y === a)){
+    ['#b0','#b1'].forEach(s => $(s).classList.add('ok')); pop(880);
+    phase = 'prod'; askProd(); say('一共有幾個？');
+    return;
+  }
+  misses++;
+  say(x === b && y === a ? `前後放反了，每${u}有幾個要寫在前面` : `算算看，每${u}有幾個？有幾${u}？`);
+  later(() => { $('#b0').textContent = ''; $('#b1').textContent = ''; bi = 0; markActive(); }, 900);
+}
+function win(){
+  phase = 'yay'; pad.classList.remove('show');
+  const {a, b} = cur, p = a*b;
+  $('#b2').textContent = p; $('#b2').classList.add('ok'); eq.querySelectorAll('.box').forEach(x => x.classList.remove('active'));
+  lid.classList.remove('show'); showAllTot(); pic.classList.add('happy'); pop(880); later(() => pop(1100), 140);
+  say(`對了！{${a}}乘{${b}}等於{${p}}`);
+  collected.add(key(a,b));
+  const card = book.querySelector(`.card[data-b="${b}"]`);
+  card.classList.remove('now'); card.classList.add('got'); card.disabled = true;
+  later(() => {
+    clearAll(); cur = null; renderTabs();
+    if (collected.size === total()){ phase = 'done'; openDone(); }
+    else {
+      phase = 'pick';
+      if (MULTS.every(m => collected.has(key(tab,m)))){ tab = TABLES.find(t => MULTS.some(m => !collected.has(key(t,m)))); renderTabs(); renderBook(); }
+      say('再選一張數字卡');
+    }
+  }, 2800);
+}
+
+/* ---------- 完成視窗 ---------- */
+function openDone(){
+  $('#eqs').innerHTML = TABLES.flatMap(a => MULTS.map(b => `<div>${a} × ${b} = ${a*b}</div>`)).join('');
+  $('#stamp').classList.toggle('show', LV < 5 && misses <= 1);
+  $('#doneBox').classList.add('show');
+}
+function closeDone(){
+  $('#doneBox').classList.remove('show');
+  if (phase === 'done'){ say('全部都收集好了！'); $('#again').style.display = 'inline-flex'; }
+}
+$('#closeDone').addEventListener('click', closeDone);
+$('#doneBox').addEventListener('click', e => { if (e.target.id === 'doneBox') closeDone(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#doneBox').classList.contains('show')) closeDone(); });
+$('#playAgain').addEventListener('click', () => { $('#doneBox').classList.remove('show'); startRound(); });
+$('#again').addEventListener('click', startRound);
+$('#redraw').addEventListener('click', () => { $('#doneBox').classList.remove('show'); stopTimers(); goDraw(); });
+$('#goStart').addEventListener('click', () => { pop(600); goDraw(); });
+window.addEventListener('resize', () => { if (cur && groups.children.length){ layout(); } });
+}
+</script>
+</body>
+</html>
