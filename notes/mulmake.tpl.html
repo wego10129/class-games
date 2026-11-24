@@ -12,10 +12,10 @@ IDEA: 蠟筆畫的盤子和排排站，裝進孩子自己畫的角色
 PICTURE: 一盤一盤（或一排一排）的角色，下面跳出 2、4、6
 COLOUR and TYPE: 圖畫紙米色、深咖啡筆線、橘與藍綠；粗黑體大數字＋注音字型
 LAYOUT: 橫放左邊收集冊（每個乘法一個分頁）、右邊圖和算式；直放上下堆疊
-版本：v1.0（2026-11-24）
+版本：v1.1（2026-11-24）加上舊版 iPad 除錯訊息
 */
 /* 注音：Bpmf Zihi Kai Std（ButTaiwan bpmfvs 規格，SIL OFL 1.1），只保留這一頁用到的字。做法見 notes/zhuyin.md */
-@font-face{font-family:'MM Bpmf';src:url(data:font/woff2;base64,__FONT__) format('woff2');font-display:block}
+@font-face{font-family:'MM Bpmf';src:url(data:font/woff2;base64,__FONT__) format('woff2');font-display:swap}
 .zyt{font-family:'MM Bpmf','PingFang TC',serif;font-weight:400}
 :root{
   color-scheme:light;
@@ -154,6 +154,20 @@ svg{display:block}
 @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg) translateY(-4px)}75%{transform:rotate(10deg) translateY(-4px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<script>
+/* 舊版 iPad 除錯：程式出錯或沒有執行時，畫面左下角顯示原因，方便拍照回報 */
+(function(){
+  function note(t){
+    var d = document.getElementById('diag');
+    if (!d){ d = document.createElement('div'); d.id = 'diag';
+      d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99;max-width:90vw;background:#fff3f0;color:#9b1c1c;border:2px solid #9b1c1c;border-radius:8px;padding:6px 10px;font:14px/1.4 sans-serif';
+      (document.body || document.documentElement).appendChild(d); }
+    d.textContent += (d.textContent ? '／' : '') + t;
+  }
+  window.addEventListener('error', function(e){ note('錯誤：' + e.message + '（第 ' + e.lineno + ' 行）'); });
+  window.addEventListener('load', function(){ setTimeout(function(){ if (!window.__ok) note('程式沒有執行（' + navigator.userAgent.replace(/.*OS ([\d_]+).*/, 'iOS $1') + '）'); }, 1500); });
+})();
+</script>
 </head>
 <body>
 
@@ -576,6 +590,7 @@ $('#playAgain').addEventListener('click', () => { $('#doneBox').classList.remove
 $('#again').addEventListener('click', startRound);
 $('#redraw').addEventListener('click', () => { $('#doneBox').classList.remove('show'); stopTimers(); goDraw(); });
 $('#goStart').addEventListener('click', () => { pop(600); goDraw(); });
+window.__ok = true;
 window.addEventListener('resize', () => { if (cur && groups.children.length){ layout(); } });
 }
 </script>
