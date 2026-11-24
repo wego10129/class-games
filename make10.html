@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>我的湊十工廠</title>
+<style>
+/*
+VOICE: 低年級學扶孩子的手作勞作，溫暖、不催促
+IDEA: 一張蠟筆畫在圖畫紙上的十格框，加上一本可以翻面的收集冊
+PICTURE: 孩子自己畫的角色，排進十格框
+COLOUR and TYPE: 圖畫紙米色、深咖啡筆線、橘與藍綠兩支蠟筆；粗黑體大數字
+LAYOUT: 橫放左邊收集冊、右邊十格框；直放上下堆疊
+*/
+:root{
+  color-scheme:light;
+  --paper:#fbf5e6; --ink:#3b2f2a; --orange:#f08a3c; --teal:#2f9e97; --yellow:#f7c948;
+  --soft:#fffdf7; --dash:#cdbf9c;
+  --cell:min(13vmin,100px);
+  --card:min(10.5vmin,84px);
+  --wob:255px 18px 225px 18px / 18px 225px 18px 255px;
+  --wob2:18px 225px 18px 255px / 255px 18px 225px 18px;
+}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  background-color:var(--paper);
+  background-image:radial-gradient(rgba(120,90,50,.08) 1px,transparent 1.3px),radial-gradient(rgba(120,90,50,.05) 1px,transparent 1.3px);
+  background-size:18px 18px,27px 27px;background-position:0 0,9px 13px;
+  color:var(--ink);
+  font-family:"PingFang TC","Heiti TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  overflow:hidden;touch-action:manipulation;
+}
+button{font-family:inherit;color:inherit;touch-action:manipulation;cursor:pointer}
+svg{display:block}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:3vmin;padding:2vmin}
+.screen.show{display:flex}
+
+.btn{border:3px solid var(--ink);border-radius:var(--wob2);background:var(--yellow);font-weight:800;
+  font-size:clamp(22px,4vmin,32px);padding:.45em 1.1em;box-shadow:3px 4px 0 var(--ink);
+  display:inline-flex;align-items:center;gap:.4em;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translate(2px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn:disabled{opacity:.35;box-shadow:none}
+.btn svg{width:1.3em;height:1.3em}
+.btn.white{background:#fff}
+.icon-btn{width:64px;height:64px;border:3px solid var(--ink);border-radius:var(--wob);background:#fff;
+  display:flex;align-items:center;justify-content:center;box-shadow:2px 3px 0 var(--ink);padding:0}
+.icon-btn svg{width:36px;height:36px}
+.icon-btn:active{transform:translate(2px,2px);box-shadow:none}
+
+/* 開始 */
+.backlink{position:absolute;top:14px;left:16px;font-size:18px;font-weight:800;color:var(--ink);text-decoration:none;border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;padding:8px 14px}
+.title{font-size:clamp(34px,7vmin,60px);font-weight:900;margin:0;letter-spacing:.04em}
+.title b{color:var(--orange)}
+.hero{width:min(60vmin,420px)}
+
+/* 畫角色 */
+.draw-head{display:flex;align-items:center;gap:16px;font-size:clamp(24px,4.4vmin,36px);font-weight:900}
+#pad{width:min(58vmin,400px);height:min(58vmin,400px);background:#fff;border:4px solid var(--ink);
+  border-radius:var(--wob);touch-action:none}
+.tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+.sw{width:56px;height:56px;border-radius:50%;border:3px solid var(--ink);padding:0}
+.sw.on{outline:5px solid var(--ink);outline-offset:3px}
+
+/* 遊戲 */
+#play{justify-content:flex-start;gap:0;padding:12px 16px}
+.bar{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.me{width:72px;height:72px;border:3px solid var(--ink);border-radius:50%;background:#fff;
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.me img{width:84%;height:84%;object-fit:contain}
+.prompt{flex:1;text-align:center;font-size:clamp(20px,3.6vmin,30px);font-weight:800;line-height:1.35;min-height:2.7em;
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.3em}
+.prompt .n{font-size:1.6em;color:var(--orange);line-height:1}
+.stage{flex:1;width:100%;display:flex;align-items:center;justify-content:center;gap:5vmin}
+@media (orientation:portrait){.stage{flex-direction:column;gap:4vmin}}
+
+.book{display:grid;grid-template-columns:repeat(3,var(--card));gap:12px;padding:16px;background:var(--soft);
+  border:3px solid var(--ink);border-radius:var(--wob)}
+.card{width:var(--card);height:calc(var(--card)*1.18);border:none;background:none;padding:0;perspective:700px}
+.inner{position:relative;width:100%;height:100%;transition:transform .7s;transform-style:preserve-3d}
+.card.got .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border:3px solid var(--ink);
+  border-radius:var(--wob2);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.front{background:#fff;font-size:calc(var(--card)*.6);font-weight:900;box-shadow:2px 3px 0 var(--ink)}
+.back{background:#e6f5f3;transform:rotateY(180deg);font-weight:900;font-size:calc(var(--card)*.24);line-height:1.15}
+.back img{width:46%;height:40%;object-fit:contain}
+.card.now .front{background:var(--yellow);transform:translateY(-4px)}
+.card:disabled{cursor:default}
+
+.right{display:flex;flex-direction:column;align-items:center;gap:3vmin}
+.frame{display:grid;grid-template-columns:repeat(5,var(--cell));gap:8px;padding:12px;background:#fff;
+  border:4px solid var(--ink);border-radius:var(--wob)}
+.cell{width:var(--cell);height:var(--cell);border:3px dashed var(--dash);border-radius:16px;background:#fffaf0;
+  padding:0;display:flex;align-items:center;justify-content:center}
+.cell img{width:86%;height:86%;object-fit:contain;animation:popin .28s ease-out}
+.cell.add{border:3px solid var(--teal);background:#e6f5f3}
+.cell.flash{animation:flash .45s 3}
+.frame.happy img{animation:wiggle .45s ease-in-out 4}
+.nums{display:flex;gap:8px;flex-wrap:nowrap;justify-content:center;visibility:hidden}
+.nums.show{visibility:visible}
+.num{width:min(7.6vmin,62px);height:min(9vmin,70px);border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;
+  font-size:min(5.5vmin,40px);font-weight:900;box-shadow:2px 3px 0 var(--ink);padding:0}
+.num:active{transform:translate(2px,2px);box-shadow:none}
+.again{display:none}
+
+/* 彈跳視窗 */
+.overlay{position:fixed;inset:0;background:rgba(59,47,42,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:5}
+.overlay.show{display:flex}
+.modal{position:relative;background:var(--paper);border:4px solid var(--ink);border-radius:var(--wob);
+  padding:28px 32px;max-width:640px;width:100%;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+.x{position:absolute;top:10px;right:10px;width:52px;height:52px;border:3px solid var(--ink);border-radius:50%;
+  background:#fff;padding:0;display:flex;align-items:center;justify-content:center}
+.x svg{width:24px;height:24px}
+.modal h2{margin:0;font-size:clamp(28px,5vmin,40px)}
+.big-me{width:min(26vmin,170px);height:min(26vmin,170px);object-fit:contain;animation:wiggle .6s ease-in-out infinite}
+.eqs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 22px;font-size:clamp(20px,3.4vmin,28px);font-weight:800}
+.row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+
+@keyframes popin{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg) translateY(-4px)}75%{transform:rotate(10deg) translateY(-4px)}}
+@keyframes flash{50%{background:var(--yellow)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- 開始 -->
+<section class="screen show" id="start">
+  <a class="backlink" href="cat-tablet.html#make10">← 回到上一頁</a>
+  <svg class="hero" viewBox="0 0 420 200" aria-hidden="true">
+    <path d="M14 22 C120 14 300 16 406 24 C410 80 408 130 404 180 C300 188 120 186 16 178 C10 120 12 70 14 22Z" fill="#fff" stroke="#3b2f2a" stroke-width="5"/>
+    <path d="M18 100 C140 96 280 104 402 98 M94 24 C96 80 92 130 96 180 M174 22 C176 80 172 130 176 182 M254 22 C256 80 252 130 256 182 M334 24 C336 80 332 130 334 180" fill="none" stroke="#3b2f2a" stroke-width="3"/>
+    <g fill="#f08a3c" stroke="#3b2f2a" stroke-width="3">
+      <circle cx="55" cy="60" r="22"/><circle cx="135" cy="60" r="22"/><circle cx="215" cy="60" r="22"/><circle cx="295" cy="60" r="22"/><circle cx="373" cy="60" r="22"/>
+      <circle cx="55" cy="140" r="22"/><circle cx="135" cy="140" r="22"/>
+    </g>
+    <g fill="#2f9e97" stroke="#3b2f2a" stroke-width="3"><circle cx="215" cy="140" r="22"/><circle cx="295" cy="140" r="22"/><circle cx="373" cy="140" r="22"/></g>
+  </svg>
+  <h1 class="title">我的湊 <b>10</b> 工廠</h1>
+  <button class="btn" id="goStart">
+    <svg viewBox="0 0 48 48"><path d="M16 10 L38 24 L16 38 Z" fill="currentColor" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>開始
+  </button>
+</section>
+
+<!-- 畫角色 -->
+<section class="screen" id="draw">
+  <div class="draw-head">畫一個你的角色
+    <button class="icon-btn" id="sayDraw" aria-label="再聽一次"><svg viewBox="0 0 48 48"><path d="M7 18h8l11-8v28l-11-8H7z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M32 17c4 4 4 10 0 14M37 12c7 7 7 17 0 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg></button>
+  </div>
+  <canvas id="pad"></canvas>
+  <div class="tools" id="tools"></div>
+  <div class="row">
+    <button class="icon-btn" id="clearPad" aria-label="擦掉重畫"><svg viewBox="0 0 48 48"><path d="M12 15h24M19 15v-4h10v4M15 15l2 24h14l2-24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="btn" id="doneDraw" disabled><svg viewBox="0 0 48 48"><path d="M10 25 L20 35 L38 13" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>畫好了</button>
+  </div>
+</section>
+
+<!-- 湊十 -->
+<section class="screen" id="play">
+  <div class="bar">
+    <div class="me"><img id="meImg" alt="我的角色"></div>
+    <div class="prompt" id="prompt"></div>
+    <button class="icon-btn" id="sayAgain" aria-label="再聽一次"><svg viewBox="0 0 48 48"><path d="M7 18h8l11-8v28l-11-8H7z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M32 17c4 4 4 10 0 14M37 12c7 7 7 17 0 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg></button>
+  </div>
+  <div class="stage">
+    <div class="book" id="book"></div>
+    <div class="right">
+      <div class="frame" id="frame"></div>
+      <div class="nums" id="nums"></div>
+      <button class="btn again" id="again">再玩一次</button>
+    </div>
+  </div>
+</section>
+
+<!-- 完成視窗 -->
+<div class="overlay" id="doneBox">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="x" id="closeDone" aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M5 5L19 19M19 5L5 19" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></button>
+    <img class="big-me" id="bigMe" alt="">
+    <h2>9 張都收集好了！</h2>
+    <div class="eqs" id="eqs"></div>
+    <div class="row">
+      <button class="btn" id="playAgain">再玩一次</button>
+      <button class="btn white" id="redraw">重畫角色</button>
+    </div>
+  </div>
+</div>
+
+<script>
+{
+const $ = s => document.querySelector(s);
+const LEVEL = new URLSearchParams(location.search).get('level') === '2' ? 2 : 1;
+const COLORS = ['#7a4a24','#2b2b2b','#e0584a','#3a6fd8','#f2b33d'];
+const CARD_INK = ['#e0584a','#f08a3c','#c9971b','#2f9e97','#3a6fd8','#7b5bc7','#d0508a','#7a4a24','#3b2f2a'];
+
+let charURL = null;
+let collected = new Set();
+let cur = null;      // {n, added, phase}
+let phase = 'pick';  // pick | placing | fill | ask | ask2 | auto | yay | done
+
+/* ---------- 聲音 ---------- */
+let voice = null, lastSay = '', actx = null;
+const hasTTS = 'speechSynthesis' in window;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => /zh[-_]TW/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
+}
+if (hasTTS){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function say(t){
+  lastSay = t;
+  if (!hasTTS) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = 'zh-TW'; if (voice) u.voice = voice; u.rate = 0.85;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function pop(f){
+  try{
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f*1.5, t+.08);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.22, t+.01); g.gain.exponentialRampToValueAtTime(.0001, t+.16);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+.17);
+  }catch(e){}
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('show', s.id === id));
+}
+function setPrompt(html, speech){ $('#prompt').innerHTML = html; say(speech); }
+const N = x => `<span class="n">${x}</span>`;
+
+/* ---------- 畫角色 ---------- */
+const cv = $('#pad'), ctx = cv.getContext('2d');
+const LW = 14;
+let dpr = 1, color = COLORS[0], drawing = false, strokes = 0, bb = null, cssW = 0;
+$('#tools').innerHTML = COLORS.map((c,i) =>
+  `<button class="sw${i===0?' on':''}" data-c="${c}" style="background:${c}" aria-label="顏色"></button>`).join('');
+$('#tools').addEventListener('click', e => {
+  const b = e.target.closest('.sw'); if (!b) return;
+  color = b.dataset.c;
+  document.querySelectorAll('.sw').forEach(s => s.classList.toggle('on', s === b));
+});
+function setupPad(){
+  const r = cv.getBoundingClientRect();
+  dpr = window.devicePixelRatio || 1; cssW = r.width;
+  cv.width = Math.round(r.width*dpr); cv.height = Math.round(r.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = LW;
+  clearPad();
+}
+function clearPad(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  strokes = 0; bb = null; $('#doneDraw').disabled = true;
+}
+function grow(x,y){
+  if (!bb) bb = {x0:x,y0:y,x1:x,y1:y};
+  bb.x0 = Math.min(bb.x0,x); bb.y0 = Math.min(bb.y0,y); bb.x1 = Math.max(bb.x1,x); bb.y1 = Math.max(bb.y1,y);
+}
+function pt(e){ const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+cv.addEventListener('pointerdown', e => {
+  e.preventDefault(); cv.setPointerCapture(e.pointerId); drawing = true;
+  const [x,y] = pt(e); ctx.strokeStyle = color;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+.1,y+.1); ctx.stroke(); grow(x,y);
+});
+cv.addEventListener('pointermove', e => {
+  if (!drawing) return; e.preventDefault();
+  const [x,y] = pt(e); ctx.lineTo(x,y); ctx.stroke(); grow(x,y);
+});
+const endStroke = () => {
+  if (!drawing) return; drawing = false; strokes++; $('#doneDraw').disabled = false;
+};
+cv.addEventListener('pointerup', endStroke);
+cv.addEventListener('pointercancel', endStroke);
+function exportChar(){
+  const p = LW, x0 = Math.max(0, bb.x0-p), y0 = Math.max(0, bb.y0-p);
+  const x1 = Math.min(cssW, bb.x1+p), y1 = Math.min(cssW, bb.y1+p);
+  const w = Math.max(1, x1-x0), h = Math.max(1, y1-y0);
+  const S = 256, out = document.createElement('canvas'); out.width = out.height = S;
+  const sc = Math.min(224/w, 224/h, 2.5), dw = w*sc, dh = h*sc;
+  out.getContext('2d').drawImage(cv, x0*dpr, y0*dpr, w*dpr, h*dpr, (S-dw)/2, (S-dh)/2, dw, dh);
+  return out.toDataURL('image/png');
+}
+function goDraw(){
+  show('draw'); setupPad();
+  say('先畫一個你的角色。畫好了，按打勾。');
+}
+$('#sayDraw').addEventListener('click', () => say(lastSay));
+$('#clearPad').addEventListener('click', clearPad);
+$('#doneDraw').addEventListener('click', () => {
+  if (!strokes) return;
+  charURL = exportChar();
+  $('#meImg').src = charURL; $('#bigMe').src = charURL;
+  startRound();
+});
+
+/* ---------- 收集冊與十格框 ---------- */
+const frame = $('#frame'), book = $('#book'), nums = $('#nums');
+frame.innerHTML = Array.from({length:10}, (_,i) => `<button class="cell" data-i="${i}" aria-label="格子"></button>`).join('');
+nums.innerHTML = Array.from({length:9}, (_,i) => `<button class="num" data-k="${i+1}">${i+1}</button>`).join('');
+const cells = [...frame.children];
+function img(){ const m = new Image(); m.src = charURL; m.alt = ''; return m; }
+function renderBook(){
+  book.innerHTML = Array.from({length:9}, (_,i) => {
+    const n = i+1, got = collected.has(n);
+    return `<button class="card${got?' got':''}" data-n="${n}" ${got?'disabled':''} aria-label="${n}">
+      <div class="inner">
+        <div class="face front" style="color:${CARD_INK[i]}">${n}</div>
+        <div class="face back"><img src="${charURL}" alt="">${n}+${10-n}<br>=10</div>
+      </div></button>`;
+  }).join('');
+}
+function clearFrame(){
+  cells.forEach(c => { c.className = 'cell'; c.innerHTML = ''; });
+  frame.classList.remove('happy');
+}
+function startRound(){
+  collected = new Set(); cur = null; phase = 'pick';
+  renderBook(); clearFrame(); nums.classList.remove('show');
+  $('#again').style.display = 'none';
+  show('play');
+  setPrompt('選一張數字卡', '選一張數字卡。');
+}
+book.addEventListener('click', e => {
+  const b = e.target.closest('.card'); if (!b || phase !== 'pick') return;
+  const n = +b.dataset.n; if (collected.has(n)) return;
+  cur = {n, added:0}; phase = 'placing';
+  b.classList.add('now'); clearFrame();
+  $('#prompt').innerHTML = '';
+  let i = 0;
+  const t = setInterval(() => {
+    cells[i].appendChild(img()); pop(520 + i*40); i++;
+    if (i >= n){
+      clearInterval(t);
+      setTimeout(() => {
+        if (LEVEL === 2){
+          phase = 'ask2'; nums.classList.add('show');
+          setPrompt(`這裡有 ${N(n)} 個，還要幾個才會滿 ${N(10)}？`, `這裡有${n}個。還要幾個，才會滿十？`);
+        } else {
+          phase = 'fill';
+          setPrompt(`這裡有 ${N(n)} 個，把格子補滿`, `這裡有${n}個。把格子補滿。`);
+        }
+      }, 350);
+    }
+  }, 260);
+});
+frame.addEventListener('click', e => {
+  const c = e.target.closest('.cell'); if (!c || phase !== 'fill' || c.firstChild) return;
+  addOne(c);
+  if (cur.n + cur.added === 10){
+    phase = 'ask'; nums.classList.add('show');
+    setPrompt('你補了幾個？', '你補了幾個？');
+  }
+});
+function addOne(c){
+  c.classList.add('add'); c.appendChild(img()); cur.added++; pop(700 + cur.added*40);
+}
+nums.addEventListener('click', e => {
+  const b = e.target.closest('.num'); if (!b) return;
+  const k = +b.dataset.k, m = 10 - cur.n;
+  if (phase === 'ask'){
+    if (k === m) return win();
+    cells.filter(c => c.classList.contains('add')).forEach(c => {
+      c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash');
+    });
+    setPrompt('再數一數有藍框的格子', '再數一數，有藍色框框的，是你補的。');
+  } else if (phase === 'ask2'){
+    nums.classList.remove('show');
+    if (k === m){
+      phase = 'auto';
+      const empty = cells.filter(c => !c.firstChild);
+      let i = 0;
+      const t = setInterval(() => {
+        addOne(empty[i++]);
+        if (i >= empty.length){ clearInterval(t); setTimeout(win, 300); }
+      }, 260);
+    } else {
+      phase = 'fill';
+      setPrompt('補補看就知道，把格子補滿', '補補看就知道。把格子補滿。');
+    }
+  }
+});
+function win(){
+  phase = 'yay'; nums.classList.remove('show');
+  const n = cur.n, m = 10 - n;
+  frame.classList.add('happy'); pop(880); setTimeout(() => pop(1100), 140);
+  setPrompt(`對了！${N(n)} 和 ${N(m)} 湊成 ${N(10)}`, `對了！${n}和${m}，湊成十。`);
+  collected.add(n);
+  const card = book.querySelector(`.card[data-n="${n}"]`);
+  card.classList.remove('now'); card.classList.add('got'); card.disabled = true;
+  setTimeout(() => {
+    clearFrame(); cur = null;
+    if (collected.size === 9){ phase = 'done'; openDone(); }
+    else { phase = 'pick'; setPrompt('再選一張數字卡', '再選一張數字卡。'); }
+  }, 2600);
+}
+
+/* ---------- 完成視窗 ---------- */
+function openDone(){
+  $('#eqs').innerHTML = Array.from({length:9}, (_,i) => `<div>${i+1} + ${9-i} = 10</div>`).join('');
+  $('#doneBox').classList.add('show');
+  say('九張卡都收集好了！好厲害！');
+}
+function closeDone(){
+  $('#doneBox').classList.remove('show');
+  if (phase === 'done'){
+    $('#prompt').innerHTML = '全部收集好了！';
+    $('#again').style.display = 'inline-flex';
+  }
+}
+$('#closeDone').addEventListener('click', closeDone);
+$('#doneBox').addEventListener('click', e => { if (e.target.id === 'doneBox') closeDone(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#doneBox').classList.contains('show')) closeDone(); });
+$('#playAgain').addEventListener('click', () => { $('#doneBox').classList.remove('show'); startRound(); });
+$('#again').addEventListener('click', startRound);
+$('#redraw').addEventListener('click', () => { $('#doneBox').classList.remove('show'); goDraw(); });
+$('#sayAgain').addEventListener('click', () => say(lastSay));
+
+/* ---------- 開始：第一次點擊時開啟聲音 ---------- */
+$('#goStart').addEventListener('click', () => { pop(600); goDraw(); });
+}
+</script>
+</body>
+</html>
