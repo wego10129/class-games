@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>我的湊十工廠</title>
+<style>
+/*
+VOICE: 低年級學扶孩子的手作勞作，溫暖、不催促
+IDEA: 一張蠟筆畫在圖畫紙上的十格框，加上一本可以翻面的收集冊
+PICTURE: 孩子自己畫的角色，排進十格框
+COLOUR and TYPE: 圖畫紙米色、深咖啡筆線、橘與藍綠兩支蠟筆；粗黑體大數字＋注音字型
+LAYOUT: 橫放左邊收集冊、右邊十格框；直放上下堆疊
+版本：v2.0（2026-11-24）5 個等級、注音、取消語音
+*/
+/* 注音：Bpmf Zihi Kai Std（ButTaiwan bpmfvs 規格，SIL OFL 1.1），只保留這一頁用到的字。做法見 notes/zhuyin.md */
+@font-face{font-family:'M10 Bpmf';src:url(data:font/woff2;base64,__FONT__) format('woff2');font-display:block}
+.zyt{font-family:'M10 Bpmf','PingFang TC',serif;font-weight:400}
+:root{
+  color-scheme:light;
+  --paper:#fbf5e6; --ink:#3b2f2a; --orange:#f08a3c; --teal:#2f9e97; --yellow:#f7c948;
+  --soft:#fffdf7; --dash:#cdbf9c;
+  --cell:min(12vmin,96px);
+  --card:min(10vmin,80px);
+  --wob:255px 18px 225px 18px / 18px 225px 18px 255px;
+  --wob2:18px 225px 18px 255px / 255px 18px 225px 18px;
+}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  background-color:var(--paper);
+  background-image:radial-gradient(rgba(120,90,50,.08) 1px,transparent 1.3px),radial-gradient(rgba(120,90,50,.05) 1px,transparent 1.3px);
+  background-size:18px 18px,27px 27px;background-position:0 0,9px 13px;
+  color:var(--ink);
+  font-family:"PingFang TC","Heiti TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  overflow:hidden;touch-action:manipulation;
+}
+button{font-family:inherit;color:inherit;touch-action:manipulation;cursor:pointer}
+svg{display:block}
+.n{font-family:"PingFang TC","Heiti TC",sans-serif;font-weight:900;color:var(--orange);font-size:1.5em;line-height:1;margin:0 .12em}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:3vmin;padding:2vmin}
+.screen.show{display:flex}
+
+.btn{border:3px solid var(--ink);border-radius:var(--wob2);background:var(--yellow);
+  font-size:clamp(24px,4.2vmin,34px);padding:.35em 1.1em;box-shadow:3px 4px 0 var(--ink);
+  display:inline-flex;align-items:center;gap:.4em;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translate(2px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn:disabled{opacity:.35;box-shadow:none}
+.btn svg{width:1.2em;height:1.2em;flex:none}
+.btn.white{background:#fff}
+.icon-btn{width:64px;height:64px;border:3px solid var(--ink);border-radius:var(--wob);background:#fff;
+  display:flex;align-items:center;justify-content:center;box-shadow:2px 3px 0 var(--ink);padding:0}
+.icon-btn svg{width:36px;height:36px}
+.icon-btn:active{transform:translate(2px,2px);box-shadow:none}
+.badge{border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;padding:.15em .7em;font-size:clamp(20px,3.4vmin,28px);white-space:nowrap}
+
+/* 開始 */
+.backlink{position:absolute;top:14px;left:16px;font-size:18px;font-weight:800;color:var(--ink);text-decoration:none;
+  border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;padding:8px 14px}
+.title{font-size:clamp(34px,7vmin,58px);margin:0;letter-spacing:.04em;font-weight:400}
+.hero{width:min(58vmin,400px)}
+
+/* 畫角色 */
+.draw-head{font-size:clamp(28px,5vmin,40px)}
+#pad{width:min(56vmin,400px);height:min(56vmin,400px);background:#fff;border:4px solid var(--ink);
+  border-radius:var(--wob);touch-action:none}
+.tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+.sw{width:56px;height:56px;border-radius:50%;border:3px solid var(--ink);padding:0}
+.sw.on{outline:5px solid var(--ink);outline-offset:3px}
+.row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center}
+
+/* 遊戲 */
+#play{justify-content:flex-start;gap:0;padding:10px 16px}
+.bar{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.me{width:68px;height:68px;border:3px solid var(--ink);border-radius:50%;background:#fff;flex:none;
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.me img{width:84%;height:84%;object-fit:contain}
+.prompt{flex:1;text-align:center;font-size:clamp(22px,3.8vmin,32px);line-height:1.6;min-height:2.6em;
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap}
+.stage{flex:1;width:100%;display:flex;align-items:center;justify-content:center;gap:5vmin}
+@media (orientation:portrait){.stage{flex-direction:column;gap:3vmin}}
+
+.book{display:grid;grid-template-columns:repeat(3,var(--card));gap:12px;padding:16px;background:var(--soft);
+  border:3px solid var(--ink);border-radius:var(--wob)}
+.card{width:var(--card);height:calc(var(--card)*1.18);border:none;background:none;padding:0;perspective:700px}
+.inner{position:relative;width:100%;height:100%;transition:transform .7s;transform-style:preserve-3d}
+.card.got .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border:3px solid var(--ink);
+  border-radius:var(--wob2);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.front{background:#fff;font-size:calc(var(--card)*.6);font-weight:900;box-shadow:2px 3px 0 var(--ink)}
+.back{background:#e6f5f3;transform:rotateY(180deg);font-weight:900;font-size:calc(var(--card)*.24);line-height:1.15}
+.back img{width:46%;height:40%;object-fit:contain}
+.card.now .front{background:var(--yellow);transform:translateY(-4px)}
+.card:disabled{cursor:default}
+
+.right{display:flex;flex-direction:column;align-items:center;gap:2.4vmin}
+.fwrap{position:relative}
+.frame{display:grid;grid-template-columns:repeat(5,var(--cell));gap:8px;padding:12px;background:#fff;
+  border:4px solid var(--ink);border-radius:var(--wob)}
+.cell{width:var(--cell);height:var(--cell);border:3px dashed var(--dash);border-radius:16px;background:#fffaf0;
+  padding:0;display:flex;align-items:center;justify-content:center}
+.cell img{width:86%;height:86%;object-fit:contain;animation:popin .28s ease-out}
+.cell.add{border:3px solid var(--teal);background:#e6f5f3}
+.cell.flash{animation:flash .45s 3}
+.frame.happy img{animation:wiggle .45s ease-in-out 4}
+.lid{position:absolute;inset:-4px;border:4px solid var(--ink);border-radius:var(--wob);display:none;
+  align-items:center;justify-content:center;font-size:min(14vmin,110px);font-weight:900;color:#fff;
+  background:repeating-linear-gradient(-45deg,#e7a15f 0 18px,#f08a3c 18px 36px)}
+.lid.show{display:flex;animation:popin .25s ease-out}
+.count{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none;
+  font-size:min(16vmin,120px);font-weight:900;color:var(--orange);-webkit-text-stroke:3px var(--ink)}
+.count.show{display:flex}
+
+.eq{display:none;align-items:center;gap:.25em;font-size:min(8vmin,60px);font-weight:900}
+.eq.show{display:flex}
+.box{min-width:1.3em;height:1.3em;padding:0 .15em;border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;
+  display:flex;align-items:center;justify-content:center}
+.box.blank{border-style:dashed;background:#fffaf0}
+.box.ok{background:#e6f5f3;border-style:solid;color:var(--teal)}
+.nums{display:flex;gap:8px;flex-wrap:nowrap;justify-content:center;visibility:hidden}
+.nums.show{visibility:visible}
+.num{width:min(7.6vmin,62px);height:min(8.6vmin,68px);border:3px solid var(--ink);border-radius:var(--wob2);background:#fff;
+  font-size:min(5.5vmin,40px);font-weight:900;box-shadow:2px 3px 0 var(--ink);padding:0}
+.num:active{transform:translate(2px,2px);box-shadow:none}
+.again{display:none}
+
+/* 彈跳視窗 */
+.overlay{position:fixed;inset:0;background:rgba(59,47,42,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:5}
+.overlay.show{display:flex}
+.modal{position:relative;background:var(--paper);border:4px solid var(--ink);border-radius:var(--wob);
+  padding:28px 32px;max-width:640px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.x{position:absolute;top:10px;right:10px;width:52px;height:52px;border:3px solid var(--ink);border-radius:50%;
+  background:#fff;padding:0;display:flex;align-items:center;justify-content:center}
+.x svg{width:24px;height:24px}
+.modal h2{margin:0;font-size:clamp(28px,5vmin,40px);font-weight:400}
+.big-me{width:min(24vmin,160px);height:min(24vmin,160px);object-fit:contain;animation:wiggle .6s ease-in-out infinite}
+.eqs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 22px;font-size:clamp(20px,3.4vmin,28px);font-weight:800}
+.stamp{display:none;border:4px solid #d0508a;color:#d0508a;border-radius:var(--wob2);padding:.2em .8em;
+  font-size:clamp(22px,3.8vmin,30px);transform:rotate(-4deg);background:#fff}
+.stamp.show{display:block}
+
+@keyframes popin{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg) translateY(-4px)}75%{transform:rotate(10deg) translateY(-4px)}}
+@keyframes flash{50%{background:var(--yellow)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- 開始 -->
+<section class="screen show" id="start">
+  <a class="backlink" href="cat-tablet.html#make10">← 回到上一頁</a>
+  <svg class="hero" viewBox="0 0 420 200" aria-hidden="true">
+    <path d="M14 22 C120 14 300 16 406 24 C410 80 408 130 404 180 C300 188 120 186 16 178 C10 120 12 70 14 22Z" fill="#fff" stroke="#3b2f2a" stroke-width="5"/>
+    <path d="M18 100 C140 96 280 104 402 98 M94 24 C96 80 92 130 96 180 M174 22 C176 80 172 130 176 182 M254 22 C256 80 252 130 256 182 M334 24 C336 80 332 130 334 180" fill="none" stroke="#3b2f2a" stroke-width="3"/>
+    <g fill="#f08a3c" stroke="#3b2f2a" stroke-width="3">
+      <circle cx="55" cy="60" r="22"/><circle cx="135" cy="60" r="22"/><circle cx="215" cy="60" r="22"/><circle cx="295" cy="60" r="22"/><circle cx="373" cy="60" r="22"/>
+      <circle cx="55" cy="140" r="22"/><circle cx="135" cy="140" r="22"/>
+    </g>
+    <g fill="#2f9e97" stroke="#3b2f2a" stroke-width="3"><circle cx="215" cy="140" r="22"/><circle cx="295" cy="140" r="22"/><circle cx="373" cy="140" r="22"/></g>
+  </svg>
+  <h1 class="title" id="titleTx"></h1>
+  <div class="badge" id="lvStart"></div>
+  <button class="btn" id="goStart">
+    <svg viewBox="0 0 48 48"><path d="M16 10 L38 24 L16 38 Z" fill="currentColor" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg><span id="startTx"></span>
+  </button>
+</section>
+
+<!-- 畫角色 -->
+<section class="screen" id="draw">
+  <div class="draw-head" id="drawTx"></div>
+  <canvas id="pad"></canvas>
+  <div class="tools" id="tools"></div>
+  <div class="row">
+    <button class="icon-btn" id="clearPad" aria-label="擦掉重畫"><svg viewBox="0 0 48 48"><path d="M12 15h24M19 15v-4h10v4M15 15l2 24h14l2-24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="btn" id="doneDraw" disabled><svg viewBox="0 0 48 48"><path d="M10 25 L20 35 L38 13" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="doneTx"></span></button>
+  </div>
+</section>
+
+<!-- 湊十 -->
+<section class="screen" id="play">
+  <div class="bar">
+    <div class="me"><img id="meImg" alt="我的角色"></div>
+    <div class="prompt" id="prompt"></div>
+    <div class="badge" id="lvPlay"></div>
+  </div>
+  <div class="stage">
+    <div class="book" id="book"></div>
+    <div class="right">
+      <div class="fwrap">
+        <div class="frame" id="frame"></div>
+        <div class="lid" id="lid">?</div>
+        <div class="count" id="count"></div>
+      </div>
+      <div class="eq" id="eq"></div>
+      <div class="nums" id="nums"></div>
+      <button class="btn again" id="again"></button>
+    </div>
+  </div>
+</section>
+
+<!-- 完成視窗 -->
+<div class="overlay" id="doneBox">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="x" id="closeDone" aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M5 5L19 19M19 5L5 19" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></button>
+    <img class="big-me" id="bigMe" alt="">
+    <h2 id="doneTitle"></h2>
+    <div class="eqs" id="eqs"></div>
+    <div class="stamp" id="stamp"></div>
+    <div class="row">
+      <button class="btn" id="playAgain"></button>
+      <button class="btn white" id="redraw"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+{
+/* ---------- 等級：網址後面加 ?level=1～5（老師用 make10-qr.html 產生 QR Code） ---------- */
+const LV = Math.min(5, Math.max(1, parseInt(new URLSearchParams(location.search).get('level'), 10) || 1));
+const COLORS = ['#7a4a24','#2b2b2b','#e0584a','#3a6fd8','#f2b33d'];
+const CARD_INK = ['#e0584a','#f08a3c','#c9971b','#2f9e97','#3a6fd8','#7b5bc7','#d0508a','#7a4a24','#3b2f2a'];
+
+/* ---------- 注音（同 mulpic.html 的做法） ----------
+   先用「詞」查 WORDS（處理破音字），查不到才查單字 ZY。
+   「一」照課本變調：後面是四聲或輕聲 → ㄧˊ；一、二、三聲 → ㄧˋ；後面沒有字 → ㄧ。
+   要加新的字：先加進表裡，再重新產生字型（notes/zhuyin.md）。 */
+const WORDS = {
+  '一個':'ㄧˊ ˙ㄍㄜ', '角色':'ㄐㄧㄠˇ ㄙㄜˋ', '數字':'ㄕㄨˋ ㄗˋ', '格子':'ㄍㄜˊ ˙ㄗ', '還要':'ㄏㄞˊ ㄧㄠˋ',
+  '空格':'ㄎㄨㄥˋ ㄍㄜˊ', '重畫':'ㄔㄨㄥˊ ㄏㄨㄚˋ', '挑戰':'ㄊㄧㄠˇ ㄓㄢˋ', '知道':'ㄓ ㄉㄠˋ',
+};
+const ZY = {
+  '我':'ㄨㄛˇ','的':'˙ㄉㄜ','湊':'ㄘㄡˋ','十':'ㄕˊ','工':'ㄍㄨㄥ','廠':'ㄔㄤˇ','開':'ㄎㄞ','始':'ㄕˇ','第':'ㄉㄧˋ','級':'ㄐㄧˊ',
+  '畫':'ㄏㄨㄚˋ','一':'ㄧ','個':'ㄍㄜˋ','你':'ㄋㄧˇ','好':'ㄏㄠˇ','了':'˙ㄌㄜ','選':'ㄒㄩㄢˇ','張':'ㄓㄤ','卡':'ㄎㄚˇ','再':'ㄗㄞˋ',
+  '這':'ㄓㄜˋ','裡':'ㄌㄧˇ','有':'ㄧㄡˇ','把':'ㄅㄚˇ','補':'ㄅㄨˇ','滿':'ㄇㄢˇ','幾':'ㄐㄧˇ','對':'ㄉㄨㄟˋ','才':'ㄘㄞˊ','會':'ㄏㄨㄟˋ',
+  '看':'ㄎㄢˋ','圖':'ㄊㄨˊ','空':'ㄎㄨㄥ','填':'ㄊㄧㄢˊ','藍':'ㄌㄢˊ','色':'ㄙㄜˋ','記':'ㄐㄧˋ','住':'ㄓㄨˋ','蓋':'ㄍㄞˋ','下':'ㄒㄧㄚˋ',
+  '偷':'ㄊㄡ','玩':'ㄨㄢˊ','可':'ㄎㄜˇ','以':'ㄧˇ','拿':'ㄋㄚˊ','給':'ㄍㄟˇ','老':'ㄌㄠˇ','師':'ㄕ','就':'ㄐㄧㄡˋ','全':'ㄑㄩㄢˊ',
+  '部':'ㄅㄨˋ','都':'ㄉㄡ','收':'ㄕㄡ','集':'ㄐㄧˊ','算':'ㄙㄨㄢˋ','加':'ㄐㄧㄚ','等':'ㄉㄥˇ','於':'ㄩˊ','要':'ㄧㄠˋ','格':'ㄍㄜˊ',
+};
+/* 字型裡每個字的讀音順序（第 1 個是預設讀音；第 k+1 個要在字後面加 U+E01E0+k）；由建置程式從 bpmfvs 讀音表產生 */
+const BPMF = __BPMF__;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isHan = ch => /[㐀-鿿]/.test(ch);
+function yiTone(next){
+  if (!next || !next.py) return 'ㄧ';
+  const p = next.py, t = p[p.length-1];
+  return t === 'ˋ' || p[0] === '˙' ? 'ㄧˊ' : 'ㄧˋ';
+}
+function zy(str){
+  const ch = [...String(str)], seq = [];
+  for (let i = 0; i < ch.length;){
+    let hit = null;
+    for (let L = 3; L >= 2 && !hit; L--){ const w = ch.slice(i, i+L).join(''); if (w.length === L && WORDS[w]) hit = [w, WORDS[w].split(' ')]; }
+    if (hit){ [...hit[0]].forEach((c,k) => seq.push({c, py:hit[1][k]})); i += [...hit[0]].length; continue; }
+    const c = ch[i]; seq.push({c, py: isHan(c) ? ZY[c] || null : null}); i++;
+  }
+  seq.forEach((x,i) => { if (x.c === '一') x.py = yiTone(seq[i+1]); });
+  return '<span class="zyt">' + seq.map(x => {
+    if (!x.py) return esc(x.c);
+    const k = (BPMF[x.c] || []).indexOf(x.py);
+    return k > 0 ? x.c + String.fromCodePoint(0xE01E0 + k) : x.c;
+  }).join('') + '</span>';
+}
+/* 文字裡的數字寫成 {數字}，會換成醒目的大數字 */
+const T = s => String(s).split(/(\{[^}]*\})/).map(p => p[0] === '{' ? `<span class="n">${esc(p.slice(1,-1))}</span>` : (p ? zy(p) : '')).join('');
+
+const $ = s => document.querySelector(s);
+const put = (sel, s) => { $(sel).innerHTML = T(s); };
+put('#titleTx', '我的湊十工廠'); put('#startTx', '開始'); put('#drawTx', '畫一個你的角色'); put('#doneTx', '畫好了');
+put('#lvStart', `第{${LV}}級`); put('#lvPlay', `第{${LV}}級`);
+put('#again', '再玩一次'); put('#playAgain', '再玩一次'); put('#redraw', '重畫角色'); put('#doneTitle', '{9}張都收集好了！');
+put('#stamp', '可以挑戰下一級了！拿給老師看');
+
+/* ---------- 音效（只有小小的「啵」，沒有語音、沒有刺耳的錯誤音） ---------- */
+let actx = null;
+function pop(f){
+  try{
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f*1.5, t+.08);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.22, t+.01); g.gain.exponentialRampToValueAtTime(.0001, t+.16);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+.17);
+  }catch(e){}
+}
+function show(id){ document.querySelectorAll('.screen').forEach(s => s.classList.toggle('show', s.id === id)); }
+const say = s => put('#prompt', s);
+
+/* ---------- 畫角色 ---------- */
+const cv = $('#pad'), ctx = cv.getContext('2d');
+const LW = 14;
+let dpr = 1, color = COLORS[0], drawing = false, strokes = 0, bb = null, cssW = 0, charURL = null;
+$('#tools').innerHTML = COLORS.map((c,i) =>
+  `<button class="sw${i===0?' on':''}" data-c="${c}" style="background:${c}" aria-label="顏色"></button>`).join('');
+$('#tools').addEventListener('click', e => {
+  const b = e.target.closest('.sw'); if (!b) return;
+  color = b.dataset.c;
+  document.querySelectorAll('.sw').forEach(s => s.classList.toggle('on', s === b));
+});
+function setupPad(){
+  const r = cv.getBoundingClientRect();
+  dpr = window.devicePixelRatio || 1; cssW = r.width;
+  cv.width = Math.round(r.width*dpr); cv.height = Math.round(r.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = LW;
+  clearPad();
+}
+function clearPad(){ ctx.clearRect(0,0,cv.width,cv.height); strokes = 0; bb = null; $('#doneDraw').disabled = true; }
+function grow(x,y){
+  if (!bb) bb = {x0:x,y0:y,x1:x,y1:y};
+  bb.x0 = Math.min(bb.x0,x); bb.y0 = Math.min(bb.y0,y); bb.x1 = Math.max(bb.x1,x); bb.y1 = Math.max(bb.y1,y);
+}
+function pt(e){ const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+cv.addEventListener('pointerdown', e => {
+  e.preventDefault(); cv.setPointerCapture(e.pointerId); drawing = true;
+  const [x,y] = pt(e); ctx.strokeStyle = color;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+.1,y+.1); ctx.stroke(); grow(x,y);
+});
+cv.addEventListener('pointermove', e => {
+  if (!drawing) return; e.preventDefault();
+  const [x,y] = pt(e); ctx.lineTo(x,y); ctx.stroke(); grow(x,y);
+});
+const endStroke = () => { if (!drawing) return; drawing = false; strokes++; $('#doneDraw').disabled = false; };
+cv.addEventListener('pointerup', endStroke);
+cv.addEventListener('pointercancel', endStroke);
+function exportChar(){
+  const p = LW, x0 = Math.max(0, bb.x0-p), y0 = Math.max(0, bb.y0-p);
+  const x1 = Math.min(cssW, bb.x1+p), y1 = Math.min(cssW, bb.y1+p);
+  const w = Math.max(1, x1-x0), h = Math.max(1, y1-y0);
+  const S = 256, out = document.createElement('canvas'); out.width = out.height = S;
+  const sc = Math.min(224/w, 224/h, 2.5), dw = w*sc, dh = h*sc;
+  out.getContext('2d').drawImage(cv, x0*dpr, y0*dpr, w*dpr, h*dpr, (S-dw)/2, (S-dh)/2, dw, dh);
+  return out.toDataURL('image/png');
+}
+function goDraw(){ show('draw'); setupPad(); }
+$('#clearPad').addEventListener('click', clearPad);
+$('#doneDraw').addEventListener('click', () => {
+  if (!strokes) return;
+  charURL = exportChar();
+  $('#meImg').src = charURL; $('#bigMe').src = charURL;
+  startRound();
+});
+
+/* ---------- 收集冊、十格框、算式 ---------- */
+const frame = $('#frame'), book = $('#book'), nums = $('#nums'), eq = $('#eq'), lid = $('#lid'), count = $('#count');
+frame.innerHTML = Array.from({length:10}, (_,i) => `<button class="cell" data-i="${i}" aria-label="格子"></button>`).join('');
+nums.innerHTML = Array.from({length:9}, (_,i) => `<button class="num" data-k="${i+1}">${i+1}</button>`).join('');
+const cells = [...frame.children];
+let collected = new Set(), cur = null, phase = 'pick', misses = 0, timers = [];
+const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
+function stopTimers(){ timers.forEach(clearTimeout); timers = []; }
+function img(){ const m = new Image(); m.src = charURL; m.alt = ''; return m; }
+
+function renderBook(){
+  book.innerHTML = Array.from({length:9}, (_,i) => {
+    const n = i+1, got = collected.has(n);
+    return `<button class="card${got?' got':''}" data-n="${n}" ${got?'disabled':''} aria-label="${n}">
+      <div class="inner">
+        <div class="face front" style="color:${CARD_INK[i]}">${n}</div>
+        <div class="face back"><img src="${charURL}" alt="">${n}+${10-n}<br>=10</div>
+      </div></button>`;
+  }).join('');
+}
+function clearFrame(){
+  cells.forEach(c => { c.className = 'cell'; c.innerHTML = ''; });
+  frame.classList.remove('happy'); lid.classList.remove('show'); count.classList.remove('show');
+  eq.classList.remove('show'); nums.classList.remove('show');
+}
+function setEq(){
+  const n = cur.n, blank = '<div class="box blank" id="blank"></div>', known = `<div class="box">${n}</div>`;
+  eq.innerHTML = (cur.front ? blank + '<span>+</span>' + known : known + '<span>+</span>' + blank) + '<span>=</span><div class="box">10</div>';
+  eq.classList.add('show');
+}
+function startRound(){
+  stopTimers(); collected = new Set(); cur = null; phase = 'pick'; misses = 0;
+  renderBook(); clearFrame(); $('#again').style.display = 'none';
+  show('play'); say('選一張數字卡');
+}
+book.addEventListener('click', e => {
+  const b = e.target.closest('.card'); if (!b || phase !== 'pick') return;
+  const n = +b.dataset.n; if (collected.has(n)) return;
+  cur = {n, added:0, front: LV === 5 && Math.random() < .5};
+  phase = 'busy'; b.classList.add('now'); clearFrame(); $('#prompt').innerHTML = '';
+  if (LV === 5){                       /* 只有算式：圖先放好、蓋起來 */
+    for (let i = 0; i < n; i++) cells[i].appendChild(img());
+    lid.classList.add('show'); setEq(); askEq('空格要填幾？');
+    return;
+  }
+  let i = 0;
+  const step = () => {
+    cells[i].appendChild(img()); pop(520 + i*40); i++;
+    if (i < n) later(step, 260); else later(afterPlace, 350);
+  };
+  step();
+});
+function afterPlace(){
+  const n = cur.n;
+  if (LV === 1){ phase = 'fill'; say(`這裡有{${n}}個，把格子補滿`); }
+  else if (LV === 2){ phase = 'guess'; nums.classList.add('show'); say(`這裡有{${n}}個，還要幾個才會滿{10}？`); }
+  else if (LV === 3){ setEq(); askEq('看圖，空格要填幾？'); }
+  else {                               /* 第 4 級：看 3 秒，蓋起來 */
+    say('記住有幾個！');
+    let s = 3; count.textContent = s; count.classList.add('show');
+    const tick = () => {
+      s--;
+      if (s > 0){ count.textContent = s; later(tick, 1000); return; }
+      count.classList.remove('show'); lid.classList.add('show'); setEq(); askEq('格子蓋住了，空格要填幾？');
+    };
+    later(tick, 1000);
+  }
+}
+function askEq(s){ phase = 'eq'; nums.classList.add('show'); say(s); }
+
+frame.addEventListener('click', e => {
+  const c = e.target.closest('.cell'); if (!c || phase !== 'fill' || c.firstChild) return;
+  addOne(c);
+  if (cur.n + cur.added === 10){ phase = 'count'; nums.classList.add('show'); say('你補了幾個？'); }
+});
+function addOne(c){ c.classList.add('add'); c.appendChild(img()); cur.added++; pop(700 + cur.added*40); }
+function flash(list){ list.forEach(c => { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }); }
+function autoFill(then){
+  const empty = cells.filter(c => !c.firstChild); let i = 0;
+  if (!empty.length) return later(then, 300);
+  const step = () => { addOne(empty[i++]); if (i < empty.length) later(step, 240); else later(then, 300); };
+  step();
+}
+nums.addEventListener('click', e => {
+  const b = e.target.closest('.num'); if (!b) return;
+  const k = +b.dataset.k, m = 10 - cur.n, right = k === m;
+  if (phase === 'count'){              /* 第 1 級：補完之後回答 */
+    if (right) return win();
+    misses++; flash(cells.filter(c => c.classList.contains('add'))); say('算算看，藍色的格子有幾個？');
+  } else if (phase === 'guess'){       /* 第 2 級：先猜再補 */
+    nums.classList.remove('show');
+    if (right){ phase = 'busy'; autoFill(win); }
+    else { misses++; phase = 'fill'; say('補補看就知道，把格子補滿'); }
+  } else if (phase === 'eq'){          /* 第 3～5 級：填算式的空格 */
+    if (right){
+      phase = 'busy'; nums.classList.remove('show');
+      const bl = $('#blank'); bl.textContent = k; bl.classList.add('ok');
+      lid.classList.remove('show'); autoFill(win);
+      return;
+    }
+    misses++;
+    if (lid.classList.contains('show')){ lid.classList.remove('show'); say(LV === 4 ? '偷看一下，空格要填幾？' : '看圖，空格要填幾？'); }
+    else { flash(cells.filter(c => !c.firstChild)); say('算算看，空的格子有幾個？'); }
+  }
+});
+function win(){
+  phase = 'yay'; nums.classList.remove('show');
+  const n = cur.n, m = 10 - n;
+  frame.classList.add('happy'); pop(880); later(() => pop(1100), 140);
+  say(`對了！{${n}}加{${m}}等於{10}`);
+  collected.add(n);
+  const card = book.querySelector(`.card[data-n="${n}"]`);
+  card.classList.remove('now'); card.classList.add('got'); card.disabled = true;
+  later(() => {
+    clearFrame(); cur = null;
+    if (collected.size === 9){ phase = 'done'; openDone(); }
+    else { phase = 'pick'; say('再選一張數字卡'); }
+  }, 2600);
+}
+
+/* ---------- 完成視窗 ---------- */
+function openDone(){
+  $('#eqs').innerHTML = Array.from({length:9}, (_,i) => `<div>${i+1} + ${9-i} = 10</div>`).join('');
+  $('#stamp').classList.toggle('show', LV < 5 && misses <= 1);
+  $('#doneBox').classList.add('show');
+}
+function closeDone(){
+  $('#doneBox').classList.remove('show');
+  if (phase === 'done'){ say('全部都收集好了！'); $('#again').style.display = 'inline-flex'; }
+}
+$('#closeDone').addEventListener('click', closeDone);
+$('#doneBox').addEventListener('click', e => { if (e.target.id === 'doneBox') closeDone(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#doneBox').classList.contains('show')) closeDone(); });
+$('#playAgain').addEventListener('click', () => { $('#doneBox').classList.remove('show'); startRound(); });
+$('#again').addEventListener('click', startRound);
+$('#redraw').addEventListener('click', () => { $('#doneBox').classList.remove('show'); stopTimers(); goDraw(); });
+$('#goStart').addEventListener('click', () => { pop(600); goDraw(); });
+}
+</script>
+</body>
+</html>
