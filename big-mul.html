@@ -63,7 +63,8 @@ main>section{flex:1;min-height:0}
 .gcard.on{background:#FFF6C7;box-shadow:0 0 0 6px var(--gold),6px 6px 0 var(--ink)}
 .panel{background:var(--card);border:4px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:16px 26px;display:grid;gap:12px;align-content:start;flex:1}
 .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.lab{font:900 26px var(--f-body);width:150px;flex:none}
+.lab{font:900 26px var(--f-body);width:156px;flex:none;display:flex;align-items:center}
+.lab .qm{margin-left:auto}
 .seg{display:flex;gap:10px;flex-wrap:wrap}
 .opt{font:700 26px var(--f-body);min-width:96px;padding:6px 18px;border:4px solid var(--ink);border-radius:14px;background:var(--card);box-shadow:3px 3px 0 var(--ink)}
 .opt.num{font:600 30px var(--f-num);min-width:74px;padding:2px 10px}
@@ -72,7 +73,25 @@ main>section{flex:1;min-height:0}
 .quick{font:700 20px var(--f-body);padding:4px 14px;border:3px solid var(--ink);border-radius:999px;background:var(--paper)}
 .names{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;flex:1}
 .nm{display:flex;align-items:center;gap:10px;border:4px solid var(--ink);border-radius:14px;padding:4px 12px;background:var(--l)}
-.nm .dot{width:26px;height:26px;border-radius:50%;background:var(--c);border:3px solid var(--ink);flex:none}
+.nm .mk{width:30px;height:30px;flex:none}
+.mk{display:block;flex:none;overflow:visible}
+.zhead .zmk{width:38px;height:38px}
+.rcard .top .rmk{width:52px;height:52px}
+.lane .ln{display:flex;align-items:center;gap:8px}
+.lane .ln .lmk{width:26px;height:26px}
+.ht .hmk{width:24px;height:24px}
+.ctot{font:600 52px var(--f-num);background:#DDF6E8;border:4px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:0 22px;white-space:nowrap}
+.ctot small{font:900 24px var(--f-body);color:var(--ink-soft);margin:0 6px}
+.rcol.coop .rcard{margin-top:24px}
+/* 看算式找圖：題目只有算式，地鼠拿著圖 */
+.zone.rev.c-concept.g-mole .zq{height:240px}
+.zone.rev.c-concept.g-mole .qline{font-size:100px;margin-bottom:30px}
+.zone.rev .mole .mn .mpic b i{width:13px;height:13px}
+.zone.rev .qline .slot{min-width:1.1em}
+.zone.rev .mole .mn{padding:4px;font-size:0;background:#fff}
+.zone.rev .mole .mn .mpic{border:0;box-shadow:none;padding:2px;max-width:200px}
+.n3 .zone.rev .mole .mn .mpic{max-width:170px}
+.zone.rev .mole.hit .mn,.zone.rev .mole.bad .mn{border-width:6px}
 .nm input{font:700 26px var(--f-body);border:0;background:transparent;width:100%;min-width:0;color:var(--ink);outline:none}
 .nm.off{opacity:.3}
 .hint{font:700 20px var(--f-body);color:var(--ink-soft);line-height:1.5;margin:0}
@@ -320,7 +339,7 @@ main>section{flex:1;min-height:0}
 
 /* ---------- 出題：精熟練習、各隊同題 ---------- */
 .opt.weak.on{background:#FFD7A8}
-.weakline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 0 164px}
+.weakline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 0 170px}
 .weakline .wq{font:600 24px var(--f-num);background:#FFF1F1;border:3px solid var(--bad);border-radius:10px;padding:0 10px}
 .fixed{font:600 30px var(--f-num);border:4px solid var(--ink);border-radius:14px;background:var(--hl);padding:2px 16px}
 
@@ -363,48 +382,46 @@ main>section{flex:1;min-height:0}
 .qm.big{font-size:30px}
 .kbtn{font:400 34px/1 var(--f-body);width:58px;height:50px;border:3px solid var(--ink-soft);border-radius:12px;background:var(--card);color:var(--ink-soft);padding:0}
 .quick.on{background:var(--hl)}
-/* 導覽、說明裡的示意動畫（每 5 秒重播一次） */
+/* 導覽、說明裡的示意動畫：用遊戲本身的畫面元件，縮小放進說明框；每 5 秒重播一次 */
 .dm{font:700 22px var(--f-body);color:var(--ink);display:grid;gap:10px;justify-items:center}
-.dm b,.dm em{font-style:normal}
-.dm-class{display:flex;gap:8px}
-.dm-class b,.dm-t b{font:600 30px/1 var(--f-num);width:46px;height:46px;display:grid;place-items:center;background:#fff;border:3px solid var(--ink);border-radius:10px}
-.dm-class b.away{animation:dmAway 5s infinite}
-@keyframes dmAway{0%,15%{background:#fff;color:var(--ink);text-decoration:none}25%,100%{background:var(--dim);color:var(--ink-soft);text-decoration:line-through}}
-.dm-arrow{color:var(--ink-soft);font-size:20px}
-.dm-teams{display:flex;gap:18px}
-.dm-t{display:flex;align-items:center;gap:6px;background:var(--l);border:3px solid var(--c);border-radius:12px;padding:6px 10px}
-.dm-t i{font-style:normal;font-weight:900;color:var(--c);margin-right:4px}
-.dm-t b{animation:dmIn 5s infinite;animation-delay:calc(var(--d) * .25s)}
+.dmw{position:relative;overflow:hidden;pointer-events:none;line-height:normal}
+.dmin{position:absolute;left:0;top:0;transform-origin:0 0}
+.dmin .zone,.dmin .mz{box-shadow:4px 4px 0 var(--ink)}
+.dmin .zq{flex:1}
+.dmin .cq{padding:8px 10px 44px}
+.dmin .qline{font-size:96px}
+.dmin .c-concept .qline{font-size:80px}
+.dmin .zmsg{font-size:30px}
+.dm-two{display:grid;grid-template-columns:1fr 1fr;gap:20px;height:100%}
+.dm-ab{display:grid}
+.dm-ab>*{grid-area:1/1;display:flex;flex-direction:column;align-items:center}
+.dm-a{animation:dmA 5s infinite}
+.dm-b{animation:dmB 5s infinite}
+@keyframes dmA{0%,42%{opacity:1}48%,96%{opacity:0}100%{opacity:1}}
+@keyframes dmB{0%,42%{opacity:0}48%,96%{opacity:1}100%{opacity:0}}
+.dm-win{animation:dmWin 5s infinite}
+@keyframes dmWin{0%,42%,96%,100%{box-shadow:4px 4px 0 var(--ink)}48%,90%{box-shadow:0 0 0 10px var(--good),4px 4px 0 var(--ink)}}
+.swap.dm-show{animation:dmB 5s infinite}
+.swap.dm-show .box{animation:none}
+.dm-grp{display:grid;gap:16px;height:100%;grid-template-rows:auto auto 1fr}
+.dm-grp .seatgrid span{font:600 34px var(--f-num);border:4px solid var(--ink);border-radius:14px;background:#fff;box-shadow:3px 3px 0 var(--ink);padding:4px 0;text-align:center}
+.dm-grp .dm-away{animation:dmAway 5s infinite}
+@keyframes dmAway{0%,15%{background:#fff;color:var(--ink);text-decoration:none}25%,100%{background:var(--dim);color:var(--ink-soft);text-decoration:line-through;box-shadow:none}}
+.dm-grp .mz{border-width:4px}
+.dm-in{animation:dmIn 5s infinite;animation-delay:calc(var(--d) * .25s)}
 @keyframes dmIn{0%,35%{opacity:0;transform:scale(.4)}45%,100%{opacity:1;transform:none}}
-.dm-z{position:relative;width:300px;background:var(--l);border:3px solid var(--ink);border-radius:12px;overflow:hidden}
-.dm-h{background:var(--c);color:#fff;font-weight:900;padding:4px 10px;display:flex;justify-content:space-between}
-.dm-h span{background:#fff;color:var(--ink);border-radius:999px;padding:0 8px;font-size:18px}
-.dm-q{font:600 40px/1.6 var(--f-num);text-align:center}
-.dm-q u{text-decoration:none;color:var(--good)}
-.dm-pop{position:absolute;inset:34px 0 0;background:rgba(27,40,54,.7);display:grid;place-items:center;align-content:center;gap:4px;color:#fff;animation:dmPop 5s infinite}
-.dm-pop b{font:700 30px var(--f-display);color:#FFE066}
-.dm-pop em{font:600 34px var(--f-num);color:#FFE066}
-.dm-pop span{background:var(--hl);color:var(--ink);border:3px solid var(--ink);border-radius:10px;padding:0 12px;font-size:18px}
-@keyframes dmPop{0%,40%{opacity:0;transform:scale(.8)}50%,90%{opacity:1;transform:none}100%{opacity:0}}
-.dm-same{display:flex;gap:14px}
-.dm-same .dm-z{width:220px}
-.dm-r{text-align:center;font-weight:900;height:34px;animation:dmR 5s infinite}
-.dm-z.win .dm-r{color:var(--good)}
-.dm-z.lose .dm-r{color:var(--ink-soft)}
-.dm-z.win{animation:dmWin 5s infinite}
-@keyframes dmR{0%,40%{opacity:0}50%,95%{opacity:1}100%{opacity:0}}
-@keyframes dmWin{0%,40%,95%,100%{box-shadow:none}50%,90%{box-shadow:0 0 0 5px var(--good)}}
-.dm-wl{display:flex;gap:10px}
-.dm-wl span{font:600 30px var(--f-num);background:#FFF1F1;border:3px solid var(--bad);border-radius:10px;padding:0 10px;animation:beat 1.6s infinite}
-.dm-steps{display:flex;align-items:center;gap:10px}
-.dm-steps b{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:2px 10px}
-.dm-steps i{font-style:normal;color:var(--ink-soft)}
-.dm-plates{display:flex;gap:14px}
-.dm-plates span{display:grid;grid-template-columns:repeat(2,18px);gap:6px;padding:10px 16px;background:#FFF4E0;border:3px solid var(--ink);border-radius:50%/40%}
-.dm-plates i{width:18px;height:18px;border-radius:50%;background:var(--bad)}
-.dm-eq{display:flex;align-items:flex-start;gap:14px;font:600 44px/1 var(--f-num)}
-.dm-eq b{display:grid;justify-items:center;gap:4px}
-.dm-eq small{font:700 18px/1.3 var(--f-body);color:var(--ink-soft);text-align:center}
+.dm-arrow{color:var(--ink-soft);font:900 28px var(--f-body);text-align:center}
+.dm-rv{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;height:100%}
+.dm-rv .rv{min-height:0;height:100%;justify-content:center}
+.dm-rv .rpic{--e:20px}
+.dm-ca{display:grid;justify-items:center;gap:14px}
+.dm-eq{display:flex;align-items:flex-start;gap:18px;font:600 80px/1 var(--f-num)}
+.dm-eq b{display:grid;justify-items:center;gap:6px;font-weight:600}
+.dm-eq .op{color:var(--ink-soft);margin-top:10px}
+.dm-eq small{font:700 24px/1.3 var(--f-body);color:var(--ink-soft);text-align:center}
+.dm-coop{display:grid;gap:18px;justify-items:center}
+.dm-coop .dm-two{width:100%}
+.dm-coop .zone{height:auto}
 .dm-keys p{margin:0;font-size:24px}
 .dm-keys kbd{font:600 22px var(--f-num);border:3px solid var(--ink);border-radius:8px;padding:0 10px;background:#fff;box-shadow:0 3px 0 var(--ink);margin-right:8px}
 </style>
@@ -413,8 +430,9 @@ main>section{flex:1;min-height:0}
 <body>
 <div id="stage">
   <header class="bar">
-    <div class="brand"><span class="tag" id="tag">×</span><h1 id="title">乘法心算大會戰</h1><span class="ver">教師大屏 v2.2</span></div>
+    <div class="brand"><span class="tag" id="tag">×</span><h1 id="title">乘法心算大會戰</h1><span class="ver">教師大屏 v2.3</span></div>
     <div class="spacer"></div>
+    <div class="ctot" id="coopTot" hidden></div>
     <div class="timer" id="timer" hidden>3:00</div>
     <button class="btn" id="soundBtn" type="button">🔊 聲音</button>
     <button class="btn" id="fsBtn" type="button">⛶ 全螢幕</button>
@@ -435,8 +453,8 @@ main>section{flex:1;min-height:0}
       <div class="col">
         <h2 class="h2"><i>2</i>設定</h2>
         <div class="panel">
-          <div class="row"><span class="lab">比賽方式</span><div class="seg" id="modeSeg"></div><span class="lab" style="width:auto;margin-left:36px">幾方對抗</span><div class="seg" id="nSeg"></div></div>
-          <div class="row" style="align-items:flex-start"><span class="lab" style="padding-top:8px"><span id="tabLab">乘法範圍</span><button class="qm" type="button" data-help="ca" id="caHelp" aria-label="說明">?</button></span>
+          <div class="row"><span class="lab">比賽方式<button class="qm" type="button" data-help="coop" aria-label="說明">?</button></span><div class="seg" id="modeSeg"></div><span class="lab" style="width:auto;margin-left:28px" id="nLab">幾方對抗</span><div class="seg" id="nSeg"></div></div>
+          <div class="row" style="align-items:flex-start"><span class="lab" style="margin-top:8px"><span id="tabLab">乘法範圍</span><button class="qm" type="button" data-help="ca" id="caHelp" aria-label="說明">?</button></span>
             <div style="display:grid;gap:10px;flex:1">
               <div class="seg" id="tabSeg"></div>
               <div class="seg" id="quickSeg"></div>
@@ -447,6 +465,7 @@ main>section{flex:1;min-height:0}
           <div class="row" id="sameRow"><span class="lab">各隊題目<button class="qm" type="button" data-help="same" aria-label="說明">?</button></span><div class="seg" id="sameSeg"></div></div>
           <div class="row" id="goalRow"><span class="lab" id="goalLab">終點</span><div class="seg" id="goalSeg"></div>
             <span class="own">自己訂</span><div class="stepper" data-k="goal"><button type="button" data-step="-1">▼</button><input type="number" inputmode="numeric" data-in="goal"><button type="button" data-step="1">▲</button></div><span class="own" id="goalUnit">題</span></div>
+          <div class="row" id="revRow" hidden><span class="lab">題目方向</span><div class="seg" id="revSeg"></div></div>
           <div class="row" id="timeRow"><span class="lab">時間</span><div class="seg" id="timeSeg"></div>
             <span class="own">自己訂</span><div class="stepper" data-k="time"><button type="button" data-step="-5">▼</button><input type="number" inputmode="numeric" data-in="time"><button type="button" data-step="5">▲</button></div><span class="own">秒</span></div>
           <div class="row" id="swapRow"><span class="lab">換人提醒<button class="qm" type="button" data-help="swap" aria-label="說明">?</button></span><div class="seg" id="swapSeg"></div>
@@ -512,10 +531,17 @@ const fmt = s => { s = Math.max(0, Math.ceil(s)); return `${Math.floor(s / 60)}:
 
 /* ---------- 參數 ---------- */
 const TEAMS = [
-  {c:'#E5484D', m:'#F59A9C', l:'#FDE3E4', team:'紅隊', solo:'紅方'},
-  {c:'#3A9FEF', m:'#93CBF6', l:'#DDF0FF', team:'藍隊', solo:'藍方'},
-  {c:'#1FA963', m:'#7BD6A3', l:'#DDF6E8', team:'綠隊', solo:'綠方'},
+  {c:'#E5484D', m:'#F59A9C', l:'#FDE3E4', team:'紅隊', solo:'紅方', shape:'tri'},
+  {c:'#3A9FEF', m:'#93CBF6', l:'#DDF0FF', team:'藍隊', solo:'藍方', shape:'dot'},
+  {c:'#1FA963', m:'#7BD6A3', l:'#DDF6E8', team:'綠隊', solo:'綠方', shape:'sq'},
 ];
+/* 每一隊除了顏色，再加一個形狀（紅▲、藍●、綠■）：分不清紅綠的孩子也認得出自己的隊 */
+const SHAPE = {
+  tri:(f, w) => `<path d="M12 2.5 L22.5 20.5 H1.5 Z" fill="${f}" stroke="#1B2836" stroke-width="${w}" stroke-linejoin="round"/>`,
+  dot:(f, w) => `<circle cx="12" cy="12.5" r="9.5" fill="${f}" stroke="#1B2836" stroke-width="${w}"/>`,
+  sq:(f, w) => `<rect x="3" y="3.5" width="18" height="18" rx="2.5" fill="${f}" stroke="#1B2836" stroke-width="${w}"/>`,
+};
+const mark = (i, fill, cls = '') => `<svg class="mk ${cls}" viewBox="0 0 24 24" aria-hidden="true">${SHAPE[(TEAMS[i] || TEAMS[0]).shape](fill || TEAMS[i].c, 2.4)}</svg>`;
 /* 兩個主題（大屏專區 → 主題 → 四種玩法） */
 const TOPICS = {
   calc:   {name:'乘法心算大會戰', tag:'×', back:'cat-big.html#big-calc'},
@@ -534,7 +560,7 @@ const GAMES = {
   meteor:{name:'乘法流星雨', kind:'time', ns:[2,3], defTime:60,
           desc:{calc:'各自守住自己的天空，時間到，打碎最多流星的贏！', concept:'流星上有圖，打出「被乘數、乘數」打碎它，時間到，打碎最多的贏！'}},
   mole:  {name:'乘法打地鼠', kind:'time', ns:[2,3], defTime:60,
-          desc:{calc:'敲出拿著正確答案的地鼠，時間到，敲最多隻的贏！', concept:'看圖，敲出拿著正確算式的地鼠，時間到，敲最多隻的贏！'}},
+          desc:{calc:'敲出拿著正確答案的地鼠，時間到，敲最多隻的贏！', concept:'看圖，敲出拿著正確算式的地鼠，時間到，敲最多隻的贏！', rev:'看算式，敲出拿著正確的圖的地鼠，時間到，敲最多隻的贏！'}},
 };
 /* 認識乘法的圖：c＝一份的單位、n＝東西、u＝單位（和「認識乘法」練習頁一樣） */
 const PIC_THINGS = [
@@ -563,6 +589,7 @@ try { Object.assign(S, JSON.parse(localStorage.getItem('bigmul.v1') || '{}')); }
 const clampInt = (v, lo, hi) => Math.min(hi, Math.max(lo, Math.round(+v)));
 const okInt = (v, lo, hi) => Number.isFinite(+v) && +v >= lo && +v <= hi;
 if (S.game === 'tower') S.game = 'stack';
+if (!['team', 'solo', 'coop'].includes(S.mode)) S.mode = 'team';
 if (!GAMES[S.game]) S.game = 'race';
 if (!TOPICS[S.topic]) S.topic = 'calc';
 if (!['normal', 'weak'].includes(S.src)) S.src = 'normal';
@@ -614,7 +641,8 @@ const SND = {
 };
 
 /* ---------- 圖 ---------- */
-function critter(c){
+function critter(c, si){
+  const sh = si == null ? '' : `<g transform="translate(30 62) scale(1.05)">${SHAPE[TEAMS[si].shape]('#fff', 2.6)}</g>`;   // 肚子上的隊伍形狀
   return `<svg class="cr" viewBox="0 0 120 120" aria-hidden="true">
     <g stroke="#1B2836" stroke-width="8" stroke-linecap="round"><line class="l1" x1="44" y1="92" x2="44" y2="114"/><line class="l2" x1="76" y1="92" x2="76" y2="114"/></g>
     <path d="M30 30 L22 6 L46 22 Z M90 30 L98 6 L74 22 Z" fill="${c}" stroke="#1B2836" stroke-width="5" stroke-linejoin="round"/>
@@ -622,7 +650,7 @@ function critter(c){
     <ellipse cx="70" cy="50" rx="10" ry="12" fill="#fff" stroke="#1B2836" stroke-width="4"/><circle cx="74" cy="52" r="5" fill="#1B2836"/>
     <ellipse cx="94" cy="50" rx="9" ry="11" fill="#fff" stroke="#1B2836" stroke-width="4"/><circle cx="97" cy="52" r="4.5" fill="#1B2836"/>
     <ellipse cx="62" cy="70" rx="7" ry="5" fill="#FF9EC4" opacity=".8"/>
-    <path d="M78 72 q8 8 17 0" fill="none" stroke="#1B2836" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M78 72 q8 8 17 0" fill="none" stroke="#1B2836" stroke-width="4.5" stroke-linecap="round"/>${sh}
   </svg>`;
 }
 function moleSVG(){
@@ -662,7 +690,8 @@ const GAME_PIC = {
 };
 
 /* ---------- 設定畫面 ---------- */
-const nameOf = i => (S.names[i] || '').trim() || TEAMS[i][S.mode];
+const nameKey = () => S.mode === 'solo' ? 'solo' : 'team';
+const nameOf = i => (S.names[i] || '').trim() || TEAMS[i][nameKey()];
 const tablesText = t => t.length === 8 && !t.includes(1) ? '2～9' : t.length === 9 ? '1～9' : t.join('、');
 const tabsOf = () => S.topic === 'concept' ? S.ctables : S.tables;
 const setTabs = t => { if (S.topic === 'concept') S.ctables = t.filter(x => CA_ALL.includes(x)); else S.tables = t; };
@@ -678,7 +707,8 @@ function weakList(topic){
     const k = a + '×' + b, o = m.get(k) || {a, b, ok:0, no:0}; o.ok += ok; o.no += no; m.set(k, o); }));
   return [...m.values()].filter(o => o.no > 0 && o.ok / (o.ok + o.no) < .75).sort((x, y) => y.no - x.no || x.ok - y.ok).slice(0, WEAK_MAX);
 }
-const isTeam = () => S.mode === 'team';
+const isTeam = () => S.mode !== 'solo';      // 小組賽、全班合作：一隊有好幾個人，要換人
+const isCoop = () => S.mode === 'coop';      // 全班合作：各隊答對的加起來，一起挑戰全班目標（沒有輸贏）
 const secText = v => `${v} 秒`;
 /* 自己訂的數字：▲▼ 或直接打字（打字的時候先不要重畫，免得游標跑掉） */
 const STEP = {
@@ -702,9 +732,9 @@ function drawLobby(){
   $('#games').innerHTML = Object.entries(GAMES).map(([k, v]) => `
     <button class="gcard ${k === S.game ? 'on' : ''}" type="button" data-g="${k}">
       <span class="pic">${GAME_PIC[k]}</span>
-      <span><b>${v.name}</b><small>${v.desc[S.topic]}</small><span class="who ${v.kind}">${KIND_TXT[v.kind]}</span></span>
+      <span><b>${v.name}</b><small>${v.desc[S.topic === 'concept' && k === 'mole' && S.rev ? 'rev' : S.topic]}</small><span class="who ${v.kind}">${KIND_TXT[v.kind]}</span></span>
     </button>`).join('');
-  $('#modeSeg').innerHTML = [['team','小組賽'],['solo','個人賽']].map(([k, t]) => `<button class="opt ${S.mode === k ? 'on' : ''}" type="button" data-mode="${k}">${t}</button>`).join('');
+  $('#modeSeg').innerHTML = [['team','小組賽'],['solo','個人賽'],['coop','全班合作']].map(([k, t]) => `<button class="opt ${S.mode === k ? 'on' : ''}" type="button" data-mode="${k}">${t}</button>`).join('');
   $('#nSeg').innerHTML = [2, 3].map(n => `<button class="opt num ${S.n === n ? 'on' : ''}" type="button" data-n="${n}" ${g.ns.includes(n) ? '' : 'disabled'}>${n}</button>`).join('');
   const tabs = tabsOf(), concept = S.topic === 'concept';
   $('#tabLab').textContent = concept ? '被乘數' : '乘法範圍';
@@ -725,18 +755,23 @@ function drawLobby(){
   $('#goalRow').hidden = g.kind !== 'goal';
   $('#timeRow').hidden = g.kind !== 'time';
   if (g.kind === 'goal'){
-    $('#goalLab').textContent = g.goal.label; $('#goalUnit').textContent = g.goal.unit;
+    $('#goalLab').textContent = isCoop() ? '全班目標' : g.goal.label; $('#goalUnit').textContent = g.goal.unit;
     $('#goalSeg').innerHTML = GOAL_OPTS.map(v => `<button class="opt ${S.goal[S.game] === v ? 'on' : ''}" type="button" data-goal="${v}">${v} ${g.goal.unit}</button>`).join('');
   } else {
     $('#timeSeg').innerHTML = TIME_OPTS.map(v => `<button class="opt ${S.time[S.game] === v ? 'on' : ''}" type="button" data-time="${v}">${secText(v)}</button>`).join('');
   }
   /* 個人賽：一方只有一個人，不用換人、不用輸入座號 */
   $('#swapRow').hidden = !isTeam(); $('#seatRow').hidden = !isTeam();
+  $('#sameRow').hidden = isCoop();   // 全班合作不搶答
+  $('#nLab').textContent = isCoop() ? '分成幾區' : '幾方對抗';
+  /* 認識乘法的打地鼠：可以反過來「看算式找圖」 */
+  $('#revRow').hidden = !(S.topic === 'concept' && S.game === 'mole');
+  $('#revSeg').innerHTML = [[0,'看圖找算式'],[1,'看算式找圖']].map(([v, t]) => `<button class="opt ${+!!S.rev === v ? 'on' : ''}" type="button" data-rev="${v}">${t}</button>`).join('');
   $('#swapSeg').innerHTML = [[0,'不提醒'], ...SWAP_OPTS.map(v => [v, `每 ${v} 題`])].map(([v, t]) => `<button class="opt ${S.swap === v ? 'on' : ''}" type="button" data-swap="${v}">${t}</button>`).join('');
   $('#seatSeg').innerHTML = [[1,'要輸入'],[0,'跳過']].map(([v, t]) => `<button class="opt ${+S.seats === v ? 'on' : ''}" type="button" data-seats="${v}">${t}</button>`).join('');
   drawSteppers();
-  $('#names').innerHTML = TEAMS.map((t, i) => `<label class="nm ${i < S.n ? '' : 'off'}" style="--c:${t.c};--l:${t.l}"><span class="dot"></span>
-    <input data-name="${i}" maxlength="8" list="pastNames" value="${esc(S.names[i] || '')}" placeholder="${t[S.mode]}" ${i < S.n ? '' : 'disabled'}></label>`).join('');
+  $('#names').innerHTML = TEAMS.map((t, i) => `<label class="nm ${i < S.n ? '' : 'off'}" style="--c:${t.c};--l:${t.l}">${mark(i)}
+    <input data-name="${i}" maxlength="8" list="pastNames" value="${esc(S.names[i] || '')}" placeholder="${t[nameKey()]}" ${i < S.n ? '' : 'disabled'}></label>`).join('');
   $('#pastNames').innerHTML = S.pastNames.map(n => `<option value="${esc(n)}">`).join('');
   $('#warn').textContent = tabs.length ? '' : concept ? '請至少選一個被乘數' : '請至少選一個乘法';
   $('#startBtn').textContent = isTeam() && S.seats ? '下一步：輸入座號 ▶' : '開始比賽 ▶';
@@ -758,6 +793,7 @@ $('#lobby').addEventListener('click', e => {
   else if (b.dataset.seats) S.seats = b.dataset.seats === '1';
   else if (b.dataset.src) S.src = b.dataset.src;
   else if (b.dataset.same) S.same = b.dataset.same === '1';
+  else if (b.dataset.rev) S.rev = b.dataset.rev === '1';
   else if (b.dataset.step){
     const k = b.closest('.stepper').dataset.k, st = STEP[k], cur = st.get();
     const d = +b.dataset.step, base = cur || (d > 0 ? st.lo - d : st.lo);   // 換人提醒從「不提醒」按 ▲ → 1
@@ -794,7 +830,7 @@ function showMembers(){
   $('#mzones').style.setProperty('--n', S.n);
   $('#mzones').className = 'n' + S.n;
   $('#mzones').innerHTML = TEAMS.slice(0, S.n).map((t, i) => `<div class="mz" style="--c:${t.c};--l:${t.l}">
-    <div class="zhead"><span class="zn">${esc(nameOf(i))}</span><button class="clr" type="button" data-mix="${i}">🔀 打亂順序</button><button class="clr" type="button" data-clr="${i}">全部清掉</button></div>
+    <div class="zhead">${mark(i, '#fff', 'zmk')}<span class="zn">${esc(nameOf(i))}</span><button class="clr" type="button" data-mix="${i}">🔀 打亂順序</button><button class="clr" type="button" data-clr="${i}">全部清掉</button></div>
     <div class="seats" id="seats${i}"></div>
     <div class="mrow"><span class="lbl">座號</span><span class="slot" id="mslot${i}">&nbsp;</span><span class="mmsg" id="mmsg${i}"></span></div>
     <div class="pad seat" data-i="${i}">${padKeys('<button class="key add" type="button" data-k="add">加入</button>')}</div>
@@ -969,6 +1005,7 @@ function picHTML(q){
   const cols = q.a <= 5 ? q.a : Math.ceil(q.a / 2);
   return Array.from({length:q.b}, () => `<div class="cbox ${q.th.cls}" style="grid-template-columns:repeat(${cols},auto)">${`<i>${q.th.e}</i>`.repeat(q.a)}</div>`).join('');
 }
+const REV_TH = {c:'份', u:'個'};
 /* 流星上的小圖：用圓點，比較小也看得清楚 */
 function miniPic(q){
   const cols = q.a <= 5 ? q.a : Math.ceil(q.a / 2);
@@ -980,7 +1017,7 @@ let G = null;
 const SECTIONS = ['lobby', 'members', 'review', 'game', 'result', 'hist'];
 const show = id => { SECTIONS.forEach(s => $('#' + s).hidden = s !== id);
   const playing = id === 'game';
-  $('#timer').hidden = !playing; $('#pauseBtn').hidden = !playing; $('#endBtn').hidden = !playing;
+  $('#timer').hidden = !playing; $('#pauseBtn').hidden = !playing; if (!playing) $('#coopTot').hidden = true; $('#endBtn').hidden = !playing;
   $('#backBtn').hidden = id !== 'lobby'; $('#histBtn').hidden = id !== 'lobby'; $('#tourBtn').hidden = id !== 'lobby';
   if (window.Tour) Tour.close(); };
 
@@ -989,7 +1026,8 @@ function start(skipSeats){
   const kind = S.game, gm = GAMES[kind];
   if (!isTeam()) skipSeats = true;
   G = {kind, topic:S.topic, n:S.n, goal:gm.kind === 'goal' ? S.goal[kind] : 0, time:gm.kind === 'time' ? S.time[kind] : 0,
-    swap:isTeam() ? S.swap : 0, t:0, last:0, paused:true, ended:false, zones:[], same:S.same, sq:null, sqi:1, sqDone:false, nextSpawn:0,
+    swap:isTeam() ? S.swap : 0, t:0, last:0, paused:true, ended:false, zones:[], same:S.same && !isCoop(), coop:isCoop(), total:0,
+    rev:S.topic === 'concept' && kind === 'mole' && !!S.rev, sq:null, sqi:1, sqDone:false, nextSpawn:0,
     weak:S.src === 'weak' && weakList(S.topic).length ? weakList(S.topic) : null};
   G.mw = G.topic === 'concept' ? 240 : 200; G.mh = G.topic === 'concept' ? 200 : 150;
   for (let i = 0; i < G.n; i++){
@@ -1008,20 +1046,20 @@ function start(skipSeats){
     const z = {i, name:nameOf(i), c:T.c, m:T.m, l:T.l, score:0, right:0, wrong:0, misses:[], qs:{}, qi:0, times:[], q:null, qT:0, input:'', lock:0, miss:0,
       mets:[], nextSpawn:0, t:0, done:0, turn:0, swap:false, per:{}, members:skipSeats ? [] : [...S.members[i]]};
     const el = document.createElement('div');
-    el.className = `zone g-${kind} c-${G.topic}`; el.style.cssText = `--c:${T.c};--l:${T.l}`;
-    const qbox = G.topic === 'concept'
+    el.className = `zone g-${kind} c-${G.topic}${G.rev ? ' rev' : ''}`; el.style.cssText = `--c:${T.c};--l:${T.l}`;
+    const qbox = G.topic === 'concept' && !G.rev
       ? `<div class="zq"><div class="cq"><div class="cpic"></div><div class="qline"></div></div><div class="zmsg"></div></div>`
       : `<div class="zq"><div class="qline"></div><div class="zmsg"></div></div>`;
     const ans = G.topic === 'concept' ? `<span class="lbl">被乘數</span><span class="slot s1"></span><span class="op">×</span><span class="slot s2"></span><span class="lbl">乘數</span>` : `<span class="lbl">答案</span><span class="slot"></span>`;
     const body = kind === 'meteor'
       ? `<div class="sky"><div class="ground"></div></div><div class="ansbar">${ans}</div>`
       : kind === 'stack'
-      ? `<div class="stackbox"><div class="top"><span>目標 ${G.goal} 塊</span></div><div class="blocks"></div><div class="climber">${critter(T.c)}</div><div class="gnd"></div></div>${qbox}`
+      ? `<div class="stackbox"><div class="top"><span>${G.coop ? `全班一起 ${G.goal} 塊` : `目標 ${G.goal} 塊`}</span></div><div class="blocks"></div><div class="climber">${critter(T.c, i)}</div><div class="gnd"></div></div>${qbox}`
       : kind === 'mole'
       ? `${qbox}<div class="field">${('<div class="hole"><div class="pit"></div><div class="mwrap"><button class="mole" type="button" tabindex="-1"><span class="mn"></span><span class="mb">' + moleSVG() + '</span></button></div></div>').repeat(6)}<img class="hammer" src="assets/hammer.png" alt=""></div>`
       : qbox;
     const pad = kind === 'mole' ? '' : `<div class="pad">${[1,2,3,4,5,6,7,8,9,0].map(k => `<button class="key" type="button" data-k="${k}">${k}</button>`).join('')}<button class="key del" type="button" data-k="del">⌫<br>擦掉</button></div>`;
-    el.innerHTML = `<div class="zhead"><span class="zn">${esc(z.name)}</span>${G.same && kind !== 'meteor' ? '<span class="zp qn"></span>' : ''}<span class="zp pl" hidden></span><span class="zs"></span></div>${body}${pad}`;
+    el.innerHTML = `<div class="zhead">${mark(i, '#fff', 'zmk')}<span class="zn">${esc(z.name)}</span>${G.same && kind !== 'meteor' ? '<span class="zp qn"></span>' : ''}<span class="zp pl" hidden></span><span class="zs"></span></div>${body}${pad}`;
     if (pad) el.querySelector('.pad').addEventListener('pointerdown', e => {
       const b = e.target.closest('.key'); if (!b) return;
       e.preventDefault();
@@ -1039,6 +1077,7 @@ function start(skipSeats){
   }
   drawScene();
   $('#scene').hidden = kind !== 'race';
+  $('#coopTot').hidden = !G.coop; hudCoop();
   show('game');
   if (kind === 'meteor') G.zones.forEach(z => { z.skyW = z.sky.offsetWidth; z.skyH = z.sky.offsetHeight; });
   else { if (G.same) G.sq = newQ(); G.zones.forEach(z => { z.q = G.same ? G.sq : newQ(); showQn(z); renderQ(z); }); }
@@ -1141,7 +1180,7 @@ function press(z, k){
 /* 答錯的提示：認識乘法要說出「哪裡錯」 */
 function wrongTip(q, input, final){
   if (G.topic !== 'concept') return final ? `答案是 ${q.ans}，換下一題` : '再想一想！';
-  const th = q.th;
+  const th = G.rev ? REV_TH : q.th;   // 看算式找圖：地鼠拿的是圓點圖，用「份、個」
   if (final) return `答案是 ${q.a}×${q.b}：1 ${th.c}有 ${q.a} ${th.u}，有 ${q.b} ${th.c}`;
   if (input === `${q.b}${q.a}`) return `前後放反了！× 前面寫「1 ${th.c}有幾${th.u}」`;
   return `數一數：1 ${th.c}有幾${th.u}？有幾${th.c}？`;
@@ -1177,7 +1216,9 @@ function judge(z){
 }
 function renderQ(z, cls = '', msg = ''){
   const q = z.q, blank = G.kind === 'mole' ? '?' : '&nbsp;';
-  if (G.topic === 'concept'){
+  if (G.rev){   // 看算式找圖：上面只有算式，地鼠拿著圖
+    z.el.querySelector('.qline').innerHTML = `<span class="slot ${cls}">${q.a}</span><span class="op">×</span><span class="slot ${cls}">${q.b}</span>`;
+  } else if (G.topic === 'concept'){
     if (z.picQ !== q){ z.picQ = q; const p = z.el.querySelector('.cpic'); p.innerHTML = picHTML(q); fitPic(z); setTimeout(() => { if (G && z.q === q) fitPic(z); }, 300); }
     const v = z.input, f = !cls && G.kind !== 'mole' ? v.length : -1;   // 下一個要填的格子亮起來
     z.el.querySelector('.qline').innerHTML = [0, 1].map(i => `<span class="slot ${cls} ${i === f ? 'focus' : ''}">${v[i] || blank}</span>`).join('<span class="op">×</span>');
@@ -1205,29 +1246,43 @@ function flash(z, x, y){
   z.el.appendChild(p); setTimeout(() => p.remove(), 800);
 }
 function progress(z){
-  z.score++; hudZ(z);
-  if (G.kind === 'race') moveRunner(z);
+  z.score++; G.total++; hudZ(z); hudCoop();
+  if (G.kind === 'race') G.coop ? G.zones.forEach(moveRunner) : moveRunner(z);
   if (G.kind === 'stack') buildStack(z, true);
-  if (G.goal && z.score >= G.goal) finish();
+  if (G.goal && (G.coop ? G.total : z.score) >= G.goal) finish();
+}
+/* 全班合作：上方顯示全班一起答對幾題 */
+function hudCoop(){
+  if (!G || !G.coop) return;
+  const u = {race:'題', stack:'塊', mole:'隻', meteor:'顆'}[G.kind];
+  $('#coopTot').innerHTML = `<small>全班一起</small>${G.total}${G.goal ? `<small> / ${G.goal} ${u}</small>` : `<small> ${u}</small>`}`;
 }
 function hudZ(z){
   const s = z.el.querySelector('.zs');
-  if (G.goal) s.innerHTML = `${z.score}<small> / ${G.goal}</small>`;
+  if (G.coop) s.innerHTML = `<small>答對</small>${z.score}`;
+  else if (G.goal) s.innerHTML = `${z.score}<small> / ${G.goal}</small>`;
   else s.innerHTML = `<small>${G.kind === 'mole' ? '敲到' : '擊碎'}</small>${z.score}`;
 }
 
 /* ---------- 賽跑 ---------- */
 function drawScene(){
   const sc = $('#scene');
-  if (G.kind === 'race'){
+  if (G.kind === 'race' && G.coop){
+    sc.className = 'scene track';
+    sc.style.setProperty('--x0', '260px'); sc.style.setProperty('--x1', '110px');
+    sc.innerHTML = `<div class="finish"></div><div class="lane" style="top:0;height:300px;--c:var(--ink)"><span class="ln">全班一起</span>
+      <div class="marks">${'<i></i>'.repeat(Math.min(G.goal, 30) + 1)}</div>
+      ${G.zones.map((z, i) => `<div class="runner" id="run${i}" style="top:${(i + 1) * 100 / (G.n + 1)}%">${critter(z.c, i)}</div>`).join('')}</div>`;
+    G.zones.forEach(moveRunner);
+  } else if (G.kind === 'race'){
     const H = 300 / G.n;
     sc.className = 'scene track';
     sc.style.setProperty('--x0', '260px'); sc.style.setProperty('--x1', '110px');
     sc.innerHTML = '<div class="finish"></div>' + G.zones.map((z, i) => `
       <div class="lane" style="top:${i * H}px;height:${H}px;--c:${z.c}">
-        <span class="ln">${esc(z.name)}</span>
+        <span class="ln">${mark(i, '#fff', 'lmk')}${esc(z.name)}</span>
         <div class="marks">${'<i></i>'.repeat(G.goal + 1)}</div>
-        <div class="runner" id="run${i}">${critter(z.c)}</div>
+        <div class="runner" id="run${i}">${critter(z.c, i)}</div>
       </div>`).join('');
     G.zones.forEach(moveRunner);
   } else sc.innerHTML = '';
@@ -1235,8 +1290,8 @@ function drawScene(){
 function moveRunner(z){
   const r = $('#run' + z.i); if (!r) return;
   const W = $('#scene').clientWidth, x0 = 260, x1 = W - 110;
-  r.style.left = (x0 + (x1 - x0) * Math.min(1, z.score / G.goal)) + 'px';
-  if (z.score){ r.classList.add('run'); clearTimeout(r._t); r._t = setTimeout(() => r.classList.remove('run'), 600); }
+  r.style.left = (x0 + (x1 - x0) * Math.min(1, (G.coop ? G.total : z.score) / G.goal)) + 'px';
+  if (G.coop ? G.total : z.score){ r.classList.add('run'); clearTimeout(r._t); r._t = setTimeout(() => r.classList.remove('run'), 600); }
 }
 
 /* ---------- 疊疊樂：每答對一題，疊上一塊積木（寬度、位置、角度都有一點點不一樣） ---------- */
@@ -1262,7 +1317,9 @@ function moleUp(z){
   const ms = z.el.querySelectorAll('.mole');
   ms.forEach(m => { m.className = 'mole'; m.style.visibility = ''; });
   holes.forEach((hI, k) => {
-    const m = ms[hI]; m.dataset.v = opts[k]; m.querySelector('.mn').textContent = opts[k];
+    const m = ms[hI]; m.dataset.v = opts[k];
+    if (G.rev){ const [a, b] = opts[k].split('×').map(Number); m.querySelector('.mn').innerHTML = miniPic({a, b}); }
+    else m.querySelector('.mn').textContent = opts[k];
     setTimeout(() => { if (G && !G.ended) m.classList.add('up'); }, 60 + k * 90);
   });
 }
@@ -1330,7 +1387,8 @@ function whack(z, m){
       setTimeout(() => { if (G && !G.ended) nextMole(z, q); }, LOCK_SHOW);
     } else {
       z.lock = performance.now() + LOCK_WRONG;
-      const tip = G.topic === 'concept' ? wrongTip(q, v.replace('×', ''), false) : '再想一想！';
+      const th = REV_TH, tip = G.rev ? (v === `${q.b}×${q.a}` ? `前後放反了！${q.a}×${q.b} 是 1 ${th.c}有 ${q.a} ${th.u}，有 ${q.b} ${th.c}` : `數一數：1 ${th.c}有幾${th.u}？有幾${th.c}？`)
+        : G.topic === 'concept' ? wrongTip(q, v.replace('×', ''), false) : '再想一想！';
       renderQ(z, 'no', tip);
       setTimeout(() => { if (G && !G.ended && z.q === q){ z.input = ''; renderQ(z); } }, LOCK_WRONG);
     }
@@ -1409,7 +1467,7 @@ function meteorInput(z){
   z.mets.forEach(m => m.el.classList.toggle('hot', !!v && m.q.key.startsWith(v)));
   const hitM = z.mets.find(m => m.q.key === v);
   if (hitM){
-    z.right++; z.score++; credit(z, true); tally(z, hitM.q, true); hudZ(z); SND.ok();
+    z.right++; z.score++; G.total++; credit(z, true); tally(z, hitM.q, true); hudZ(z); hudCoop(); SND.ok();
     ansShow(z, 'ok', v);
     z.mets = z.mets.filter(m => m !== hitM);
     hitM.el.style.setProperty('--at', `translate(${hitM.x}px,${hitM.y}px)`); hitM.el.classList.add('boom');
@@ -1463,10 +1521,26 @@ function finish(){
   const sorted = [...Z].sort((a, b) => b.score - a.score);
   const order = sorted.map(z => ({z, rank:1 + sorted.filter(o => o.score > z.score).length}));
   const winners = order.filter(o => o.rank === 1);
-  const head = winners.length === Z.length ? '平手！大家都很厲害'
+  let head = winners.length === Z.length ? '平手！大家都很厲害'
     : winners.length > 1 ? `${winners.map(o => esc(o.z.name)).join('、')} 並列第一！`
     : `${esc(winners[0].z.name)} 獲勝！`;
-  const why = G.manual ? (G.goal ? '老師結束了這一局，比一比誰最接近目標' : '老師結束了這一局')
+  /* 全班合作：沒有輸贏，和全班之前的紀錄比 */
+  let coopWhy = '';
+  if (G.coop){
+    const same = H.filter(r => r.coop && r.game === G.kind && r.teams.length === G.n && (r.topic || 'calc') === G.topic && !r.manual && (G.goal ? r.goal === G.goal : r.time === G.time));
+    const unitC = {race:'題', stack:'塊', mole:'隻', meteor:'顆'}[G.kind];
+    if (G.goal && !G.manual){
+      const best = same.length ? Math.min(...same.map(r => r.played)) : 0;
+      head = `全班一起完成 ${G.goal} ${unitC}！`;
+      coopWhy = best ? (Math.round(G.t) < best ? `🎉 破全班紀錄！（之前最快 ${fmt(best)}）` : `全班最快紀錄 ${fmt(best)}`) : '這是全班第一筆紀錄';
+    } else {
+      const best = same.length ? Math.max(...same.map(r => r.total || 0)) : 0;
+      head = `全班一起${G.kind === 'mole' ? '敲到' : G.kind === 'meteor' ? '打碎' : '完成'} ${G.total} ${unitC}！`;
+      coopWhy = G.manual ? '' : best ? (G.total > best ? `🎉 破全班紀錄！（之前最多 ${best} ${unitC}）` : `全班最多紀錄 ${best} ${unitC}`) : '這是全班第一筆紀錄';
+    }
+  }
+  const why = G.coop ? [G.goal && !G.manual ? `用了 ${fmt(G.t)}` : '', G.manual ? '老師結束了這一局' : '', coopWhy].filter(Boolean).join('・')
+    : G.manual ? (G.goal ? '老師結束了這一局，比一比誰最接近目標' : '老師結束了這一局')
     : G.kind === 'race' ? `先跑到終點（用了 ${fmt(G.t)}）`
     : G.kind === 'stack' ? `先疊到目標（用了 ${fmt(G.t)}）`
     : G.kind === 'mole' ? '時間到，敲最多隻的贏'
@@ -1475,7 +1549,7 @@ function finish(){
   const unit = {race:'答對題數', stack:'疊了幾塊', mole:'敲到幾隻', meteor:'擊碎流星'}[G.kind];
 
   /* 存進比賽紀錄 */
-  H.unshift({at:Date.now(), game:G.kind, topic:G.topic, tables:[...(G.topic === 'concept' ? S.ctables : S.tables)], weak:!!G.weak, same:!!G.same,
+  H.unshift({at:Date.now(), game:G.kind, topic:G.topic, tables:[...(G.topic === 'concept' ? S.ctables : S.tables)], weak:!!G.weak, same:!!G.same, coop:!!G.coop, total:G.total, rev:!!G.rev,
     qs:Object.values(Z.reduce((m, z) => { for (const k in z.qs){ const o = m[k] || (m[k] = [z.qs[k][0], z.qs[k][1], 0, 0]); o[2] += z.qs[k][2]; o[3] += z.qs[k][3]; } return m; }, {})), time:G.time, goal:G.goal, manual:!!G.manual, played:Math.round(G.t),
     teams:order.map(({z, rank}) => ({name:z.name, color:z.i, rank, score:z.score, right:z.right, wrong:z.wrong, members:z.members, per:z.per}))});
   if (H.length > MAX_HIST) H.length = MAX_HIST;
@@ -1492,9 +1566,9 @@ function finish(){
       const tot = z.right + z.wrong, acc = tot ? Math.round(z.right / tot * 100) : 0;
       const avg = z.times.length ? (z.times.reduce((a, b) => a + b, 0) / z.times.length).toFixed(1) : '–';
       const ms = misses(z), pc = perChips(z.per, z.members);
-      const careful = tot && accOf(z) === bestAcc && Z.length > 1;
-      return `<div class="rcol">${bigMedal(rank)}<div class="rcard ${rank === 1 ? 'first' : ''}" style="--c:${z.c};--l:${z.l}">
-        <div class="top"><span class="who ${rank === 1 ? 'win' : ''}">${critter(z.c)}</span><b>${esc(z.name)}</b></div>
+      const careful = !G.coop && tot && accOf(z) === bestAcc && Z.length > 1;
+      return `<div class="rcol ${G.coop ? 'coop' : ''}">${G.coop ? '' : bigMedal(rank)}<div class="rcard ${rank === 1 && !G.coop ? 'first' : ''}" style="--c:${z.c};--l:${z.l}">
+        <div class="top"><span class="who ${rank === 1 && !G.coop ? 'win' : ''}">${critter(z.c, z.i)}</span><b>${esc(z.name)}</b>${mark(z.i, '#fff', 'rmk')}</div>
         <div class="body">
           <div class="acc">
             <div class="acch"><span>答對比例</span>${careful ? '<em>👍 最細心</em>' : ''}</div>
@@ -1528,10 +1602,10 @@ function drawHist(){
     const d = new Date(r.at), g = GAMES[r.game] || {name:'乘法蓋高樓'};
     const when = `${d.getMonth() + 1}/${d.getDate()}（${WD[d.getDay()]}）${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     return `<div class="hrec">
-      <div class="hmeta"><b>${when}</b><span class="hg">${esc(g.name)}</span><span>${r.topic === 'concept' ? `認識乘法・被乘數 ${tablesText(r.tables)}` : `心算・${tablesText(r.tables)} 的乘法`}</span>${r.weak ? '<span>🎯 精熟練習</span>' : ''}${r.same ? '<span>同步搶答</span>' : ''}<span>玩了 ${fmt(r.played)}</span>${r.manual ? '<span>老師提前結束</span>' : ''}</div>
+      <div class="hmeta"><b>${when}</b><span class="hg">${esc(g.name)}</span><span>${r.topic === 'concept' ? `認識乘法・被乘數 ${tablesText(r.tables)}` : `心算・${tablesText(r.tables)} 的乘法`}</span>${r.coop ? `<span>全班合作・一起 ${r.total}</span>` : ''}${r.rev ? '<span>看算式找圖</span>' : ''}${r.weak ? '<span>🎯 精熟練習</span>' : ''}${r.same ? '<span>同步搶答</span>' : ''}<span>玩了 ${fmt(r.played)}</span>${r.manual ? '<span>老師提前結束</span>' : ''}</div>
       <div class="hteams" style="--n:${r.teams.length}">${r.teams.map(t => {
         const T = TEAMS[t.color] || TEAMS[0], tot = t.right + t.wrong, pc = perChips(t.per || {}, t.members);
-        return `<div class="ht" style="--c:${T.c};--l:${T.l}">${medal(t.rank, 'sm')}<b>${esc(t.name)}</b><span class="hs">${t.score}${r.goal ? ' / ' + r.goal : ''}・答對 ${tot ? Math.round(t.right / tot * 100) : 0}%</span>
+        return `<div class="ht" style="--c:${T.c};--l:${T.l}">${r.coop ? '' : medal(t.rank, 'sm')}${mark(t.color in TEAMS ? t.color : 0, '', 'hmk')}<b>${esc(t.name)}</b><span class="hs">${t.score}${r.goal ? ' / ' + r.goal : ''}・答對 ${tot ? Math.round(t.right / tot * 100) : 0}%</span>
           ${pc ? `<div class="pcs">${pc}</div>` : ''}</div>`; }).join('')}</div>
     </div>`; }).join('') : '<p class="empty">還沒有比賽紀錄。玩完一局，結果會自動存在這裡。</p>';
 }
@@ -1563,38 +1637,60 @@ addEventListener('keydown', e => {
 
 /* ---------- 說明（設定旁的小問號）和第一次打開的導覽 ----------
    只說明比較特別、猜不到的設定；會自動記住的、一看就懂的不說明 */
+/* 示意動畫直接用遊戲本身的畫面元件（縮小放進說明框），跟著目前的主題變：
+   遊戲畫面改了，說明也會跟著變，不會「說明和實際長得不一樣」 */
+const DQ = {a:4, b:3, th:PIC_THINGS[0]};
+const mini = (html, w, h, k) => `<div class="dmw" style="width:${Math.round(w * k)}px;height:${Math.round(h * k)}px"><div class="dmin" style="width:${w}px;height:${h}px;transform:scale(${k})">${html}</div></div>`;
+/* 題目區：認識乘法是圖＋□×□，心算是 4×3=□ */
+const dSlots = (cls, fill) => S.topic === 'concept'
+  ? `<div class="qline"><span class="slot ${cls}">${fill ? DQ.a : '&nbsp;'}</span><span class="op">×</span><span class="slot ${cls}">${fill ? DQ.b : '&nbsp;'}</span></div>`
+  : `<div class="qline"><span>${DQ.a}</span><span class="op">×</span><span>${DQ.b}</span><span class="op">=</span><span class="slot ${cls}">${fill ? DQ.a * DQ.b : '&nbsp;'}</span></div>`;
+const dPic = () => S.topic === 'concept' ? `<div class="cpic" style="--e:34px">${picHTML(DQ)}</div>` : '';
+const dZone = (i, head, body, cls = '') => { const T = TEAMS[i];
+  return `<div class="zone g-race c-${S.topic} ${cls}" style="--c:${T.c};--l:${T.l};height:100%"><div class="zhead">${mark(i, '#fff', 'zmk')}<span class="zn">${T.team}</span>${head}</div>${body}</div>`; };
+/* 兩個畫面輪流出現（前半 A、後半 B），每 5 秒重播 */
+const dAB = (a, b) => `<div class="dm-ab"><div class="dm-a">${a}</div><div class="dm-b">${b}</div></div>`;
 const DEMO = {
-  group:`<div class="dm dm-group"><div class="dm-class">${[1,2,3,4,5,6,7,8].map(k => `<b class="${k === 3 || k === 6 ? 'away' : ''}">${k}</b>`).join('')}</div>
-    <div class="dm-arrow">▼</div>
-    <div class="dm-teams"><div class="dm-t" style="--c:#E5484D;--l:#FDE3E4"><i>紅隊</i>${[7,1,5].map((k, j) => `<b style="--d:${j}">${k}</b>`).join('')}</div>
-      <div class="dm-t" style="--c:#3A9FEF;--l:#DDF0FF"><i>藍隊</i>${[2,8,4].map((k, j) => `<b style="--d:${j}">${k}</b>`).join('')}</div></div></div>`,
-  swap:`<div class="dm dm-swap"><div class="dm-z" style="--c:#E5484D;--l:#FDE3E4"><div class="dm-h">紅隊<span>7 號作答中</span></div>
-    <div class="dm-q">4 × 3 = <u>12</u></div><div class="dm-pop"><b>換人囉！</b>請 <em>12</em> 號上場<span>準備好了</span></div></div></div>`,
-  same:`<div class="dm dm-same">${[['紅隊','#E5484D','#FDE3E4',1],['藍隊','#3A9FEF','#DDF0FF',0]].map(([n, c, l, w]) => `<div class="dm-z ${w ? 'win' : 'lose'}" style="--c:${c};--l:${l}">
-    <div class="dm-h">${n}</div><div class="dm-q">4 × 3</div><div class="dm-r">${w ? '答對！＋1' : '紅隊搶先答對！'}</div></div>`).join('')}</div>`,
-  weak:`<div class="dm dm-weak"><div class="dm-wl">${['8×7','6×9','7×4'].map(t => `<span>${t}</span>`).join('')}</div>
-    <div class="dm-steps"><b>① 一起複習</b><i>▶</i><b>② 只用這些題目比賽</b></div></div>`,
-  ca:`<div class="dm dm-ca"><div class="dm-plates">${[0,1,2].map(() => `<span>${'<i></i>'.repeat(4)}</span>`).join('')}</div>
-    <div class="dm-eq"><b>4<small>被乘數<br>1 盤有幾個</small></b>×<b>3<small>乘數<br>有幾盤</small></b></div></div>`,
-  keys:`<div class="dm dm-keys"><p><kbd>空白鍵</kbd> 暫停／繼續</p><p><kbd>F</kbd> 全螢幕</p></div>`,
+  swap:() => mini(dZone(0, '<span class="zp pl">7 號作答中</span><span class="zs">3<small> / 15</small></span>',
+    `<div class="zq"><div class="cq">${dPic()}${dSlots('ok', true)}</div></div>
+     <div class="swap dm-show"><div class="box"><h3>換人囉！</h3><p class="who">請 <b>12</b> 號上場</p><span class="btn primary big">12 號準備好了</span></div></div>`), 640, 520, .62),
+  same:() => mini(`<div class="dm-two">${dZone(0, '<span class="zp qn">第 3 題</span><span class="zs">2<small> / 15</small></span>',
+      `<div class="zq"><div class="cq">${dPic()}${dAB(dSlots('', false), dSlots('ok', true))}</div></div>`, 'dm-win')
+    + dZone(1, '<span class="zp qn">第 3 題</span><span class="zs">2<small> / 15</small></span>',
+      `<div class="zq"><div class="cq">${dPic()}${dAB(dSlots('', false), dSlots('', false) + `<div class="zmsg">${TEAMS[0].team} 搶先答對！</div>`)}</div></div>`)}</div>`, 1080, 470, .55),
+  group:() => mini(`<div class="dm-grp"><div class="seatgrid" style="grid-template-columns:repeat(8,1fr)">${[1,2,3,4,5,6,7,8].map(k => `<span class="${k === 3 || k === 6 ? 'dm-away' : ''}">${k}</span>`).join('')}</div>
+    <div class="dm-arrow">▼ 🎲 隨機分成 2 隊</div>
+    <div class="dm-two">${[[0, [7, 1, 5]], [1, [2, 8, 4]]].map(([i, m]) => `<div class="mz" style="--c:${TEAMS[i].c};--l:${TEAMS[i].l}"><div class="zhead">${mark(i, '#fff', 'zmk')}<span class="zn">${TEAMS[i].team}</span></div>
+      <div class="seats"><div class="chips">${m.map((v, k) => `<span class="seatchip dm-in" style="--d:${k}"><i>${k + 1}</i>${v} 號</span>`).join('')}</div></div></div>`).join('')}</div></div>`, 1000, 440, .6),
+  weak:() => { const L = S.topic === 'concept' ? [[8, 4], [4, 5], [5, 2]] : [[8, 7], [6, 9], [7, 4]];
+    return mini(`<div class="dm-rv">${L.map(([a, b]) => { const q = {a, b, th:PIC_THINGS[0]};
+      return `<div class="rv">${S.topic === 'concept' ? `<div class="rpic">${picHTML(q)}</div>` : `<div class="rq">${a}×${b}</div>`}
+        ${dAB('<div class="rtip">點一下看答案</div>', `<div class="ra">${S.topic === 'concept' ? `${a}×${b}` : `= ${a * b}`}</div>`)}<div class="rcnt">最近答錯 2 次</div></div>`; }).join('')}</div>`, 960, 480, .55); },
+  ca:() => mini(`<div class="dm-ca"><div class="cpic" style="--e:40px">${picHTML(DQ)}</div>
+    <div class="dm-eq"><b><span class="slot ok">4</span><small>被乘數<br>1 盤有幾個</small></b><span class="op">×</span><b><span class="slot ok">3</span><small>乘數<br>有幾盤</small></b></div></div>`, 700, 380, .8),
+  coop:() => mini(`<div class="dm-coop"><div class="ctot"><small>全班一起</small>17<small> / 20 題</small></div>
+    <div class="dm-two">${[[0, 9], [1, 8]].map(([i, v]) => `<div class="zone" style="--c:${TEAMS[i].c};--l:${TEAMS[i].l}"><div class="zhead">${mark(i, '#fff', 'zmk')}<span class="zn">${TEAMS[i].team}</span><span class="zs"><small>答對</small>${v}</span></div></div>`).join('')}</div></div>`, 900, 230, .66),
+  keys:() => `<div class="dm dm-keys"><p><kbd>空白鍵</kbd> 暫停／繼續</p><p><kbd>F</kbd> 全螢幕</p></div>`,
 };
-const HELP = {
-  group:{title:'成員座號', demo:DEMO.group, text:'選「要輸入」，開始前各隊輸入座號（上場的順序）。下一頁的「🎲 全班自動分組」：點掉請假的同學，電腦自動平均分隊。'},
-  swap:{title:'換人提醒', demo:DEMO.swap, text:'每一隊答完幾題，那一隊的畫面會跳出「換人囉！請 X 號上場」，按「準備好了」才繼續。'},
-  same:{title:'同步搶答', demo:DEMO.same, text:'每一隊同時看到同一題，最快答對的那一隊得分，再一起換下一題。「各自作答」則是各隊做自己的題目。'},
-  weak:{title:'精熟練習', demo:DEMO.weak, text:'玩過幾局以後，最近 10 局答錯比較多的題目會列在這裡。選「進行精熟練習」，先一起複習，再只用這些題目比賽。'},
-  ca:{title:'被乘數和乘數', demo:DEMO.ca, text:`被乘數是「1 份有幾個」，可以自己選；乘數（有幾份）固定 ${CB_MIN}～${CB_MAX}。被乘數和乘數一樣的題目不出（看不出前後有沒有放對）。`},
-  keys:{title:'老師鍵盤', demo:DEMO.keys, text:'比賽中可以用電腦鍵盤操作。'},
+const HELP_TXT = {
+  group:{title:'成員座號', text:'選「要輸入」，開始前各隊輸入座號（上場的順序）。下一頁的「🎲 全班自動分組」：點掉請假的同學，電腦自動平均分隊。'},
+  swap:{title:'換人提醒', text:'每一隊答完幾題，那一隊的畫面會跳出「換人囉！請 X 號上場」，按「準備好了」才繼續。'},
+  same:{title:'同步搶答', text:'每一隊同時看到同一題，最快答對的那一隊得分，再一起換下一題。「各自作答」則是各隊做自己的題目。'},
+  weak:{title:'精熟練習', text:'玩過幾局以後，最近 10 局答錯比較多的題目會列在這裡。選「進行精熟練習」，先一起複習，再只用這些題目比賽。'},
+  ca:{title:'被乘數和乘數', text:`被乘數是「1 份有幾個」，可以自己選；乘數（有幾份）固定 ${CB_MIN}～${CB_MAX}。被乘數和乘數一樣的題目不出（看不出前後有沒有放對）。`},
+  coop:{title:'全班合作', text:'各隊答對的加在一起，一起挑戰全班目標，沒有輸贏。結果會和全班之前的紀錄比一比。'},
+  keys:{title:'老師鍵盤', text:'比賽中可以用電腦鍵盤操作。'},
 };
+const helpOf = k => Object.assign({demo:DEMO[k]()}, HELP_TXT[k]);
 const TOUR_OPT = {root:'#stage', size:30};
 const TOUR_STEPS = () => [
-  Object.assign({el:'#seatRow', tap:'.opt'}, HELP.group),
-  Object.assign({el:'#swapRow', tap:'.opt+.opt'}, HELP.swap),
-  Object.assign({el:'#sameRow', tap:'.opt+.opt'}, HELP.same),
-  Object.assign({el:'#srcRow'}, HELP.weak),
+  Object.assign({el:'#seatRow', tap:'.opt'}, helpOf('group')),
+  Object.assign({el:'#swapRow', tap:'.opt+.opt'}, helpOf('swap')),
+  Object.assign({el:'#sameRow', tap:'.opt+.opt'}, helpOf('same')),
+  Object.assign({el:'#srcRow'}, helpOf('weak')),
   {el:'#tourBtn', title:'想再看一次', text:'按「導覽」可以重看；設定旁邊的 <b class="qm">?</b> 也有說明。'},
 ];
-function showHelp(k){ if (window.Tour && HELP[k]) Tour.help(HELP[k], TOUR_OPT); }
+function showHelp(k){ if (window.Tour && HELP_TXT[k]) Tour.help(helpOf(k), TOUR_OPT); }
 $('#tourBtn').addEventListener('click', () => { if (window.Tour) Tour.run('big-mul', TOUR_STEPS(), TOUR_OPT); });
 
 soundLabel(); drawLobby(); show('lobby');
