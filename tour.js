@@ -174,5 +174,6 @@
     return true;
   }
 
+  inject();   // 一載入就放樣式：小問號（.qm）在還沒點開說明之前就要是圓的
   window.Tour = {run: run, auto: auto, help: help, close: function () { close(false); }, isOpen: function () { return !!cur; }};
 })();
