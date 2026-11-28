@@ -362,6 +362,15 @@ main>section{flex:1;min-height:0}
 .seatgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:10px}
 .seatgrid button{font:600 34px var(--f-num);border:4px solid var(--ink);border-radius:14px;background:#fff;box-shadow:3px 3px 0 var(--ink);padding:4px 0}
 .seatgrid button.away{background:var(--dim);color:var(--ink-soft);text-decoration:line-through;box-shadow:none}
+.seatgrid button.none{background:transparent;color:#B7C4CF;border-style:dashed;border-color:#B7C4CF;box-shadow:none}
+.seatgrid button.played{position:relative;background:#EEF3F6}
+.seatgrid button i{position:absolute;right:-8px;top:-10px;font:900 18px/1 var(--f-body);font-style:normal;background:var(--good);color:#fff;border:3px solid var(--ink);border-radius:999px;width:28px;height:28px;display:grid;place-items:center}
+.sgrow{display:flex;gap:12px;align-items:center}
+.sgrow .seatgrid{flex:1}
+.sx{font:900 24px var(--f-body);width:44px;height:44px;border-radius:12px;border:3px solid var(--ink);display:grid;place-items:center;flex:none}
+.sx.boy{background:#DDF0FF}.sx.girl{background:#FFE3EE}
+.grhead{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.clsname{font:700 28px var(--f-body);border:4px solid var(--ink);border-radius:14px;padding:4px 14px;width:320px;color:var(--ink)}
 
 /* ---------- 比賽紀錄 ---------- */
 #hist{display:flex;flex-direction:column;gap:16px}
@@ -430,7 +439,7 @@ main>section{flex:1;min-height:0}
 <body>
 <div id="stage">
   <header class="bar">
-    <div class="brand"><span class="tag" id="tag">×</span><h1 id="title">乘法心算大會戰</h1><span class="ver">教師大屏 v2.3</span></div>
+    <div class="brand"><span class="tag" id="tag">×</span><h1 id="title">乘法心算大會戰</h1><span class="ver">教師大屏 v2.4</span></div>
     <div class="spacer"></div>
     <div class="ctot" id="coopTot" hidden></div>
     <div class="timer" id="timer" hidden>3:00</div>
@@ -583,7 +592,7 @@ const MAX_SEATS = 20;     // 每一隊最多幾個座號
 const MAX_HIST = 60;      // 比賽紀錄最多留幾筆
 
 /* ---------- 設定和紀錄（記在這台電腦的瀏覽器，不會因為重新整理而不見） ---------- */
-const S = {topic:'calc', game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], ctables:[...CA_DEF], src:'normal', same:false, classN:28, goal:{race:15, stack:15}, time:{meteor:60, mole:60},
+const S = {topic:'calc', game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], ctables:[...CA_DEF], src:'normal', same:false, goal:{race:15, stack:15}, time:{meteor:60, mole:60},
   names:['','',''], sound:true, swap:5, seats:true, members:[[],[],[]], pastNames:[]};
 try { Object.assign(S, JSON.parse(localStorage.getItem('bigmul.v1') || '{}')); } catch (e) {}
 const clampInt = (v, lo, hi) => Math.min(hi, Math.max(lo, Math.round(+v)));
@@ -593,7 +602,6 @@ if (!['team', 'solo', 'coop'].includes(S.mode)) S.mode = 'team';
 if (!GAMES[S.game]) S.game = 'race';
 if (!TOPICS[S.topic]) S.topic = 'calc';
 if (!['normal', 'weak'].includes(S.src)) S.src = 'normal';
-if (!okInt(S.classN, 2, 40)) S.classN = 28;
 S.goal = Object.assign({}, S.goal); S.time = Object.assign({}, S.time);
 for (const k in GAMES){
   const g = GAMES[k];
@@ -873,34 +881,134 @@ $('#members').addEventListener('click', e => {
   else if (b.id === 'mBack'){ show('lobby'); drawLobby(); }
 });
 
-/* ---------- 全班自動分組：輸入全班人數，點掉請假的同學，隨機平均分成幾隊 ---------- */
-let AWAY = new Set();
+/* ---------- 全班自動分組 ----------
+   座號表：每班記一次（男生 1～20、女生 21～40，可以有空號）；之後只要點今天請假的人。
+   今天上過台的人打 ✓，分組時排在後面。每隊幾個人：自動＝目標題數 ÷ 每幾題換人。 */
+const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+if (!Array.isArray(S.classes)) S.classes = [];
+S.classes = S.classes.filter(c => c && typeof c.name === 'string' && Array.isArray(c.seats));
+if (!okInt(S.cls, 0, Math.max(0, S.classes.length - 1))) S.cls = 0;
+if (!S.today || S.today.d !== todayKey()) S.today = {d:todayKey(), away:{}, played:{}};   // 請假、上過台只算今天
+if (!['auto', 'all', 'own'].includes(S.per)) S.per = 'auto';
+if (!okInt(S.perN, 1, MAX_SEATS)) S.perN = 4;
+const curCls = () => S.classes[S.cls];
+const todayList = k => { const c = curCls(); if (!c) return []; return S.today[k][c.name] || (S.today[k][c.name] = []); };
+/* 自動：目的型＝目標題數 ÷ 每幾題換人（全班合作再除以幾區）；限時型、不換人另外處理 */
+function autoPer(){
+  const g = GAMES[S.game];
+  if (!S.swap) return {n:1, why:'不換人'};
+  if (g.kind !== 'goal') return {n:0, why:'限時型：全部平均分'};
+  const q = isCoop() ? Math.ceil(S.goal[S.game] / S.n) : S.goal[S.game];
+  return {n:Math.max(1, Math.ceil(q / S.swap)), why:`${isCoop() ? `全班 ${S.goal[S.game]} 題分 ${S.n} 區，每區約 ${q} 題` : `${q} 題`} ÷ 每 ${S.swap} 題換人`};
+}
+const perCount = () => S.per === 'all' ? 0 : S.per === 'own' ? S.perN : autoPer().n;   // 0＝全部平均
+let GE = null;   // 編輯座號表時的暫存：{name, seats:Set, idx}
 function showGroup(){
   const g = $('#grp'); g.hidden = false;
-  const N = S.classN;
-  AWAY = new Set([...AWAY].filter(x => x <= N));
-  const here = N - AWAY.size;
-  g.innerHTML = `<div class="box">
-    <h3>全班自動分組</h3>
-    <div class="row"><span class="lab" style="width:auto">全班座號 1 到</span>
-      <div class="stepper" data-k="classN"><button type="button" data-cn="-1">▼</button><input type="number" inputmode="numeric" id="cnIn" value="${N}"><button type="button" data-cn="1">▲</button></div>
-      <span class="hint">號。點一下座號＝今天請假（不分組）</span></div>
-    <div class="seatgrid">${Array.from({length:N}, (_, k) => `<button type="button" data-away="${k + 1}" class="${AWAY.has(k + 1) ? 'away' : ''}">${k + 1}</button>`).join('')}</div>
-    <div class="startrow"><span class="hint">今天 ${here} 人，分成 ${S.n} 隊，每隊約 ${Math.ceil(here / S.n)} 人；各隊的上場順序也會打亂</span>
-      <button class="btn big" type="button" data-gx="close">取消</button><button class="btn primary big" type="button" data-gx="go">🎲 隨機分成 ${S.n} 隊</button></div></div>`;
+  if (!S.classes.length && !GE) GE = {name:'', seats:new Set([...range(1, 15), ...range(21, 35)]), idx:-1};
+  g.innerHTML = `<div class="box">${GE ? groupEdit() : groupPick()}</div>`;
+}
+const range = (a, b) => Array.from({length:b - a + 1}, (_, k) => a + k);
+const seatBtn = (k, cls, attr, mark2 = '') => `<button type="button" class="${cls}" ${attr}="${k}">${k}${mark2}</button>`;
+/* 編輯座號表：快速設定「男生到幾號、女生到幾號」，再點掉空號 */
+function groupEdit(){
+  const b = Math.max(0, ...[...GE.seats].filter(k => k <= 20)), gl = Math.max(20, ...[...GE.seats].filter(k => k > 20));
+  return `<h3>${GE.idx < 0 ? '新增班級的座號表' : '編輯座號表'}</h3>
+    <div class="row"><span class="lab" style="width:auto">班級名稱</span><input class="clsname" id="geName" maxlength="10" placeholder="例如：二年 3 班" value="${esc(GE.name)}">
+      <span class="hint">只記座號，存在這台電腦</span></div>
+    <div class="row"><span class="lab" style="width:auto">男生到</span>${stepBox('gb', b)}<span class="own">號</span>
+      <span class="lab" style="width:auto;margin-left:30px">女生到</span>${stepBox('gg', gl)}<span class="own">號</span>
+      <span class="hint">再點一下空號，把它拿掉</span></div>
+    <div class="sgrow"><span class="sx boy">男</span><div class="seatgrid">${range(1, 20).map(k => seatBtn(k, GE.seats.has(k) ? '' : 'none', 'data-ge')).join('')}</div></div>
+    <div class="sgrow"><span class="sx girl">女</span><div class="seatgrid">${range(21, 40).map(k => seatBtn(k, GE.seats.has(k) ? '' : 'none', 'data-ge')).join('')}</div></div>
+    <div class="startrow"><span class="warnmsg" id="geWarn"></span>${GE.idx >= 0 ? '<button class="btn warn" type="button" data-gx="del">刪除這個班級</button>' : ''}<span class="spacer"></span>
+      ${S.classes.length ? '<button class="btn big" type="button" data-gx="ecancel">取消</button>' : '<button class="btn big" type="button" data-gx="close">取消</button>'}
+      <button class="btn primary big" type="button" data-gx="esave">儲存座號表</button></div>`;
+}
+const stepBox = (k, v) => `<div class="stepper"><button type="button" data-gs="${k}:-1">▼</button><input type="number" inputmode="numeric" data-gi="${k}" value="${v}"><button type="button" data-gs="${k}:1">▲</button></div>`;
+/* 平常：選班級 → 點今天請假的人 → 分組 */
+function groupPick(){
+  const c = curCls(), away = new Set(todayList('away')), played = new Set(todayList('played'));
+  const here = c.seats.filter(k => !away.has(k)), fresh = here.filter(k => !played.has(k));
+  const per = perCount(), ap = autoPer(), need = per ? Math.min(here.length, per * S.n) : here.length;
+  const cell = k => seatBtn(k, (away.has(k) ? 'away' : '') + (played.has(k) ? ' played' : ''), 'data-away', played.has(k) && !away.has(k) ? '<i>✓</i>' : '');
+  const boys = c.seats.filter(k => k <= 20), girls = c.seats.filter(k => k > 20);
+  return `<div class="grhead"><h3>全班自動分組</h3><div class="seg">${S.classes.map((x, i) => `<button class="opt ${i === S.cls ? 'on' : ''}" type="button" data-cl="${i}">${esc(x.name)}</button>`).join('')}
+      <button class="quick" type="button" data-gx="new">＋新增班級</button><button class="quick" type="button" data-gx="edit">編輯座號表</button></div></div>
+    <p class="hint">點一下座號＝今天請假。✓＝今天上過台，分組時排在後面。</p>
+    ${boys.length ? `<div class="sgrow"><span class="sx boy">男</span><div class="seatgrid">${boys.map(cell).join('')}</div></div>` : ''}
+    ${girls.length ? `<div class="sgrow"><span class="sx girl">女</span><div class="seatgrid">${girls.map(cell).join('')}</div></div>` : ''}
+    <div class="row"><span class="lab" style="width:auto">每隊幾個人</span><div class="seg">
+      <button class="opt ${S.per === 'auto' ? 'on' : ''}" type="button" data-per="auto">自動${ap.n ? `：${ap.n} 人` : ''}</button>
+      <button class="opt ${S.per === 'all' ? 'on' : ''}" type="button" data-per="all">全部平均</button></div>
+      <span class="own">自己訂</span><div class="stepper ${S.per === 'own' ? 'on' : ''}"><button type="button" data-pn="-1">▼</button><input type="number" inputmode="numeric" id="perIn" value="${S.perN}"><button type="button" data-pn="1">▲</button></div><span class="own">人</span>
+      ${S.per === 'auto' ? `<span class="hint">（${ap.why}）</span>` : ''}</div>
+    <div class="startrow"><span class="hint">今天 ${here.length} 人，還沒上台 ${fresh.length} 人。這一局上台 ${need} 人，分成 ${S.n} 隊${per ? `，每隊 ${Math.ceil(need / S.n)} 人` : `，每隊約 ${Math.ceil(need / S.n)} 人`}；男女平均分。</span>
+      ${played.size ? '<button class="btn" type="button" data-gx="reset">今天重新開始</button>' : ''}
+      <button class="btn big" type="button" data-gx="close">取消</button><button class="btn primary big" type="button" data-gx="go">🎲 隨機分成 ${S.n} 隊</button></div>`;
+}
+/* 分組：先挑還沒上台的，再補上過的；挑好的人男女分開輪流發給各隊，各隊順序再打亂 */
+function doGroup(){
+  const c = curCls(), away = new Set(todayList('away')), played = new Set(todayList('played'));
+  const here = c.seats.filter(k => !away.has(k));
+  const per = perCount(), need = per ? Math.min(here.length, per * S.n, MAX_SEATS * S.n) : Math.min(here.length, MAX_SEATS * S.n);
+  const pick = [...shuffle(here.filter(k => !played.has(k))), ...shuffle(here.filter(k => played.has(k)))].slice(0, need);
+  const teams = Array.from({length:S.n}, () => []);
+  let t = ri(0, S.n - 1);
+  [...shuffle(pick.filter(k => k <= 20)), ...shuffle(pick.filter(k => k > 20))].forEach(k => { teams[t].push(k); t = (t + 1) % S.n; });
+  for (let i = 0; i < S.n; i++) S.members[i] = shuffle(teams[i]);
+}
+function geRange(k, v){   // 男生到 v 號／女生到 v 號
+  v = k === 'gb' ? clampInt(v, 0, 20) : clampInt(v, 20, 40);
+  const [lo, hi] = k === 'gb' ? [1, 20] : [21, 40];
+  for (let x = lo; x <= hi; x++) if (x <= v) GE.seats.add(x); else GE.seats.delete(x);
 }
 $('#grp').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.away){ const k = +b.dataset.away; AWAY.has(k) ? AWAY.delete(k) : AWAY.add(k); showGroup(); }
-  else if (b.dataset.cn){ S.classN = clampInt(S.classN + +b.dataset.cn, 2, 40); save(); showGroup(); }
-  else if (b.dataset.gx === 'close') $('#grp').hidden = true;
-  else if (b.dataset.gx === 'go'){
-    const all = shuffle(Array.from({length:S.classN}, (_, k) => k + 1).filter(k => !AWAY.has(k)));
-    for (let i = 0; i < S.n; i++) S.members[i] = all.filter((_, k) => k % S.n === i).slice(0, MAX_SEATS);
-    save(); $('#grp').hidden = true; for (let i = 0; i < S.n; i++) drawSeats(i);
+  const gx = b.dataset.gx;
+  if (b.dataset.away){ const k = +b.dataset.away, a = todayList('away'), i = a.indexOf(k); i >= 0 ? a.splice(i, 1) : a.push(k); save(); showGroup(); }
+  else if (b.dataset.cl){ S.cls = +b.dataset.cl; save(); showGroup(); }
+  else if (b.dataset.per){ S.per = b.dataset.per; save(); showGroup(); }
+  else if (b.dataset.pn){ S.perN = clampInt(S.perN + +b.dataset.pn, 1, MAX_SEATS); S.per = 'own'; save(); showGroup(); }
+  else if (b.dataset.ge){ const k = +b.dataset.ge; GE.seats.has(k) ? GE.seats.delete(k) : GE.seats.add(k); GE.name = $('#geName').value; showGroup(); }
+  else if (b.dataset.gs){ const [k, d] = b.dataset.gs.split(':'); GE.name = $('#geName').value; const cur = +document.querySelector(`[data-gi="${k}"]`).value; geRange(k, cur + +d); showGroup(); }
+  else if (gx === 'new'){ GE = {name:'', seats:new Set([...range(1, 15), ...range(21, 35)]), idx:-1}; showGroup(); }
+  else if (gx === 'edit'){ const c = curCls(); GE = {name:c.name, seats:new Set(c.seats), idx:S.cls}; showGroup(); }
+  else if (gx === 'ecancel'){ GE = null; showGroup(); }
+  else if (gx === 'esave'){
+    const name = $('#geName').value.trim(), seats = [...GE.seats].sort((x, y) => x - y);
+    const dup = S.classes.findIndex((c, i) => c.name === name && i !== GE.idx);
+    if (!name) return $('#geWarn').textContent = '請輸入班級名稱';
+    if (dup >= 0) return $('#geWarn').textContent = '已經有同名的班級';
+    if (seats.length < S.n) return $('#geWarn').textContent = '座號太少';
+    if (GE.idx >= 0){ const old = S.classes[GE.idx].name; S.classes[GE.idx] = {name, seats};
+      if (old !== name) ['away', 'played'].forEach(k => { if (S.today[k][old]){ S.today[k][name] = S.today[k][old]; delete S.today[k][old]; } }); S.cls = GE.idx; }
+    else { S.classes.push({name, seats}); S.cls = S.classes.length - 1; }
+    GE = null; save(); showGroup();
   }
+  else if (gx === 'del'){
+    if (b.dataset.arm !== '1'){ b.dataset.arm = '1'; b.textContent = '再按一次，刪除'; setTimeout(() => { b.dataset.arm = ''; b.textContent = '刪除這個班級'; }, 2500); return; }
+    S.classes.splice(GE.idx, 1); S.cls = 0; GE = null; save(); showGroup();
+  }
+  else if (gx === 'reset'){
+    if (b.dataset.arm !== '1'){ b.dataset.arm = '1'; b.textContent = '再按一次，清掉 ✓'; setTimeout(() => { if (b.isConnected){ b.dataset.arm = ''; b.textContent = '今天重新開始'; } }, 2500); return; }
+    todayList('played').length = 0; save(); showGroup();
+  }
+  else if (gx === 'close'){ GE = null; $('#grp').hidden = true; }
+  else if (gx === 'go'){ doGroup(); save(); $('#grp').hidden = true; for (let i = 0; i < S.n; i++) drawSeats(i); }
 });
-$('#grp').addEventListener('change', e => { if (e.target.id === 'cnIn'){ S.classN = clampInt(+e.target.value || S.classN, 2, 40); save(); showGroup(); } });
+$('#grp').addEventListener('change', e => {
+  if (e.target.id === 'perIn'){ S.perN = clampInt(+e.target.value || S.perN, 1, MAX_SEATS); S.per = 'own'; save(); showGroup(); }
+  else if (e.target.dataset.gi){ GE.name = $('#geName').value; geRange(e.target.dataset.gi, +e.target.value); showGroup(); }
+});
+$('#grp').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') e.target.blur(); });
+/* 比賽結束：真的作答過的座號記成「今天上過台」 */
+function markPlayed(Z){
+  if (!curCls()) return;
+  const p = todayList('played'), cs = new Set(curCls().seats);
+  Z.forEach(z => Object.keys(z.per).map(Number).forEach(k => { if (cs.has(k) && !p.includes(k)) p.push(k); }));
+  save();
+}
 
 /* ---------- 精熟練習：開始前先列出比較不熟的題目，老師帶著一起複習 ---------- */
 let RV_SKIP = true;
@@ -1553,7 +1661,7 @@ function finish(){
     qs:Object.values(Z.reduce((m, z) => { for (const k in z.qs){ const o = m[k] || (m[k] = [z.qs[k][0], z.qs[k][1], 0, 0]); o[2] += z.qs[k][2]; o[3] += z.qs[k][3]; } return m; }, {})), time:G.time, goal:G.goal, manual:!!G.manual, played:Math.round(G.t),
     teams:order.map(({z, rank}) => ({name:z.name, color:z.i, rank, score:z.score, right:z.right, wrong:z.wrong, members:z.members, per:z.per}))});
   if (H.length > MAX_HIST) H.length = MAX_HIST;
-  saveH();
+  saveH(); markPlayed(Z);
 
   /* 卡片留在比賽時的位置（學生站哪裡，卡片就在哪裡），名次用卡片上方的大獎牌表示；
      最醒目的是「答對比例」：先看自己答對多少，比快慢是其次 */
@@ -1673,7 +1781,7 @@ const DEMO = {
   keys:() => `<div class="dm dm-keys"><p><kbd>空白鍵</kbd> 暫停／繼續</p><p><kbd>F</kbd> 全螢幕</p></div>`,
 };
 const HELP_TXT = {
-  group:{title:'成員座號', text:'選「要輸入」，開始前各隊輸入座號（上場的順序）。下一頁的「🎲 全班自動分組」：點掉請假的同學，電腦自動平均分隊。'},
+  group:{title:'成員座號', text:'選「要輸入」，開始前各隊輸入座號（上場的順序）。下一頁的「🎲 全班自動分組」：每班先存一次座號表，之後只要點今天請假的人；今天上過台的排在後面，每隊幾個人依題數自動算，男女平均分。'},
   swap:{title:'換人提醒', text:'每一隊答完幾題，那一隊的畫面會跳出「換人囉！請 X 號上場」，按「準備好了」才繼續。'},
   same:{title:'同步搶答', text:'每一隊同時看到同一題，最快答對的那一隊得分，再一起換下一題。「各自作答」則是各隊做自己的題目。'},
   weak:{title:'精熟練習', text:'玩過幾局以後，最近 10 局答錯比較多的題目會列在這裡。選「進行精熟練習」，先一起複習，再只用這些題目比賽。'},
