@@ -253,20 +253,39 @@ main>section{flex:1;min-height:0}
 @keyframes pop{from{transform:scale(1.8);opacity:0}30%{transform:scale(1);opacity:1}}
 
 /* ---------- 結果 ---------- */
-#result{display:flex;flex-direction:column;gap:22px}
-.rhead{text-align:center;font:700 72px var(--f-display);margin:6px 0 0}
+#result{display:flex;flex-direction:column;gap:14px}
+.rhead{text-align:center;font:700 60px var(--f-display);margin:0}
 .rhead small{display:block;font:700 30px var(--f-body);color:var(--ink-soft)}
 .rcards{flex:1;min-height:0;display:grid;gap:24px;grid-template-columns:repeat(var(--n),1fr)}
-.rcard{background:var(--card);border:5px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);overflow:hidden;display:flex;flex-direction:column}
+.rcol{display:flex;flex-direction:column;align-items:center;min-height:0;min-width:0}
+.rcard{background:var(--card);border:5px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);overflow:hidden;display:flex;flex-direction:column;flex:1;min-height:0;width:100%}
+.rcard.first{box-shadow:0 0 0 8px var(--gold),6px 6px 0 var(--ink)}
+.bmedal{position:relative;width:150px;height:150px;flex:none;margin-bottom:-30px;z-index:2}
+.bmedal .rib{position:absolute;left:50%;top:0;width:96px;height:56px;margin-left:-48px;background:linear-gradient(90deg,var(--r1) 0 50%,var(--r2) 50%);border:4px solid var(--ink);border-bottom:0;clip-path:polygon(0 0,100% 0,72% 100%,28% 100%)}
+.bmedal .disc{position:absolute;left:50%;bottom:0;width:110px;height:110px;margin-left:-55px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--hi),var(--m) 60%);border:6px solid var(--ink);box-shadow:inset 0 0 0 7px var(--rim),5px 5px 0 var(--ink);display:grid;place-items:center;font:600 72px/1 var(--f-num);color:var(--ink)}
+.bmedal.b1{--m:#F2B400;--hi:#FFE98A;--rim:#FFD84D;--r1:#E5484D;--r2:#3A9FEF}
+.bmedal.b2{--m:#AEBBC6;--hi:#F3F6F8;--rim:#D6DEE5;--r1:#3A9FEF;--r2:#1FA963}
+.bmedal.b3{--m:#C9824A;--hi:#F2C9A0;--rim:#DDA06E;--r1:#1FA963;--r2:#E5484D}
+.bmedal.b1 .disc{width:126px;height:126px;margin-left:-63px;font-size:84px}
+.acc{background:var(--l);border:4px solid var(--ink);border-radius:16px;padding:8px 16px 10px}
+.acch{display:flex;align-items:center;gap:10px;font:900 26px var(--f-body)}
+.acch em{font-style:normal;font:900 22px var(--f-body);background:#D4F5E2;color:#0E7A43;border:3px solid var(--good);border-radius:999px;padding:0 12px}
+.accrow{display:flex;align-items:center;gap:16px}
+.accrow b{font:600 92px/1 var(--f-num);color:var(--good);min-width:2.4em}
+.accrow b small{font-size:.45em;margin-left:2px}
+.accbar{flex:1;height:26px;background:#fff;border:4px solid var(--ink);border-radius:999px;overflow:hidden}
+.accbar i{display:block;height:100%;background:var(--good)}
+.acct{font:700 24px var(--f-body);color:var(--ink-soft)}
+.acct b{font:600 30px var(--f-num);color:var(--ink)}
 .rcard .top{background:var(--c);border-bottom:5px solid var(--ink);display:flex;align-items:center;gap:18px;padding:12px 20px;color:#fff}
-.rcard .top .who{width:110px;height:110px;flex:none}
+.rcard .top .who{width:96px;height:96px;flex:none}
 .rcard .top b{font:700 46px var(--f-display);text-shadow:2px 2px 0 rgba(0,0,0,.35);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .medal{font:900 34px var(--f-body);background:var(--hl);color:var(--ink);border:4px solid var(--ink);border-radius:999px;padding:4px 18px;white-space:nowrap}
 .medal.m2{background:#E6ECF1}.medal.m3{background:#F2C9A0}
-.rcard .body{padding:16px 22px;display:grid;gap:12px;align-content:start;flex:1}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rcard .body{padding:14px 20px;display:grid;gap:10px;align-content:start;flex:1;min-height:0;overflow:auto}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .stat{background:var(--l);border:3px solid var(--ink);border-radius:14px;padding:6px 10px;text-align:center}
-.stat b{display:block;font:600 52px/1.1 var(--f-num)}
+.stat b{display:block;font:600 40px/1.1 var(--f-num)}
 .stat span{font:700 20px var(--f-body);color:var(--ink-soft)}
 .miss h4{margin:0 0 6px;font:900 24px var(--f-body)}
 .miss .chips{display:flex;flex-wrap:wrap;gap:8px}
@@ -338,18 +357,70 @@ main>section{flex:1;min-height:0}
 .ht .hs{font:700 22px var(--f-body);color:var(--ink-soft)}
 .ht .pcs{width:100%}
 .medal.sm{font-size:20px;padding:0 10px;border-width:3px}
+
+/* ---------- 小問號、老師鍵盤 ---------- */
+.lab .qm{font-size:24px}
+.qm.big{font-size:30px}
+.kbtn{font:400 34px/1 var(--f-body);width:58px;height:50px;border:3px solid var(--ink-soft);border-radius:12px;background:var(--card);color:var(--ink-soft);padding:0}
+.quick.on{background:var(--hl)}
+/* 導覽、說明裡的示意動畫（每 5 秒重播一次） */
+.dm{font:700 22px var(--f-body);color:var(--ink);display:grid;gap:10px;justify-items:center}
+.dm b,.dm em{font-style:normal}
+.dm-class{display:flex;gap:8px}
+.dm-class b,.dm-t b{font:600 30px/1 var(--f-num);width:46px;height:46px;display:grid;place-items:center;background:#fff;border:3px solid var(--ink);border-radius:10px}
+.dm-class b.away{animation:dmAway 5s infinite}
+@keyframes dmAway{0%,15%{background:#fff;color:var(--ink);text-decoration:none}25%,100%{background:var(--dim);color:var(--ink-soft);text-decoration:line-through}}
+.dm-arrow{color:var(--ink-soft);font-size:20px}
+.dm-teams{display:flex;gap:18px}
+.dm-t{display:flex;align-items:center;gap:6px;background:var(--l);border:3px solid var(--c);border-radius:12px;padding:6px 10px}
+.dm-t i{font-style:normal;font-weight:900;color:var(--c);margin-right:4px}
+.dm-t b{animation:dmIn 5s infinite;animation-delay:calc(var(--d) * .25s)}
+@keyframes dmIn{0%,35%{opacity:0;transform:scale(.4)}45%,100%{opacity:1;transform:none}}
+.dm-z{position:relative;width:300px;background:var(--l);border:3px solid var(--ink);border-radius:12px;overflow:hidden}
+.dm-h{background:var(--c);color:#fff;font-weight:900;padding:4px 10px;display:flex;justify-content:space-between}
+.dm-h span{background:#fff;color:var(--ink);border-radius:999px;padding:0 8px;font-size:18px}
+.dm-q{font:600 40px/1.6 var(--f-num);text-align:center}
+.dm-q u{text-decoration:none;color:var(--good)}
+.dm-pop{position:absolute;inset:34px 0 0;background:rgba(27,40,54,.7);display:grid;place-items:center;align-content:center;gap:4px;color:#fff;animation:dmPop 5s infinite}
+.dm-pop b{font:700 30px var(--f-display);color:#FFE066}
+.dm-pop em{font:600 34px var(--f-num);color:#FFE066}
+.dm-pop span{background:var(--hl);color:var(--ink);border:3px solid var(--ink);border-radius:10px;padding:0 12px;font-size:18px}
+@keyframes dmPop{0%,40%{opacity:0;transform:scale(.8)}50%,90%{opacity:1;transform:none}100%{opacity:0}}
+.dm-same{display:flex;gap:14px}
+.dm-same .dm-z{width:220px}
+.dm-r{text-align:center;font-weight:900;height:34px;animation:dmR 5s infinite}
+.dm-z.win .dm-r{color:var(--good)}
+.dm-z.lose .dm-r{color:var(--ink-soft)}
+.dm-z.win{animation:dmWin 5s infinite}
+@keyframes dmR{0%,40%{opacity:0}50%,95%{opacity:1}100%{opacity:0}}
+@keyframes dmWin{0%,40%,95%,100%{box-shadow:none}50%,90%{box-shadow:0 0 0 5px var(--good)}}
+.dm-wl{display:flex;gap:10px}
+.dm-wl span{font:600 30px var(--f-num);background:#FFF1F1;border:3px solid var(--bad);border-radius:10px;padding:0 10px;animation:beat 1.6s infinite}
+.dm-steps{display:flex;align-items:center;gap:10px}
+.dm-steps b{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:2px 10px}
+.dm-steps i{font-style:normal;color:var(--ink-soft)}
+.dm-plates{display:flex;gap:14px}
+.dm-plates span{display:grid;grid-template-columns:repeat(2,18px);gap:6px;padding:10px 16px;background:#FFF4E0;border:3px solid var(--ink);border-radius:50%/40%}
+.dm-plates i{width:18px;height:18px;border-radius:50%;background:var(--bad)}
+.dm-eq{display:flex;align-items:flex-start;gap:14px;font:600 44px/1 var(--f-num)}
+.dm-eq b{display:grid;justify-items:center;gap:4px}
+.dm-eq small{font:700 18px/1.3 var(--f-body);color:var(--ink-soft);text-align:center}
+.dm-keys p{margin:0;font-size:24px}
+.dm-keys kbd{font:600 22px var(--f-num);border:3px solid var(--ink);border-radius:8px;padding:0 10px;background:#fff;box-shadow:0 3px 0 var(--ink);margin-right:8px}
 </style>
+<script src="tour.js"></script>
 </head>
 <body>
 <div id="stage">
   <header class="bar">
-    <div class="brand"><span class="tag" id="tag">×</span><h1 id="title">乘法心算大會戰</h1><span class="ver">教師大屏 v2.1</span></div>
+    <div class="brand"><span class="tag" id="tag">×</span><h1 id="title">乘法心算大會戰</h1><span class="ver">教師大屏 v2.2</span></div>
     <div class="spacer"></div>
     <div class="timer" id="timer" hidden>3:00</div>
     <button class="btn" id="soundBtn" type="button">🔊 聲音</button>
     <button class="btn" id="fsBtn" type="button">⛶ 全螢幕</button>
     <button class="btn" id="pauseBtn" type="button" hidden>⏸ 暫停</button>
     <button class="btn warn" id="endBtn" type="button" hidden>結束</button>
+    <button class="btn" id="tourBtn" type="button"><b class="qm" aria-hidden="true">?</b>導覽</button>
     <button class="btn" id="histBtn" type="button">📋 比賽紀錄</button>
     <a class="btn" id="backBtn" href="cat-big.html#big-calc">← 回到上一頁</a>
   </header>
@@ -365,40 +436,32 @@ main>section{flex:1;min-height:0}
         <h2 class="h2"><i>2</i>設定</h2>
         <div class="panel">
           <div class="row"><span class="lab">比賽方式</span><div class="seg" id="modeSeg"></div><span class="lab" style="width:auto;margin-left:36px">幾方對抗</span><div class="seg" id="nSeg"></div></div>
-          <div class="row" style="align-items:flex-start"><span class="lab" style="padding-top:8px" id="tabLab">乘法範圍</span>
+          <div class="row" style="align-items:flex-start"><span class="lab" style="padding-top:8px"><span id="tabLab">乘法範圍</span><button class="qm" type="button" data-help="ca" id="caHelp" aria-label="說明">?</button></span>
             <div style="display:grid;gap:10px;flex:1">
               <div class="seg" id="tabSeg"></div>
-              <div class="seg"><span class="hint" style="align-self:center">快速選：</span>
-                <button class="quick" type="button" data-q="2,5">2、5</button>
-                <button class="quick" type="button" data-q="3,4">3、4</button>
-                <button class="quick" type="button" data-q="6,7">6、7</button>
-                <button class="quick" type="button" data-q="8,9">8、9</button>
-                <button class="quick" type="button" data-q="2,3,4,5,6,7,8,9">2～9 全部</button>
-                <button class="quick" type="button" data-q="1,2,3,4,5,6,7,8,9" id="q19">1～9 全部</button>
-              </div>
+              <div class="seg" id="quickSeg"></div>
             </div>
           </div>
-          <div class="row" id="srcRow"><span class="lab">出題</span><div class="seg" id="srcSeg"></div></div>
+          <div class="row" id="srcRow"><span class="lab">出題<button class="qm" type="button" data-help="weak" aria-label="說明">?</button></span><div class="seg" id="srcSeg"></div></div>
           <div class="weakline" id="weakLine"></div>
-          <div class="row"><span class="lab">各隊題目</span><div class="seg" id="sameSeg"></div><span class="hint">同步搶答：每一隊同時看到同一題，最快答對的得分，再一起換下一題</span></div>
+          <div class="row" id="sameRow"><span class="lab">各隊題目<button class="qm" type="button" data-help="same" aria-label="說明">?</button></span><div class="seg" id="sameSeg"></div></div>
           <div class="row" id="goalRow"><span class="lab" id="goalLab">終點</span><div class="seg" id="goalSeg"></div>
             <span class="own">自己訂</span><div class="stepper" data-k="goal"><button type="button" data-step="-1">▼</button><input type="number" inputmode="numeric" data-in="goal"><button type="button" data-step="1">▲</button></div><span class="own" id="goalUnit">題</span></div>
           <div class="row" id="timeRow"><span class="lab">時間</span><div class="seg" id="timeSeg"></div>
             <span class="own">自己訂</span><div class="stepper" data-k="time"><button type="button" data-step="-5">▼</button><input type="number" inputmode="numeric" data-in="time"><button type="button" data-step="5">▲</button></div><span class="own">秒</span></div>
-          <div class="row" id="swapRow"><span class="lab">換人提醒</span><div class="seg" id="swapSeg"></div>
+          <div class="row" id="swapRow"><span class="lab">換人提醒<button class="qm" type="button" data-help="swap" aria-label="說明">?</button></span><div class="seg" id="swapSeg"></div>
             <span class="own">每</span><div class="stepper" data-k="swap"><button type="button" data-step="-1">▼</button><input type="number" inputmode="numeric" data-in="swap"><button type="button" data-step="1">▲</button></div><span class="own">題換人</span></div>
-          <div class="row" id="seatRow"><span class="lab">成員座號</span><div class="seg" id="seatSeg"></div><span class="hint">開始前，各隊用數字鍵盤輸入座號</span></div>
+          <div class="row" id="seatRow"><span class="lab">成員座號<button class="qm" type="button" data-help="group" aria-label="說明">?</button></span><div class="seg" id="seatSeg"></div></div>
           <div class="row"><span class="lab">名字</span><div class="names" id="names"></div><datalist id="pastNames"></datalist></div>
-          <p class="hint">名字、座號、設定都會記在這台電腦，下次打開會自動帶出上一次的內容。點數字作答，不用按確定；同一題錯 2 次會公布答案、換下一題。老師鍵盤：<kbd>空白鍵</kbd> 暫停　<kbd>F</kbd> 全螢幕</p>
-          <div class="startrow"><span class="warnmsg" id="warn"></span><button class="btn primary big" id="startBtn" type="button">開始比賽 ▶</button></div>
+          <div class="startrow"><button class="kbtn" type="button" data-help="keys" aria-label="老師鍵盤">⌨</button><span class="spacer"></span><span class="warnmsg" id="warn"></span><button class="btn primary big" id="startBtn" type="button">開始比賽 ▶</button></div>
         </div>
       </div>
     </section>
 
     <!-- 輸入成員座號 -->
     <section id="members" hidden>
-      <div class="mtop"><h2>各隊輸入成員座號</h2><span class="hint">依照上場順序輸入。上一次的座號會自動帶出來，不用每次重打。</span><span class="spacer"></span>
-        <button class="btn primary" type="button" id="mGroup">🎲 全班自動分組</button></div>
+      <div class="mtop"><h2>各隊輸入成員座號</h2><span class="hint">依照上場順序輸入</span><span class="spacer"></span>
+        <button class="btn primary" type="button" id="mGroup">🎲 全班自動分組</button><button class="qm big" type="button" data-help="group" aria-label="說明">?</button></div>
       <div id="mzones"></div>
       <div class="grp" id="grp" hidden></div>
       <div class="mbtns">
@@ -482,7 +545,8 @@ const PIC_THINGS = [
   {c:'碗', n:'草莓', u:'顆', e:'🍓', cls:'u-bowl'},
 ];
 const CB_MIN = 2, CB_MAX = 5;   // 認識乘法：乘數（有幾份）2～5，和練習頁一樣
-const CA = [2, 4, 5, 8];        // 認識乘法：被乘數固定 2、4、5、8（課本「乘法（一）」：2 和 5、4、8 的乘法）
+const CA_ALL = [2, 3, 4, 5, 6, 7, 8, 9];   // 認識乘法：被乘數可以選 2～9
+const CA_DEF = [2, 4, 5, 8];               // 預設：課本「乘法（一）」2 和 5、4、8 的乘法；「乘法（二）」是 3、6、7、9
 const WEAK_GAMES = 10;          // 精熟練習：看最近幾局
 const WEAK_MAX = 8;             // 精熟練習：最多列幾題
 const LOCK_WRONG = 900;   // 答錯停幾毫秒
@@ -493,7 +557,7 @@ const MAX_SEATS = 20;     // 每一隊最多幾個座號
 const MAX_HIST = 60;      // 比賽紀錄最多留幾筆
 
 /* ---------- 設定和紀錄（記在這台電腦的瀏覽器，不會因為重新整理而不見） ---------- */
-const S = {topic:'calc', game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], src:'normal', same:false, classN:28, goal:{race:15, stack:15}, time:{meteor:60, mole:60},
+const S = {topic:'calc', game:'race', mode:'team', n:2, tables:[2,3,4,5,6,7,8,9], ctables:[...CA_DEF], src:'normal', same:false, classN:28, goal:{race:15, stack:15}, time:{meteor:60, mole:60},
   names:['','',''], sound:true, swap:5, seats:true, members:[[],[],[]], pastNames:[]};
 try { Object.assign(S, JSON.parse(localStorage.getItem('bigmul.v1') || '{}')); } catch (e) {}
 const clampInt = (v, lo, hi) => Math.min(hi, Math.max(lo, Math.round(+v)));
@@ -512,6 +576,8 @@ for (const k in GAMES){
 if (S.swap !== 0 && !okInt(S.swap, SWAP_MIN, SWAP_MAX)) S.swap = 5;
 if (!Array.isArray(S.members) || S.members.length < 3) S.members = [[],[],[]];
 if (!Array.isArray(S.pastNames)) S.pastNames = [];
+if (!Array.isArray(S.ctables)) S.ctables = [...CA_DEF];
+S.ctables = S.ctables.filter(t => CA_ALL.includes(t));
 const save = () => { try { localStorage.setItem('bigmul.v1', JSON.stringify(S)); } catch (e) {} };
 let H = [];
 try { H = JSON.parse(localStorage.getItem('bigmul.hist') || '[]'); if (!Array.isArray(H)) H = []; } catch (e) { H = []; }
@@ -598,8 +664,13 @@ const GAME_PIC = {
 /* ---------- 設定畫面 ---------- */
 const nameOf = i => (S.names[i] || '').trim() || TEAMS[i][S.mode];
 const tablesText = t => t.length === 8 && !t.includes(1) ? '2～9' : t.length === 9 ? '1～9' : t.join('、');
-const tabsOf = () => S.topic === 'concept' ? CA : S.tables;
-const setTabs = t => { if (S.topic !== 'concept') S.tables = t; };
+const tabsOf = () => S.topic === 'concept' ? S.ctables : S.tables;
+const setTabs = t => { if (S.topic === 'concept') S.ctables = t.filter(x => CA_ALL.includes(x)); else S.tables = t; };
+/* 快速選：認識乘法照課本單元；心算照常用的組合 */
+const QUICK = {
+  concept:[['2,4,5,8', '乘法（一）2、4、5、8'], ['3,6,7,9', '乘法（二）3、6、7、9'], ['2,3,4,5,6,7,8,9', '2～9 全部']],
+  calc:[['2,5', '2、5'], ['3,4', '3、4'], ['6,7', '6、7'], ['8,9', '8、9'], ['2,3,4,5,6,7,8,9', '2～9 全部'], ['1,2,3,4,5,6,7,8,9', '1～9 全部']],
+};
 /* 精熟練習：最近 WEAK_GAMES 局（同一個主題），答錯的次數多、答對比例不到 75% 的題目 */
 function weakList(topic){
   const m = new Map();
@@ -637,19 +708,20 @@ function drawLobby(){
   $('#nSeg').innerHTML = [2, 3].map(n => `<button class="opt num ${S.n === n ? 'on' : ''}" type="button" data-n="${n}" ${g.ns.includes(n) ? '' : 'disabled'}>${n}</button>`).join('');
   const tabs = tabsOf(), concept = S.topic === 'concept';
   $('#tabLab').textContent = concept ? '被乘數' : '乘法範圍';
-  $('#tabSeg').innerHTML = concept
-    ? CA.map(t => `<span class="fixed">${t}</span>`).join('') + `<span class="hint" style="align-self:center">（1 份有幾個，課本「乘法（一）」）；乘數（有幾份）是 ${CB_MIN}～${CB_MAX}</span>`
-    : [1,2,3,4,5,6,7,8,9].map(t => `<button class="opt num ${tabs.includes(t) ? 'on' : ''}" type="button" data-t="${t}">${t}</button>`).join('') + '<span class="hint" style="align-self:center">的乘法</span>';
-  $('#q19').parentElement.hidden = concept;
+  $('#caHelp').hidden = !concept;
+  $('#tabSeg').innerHTML = (concept ? CA_ALL : [1,2,3,4,5,6,7,8,9]).map(t => `<button class="opt num ${tabs.includes(t) ? 'on' : ''}" type="button" data-t="${t}">${t}</button>`).join('')
+    + (concept ? '' : '<span class="hint" style="align-self:center">的乘法</span>');
+  const qk = tabs.slice().sort().join(',');
+  $('#quickSeg').innerHTML = '<span class="hint" style="align-self:center">快速選：</span>'
+    + QUICK[concept ? 'concept' : 'calc'].map(([v, t]) => `<button class="quick ${v === qk ? 'on' : ''}" type="button" data-q="${v}">${t}</button>`).join('');
   /* 出題：一般／精熟練習（列出比較不熟的題目）；各隊題目：不同／同一組（公平） */
   const weak = weakList(S.topic);
   if (!weak.length && S.src === 'weak') S.src = 'normal';
   $('#srcSeg').innerHTML = `<button class="opt ${S.src === 'normal' ? 'on' : ''}" type="button" data-src="normal">一般題目</button>`
     + `<button class="opt weak ${S.src === 'weak' ? 'on' : ''}" type="button" data-src="weak" ${weak.length ? '' : 'disabled'}>🎯 進行精熟練習</button>`;
   $('#sameSeg').innerHTML = [[0,'各自作答'],[1,'同步搶答（公平）']].map(([v, t]) => `<button class="opt ${+S.same === v ? 'on' : ''}" type="button" data-same="${v}">${t}</button>`).join('');
-  $('#weakLine').innerHTML = weak.length
-    ? `<span class="hint">這些題目比較不熟：</span>${weak.map(o => `<span class="wq">${o.a}×${o.b}</span>`).join('')}`
-    : `<span class="hint">玩過幾局以後，答錯比較多的題目會列在這裡，可以進行精熟練習。</span>`;
+  $('#weakLine').hidden = !weak.length;
+  $('#weakLine').innerHTML = weak.length ? `<span class="hint">這些題目比較不熟：</span>${weak.map(o => `<span class="wq">${o.a}×${o.b}</span>`).join('')}` : '';
   $('#goalRow').hidden = g.kind !== 'goal';
   $('#timeRow').hidden = g.kind !== 'time';
   if (g.kind === 'goal'){
@@ -666,7 +738,7 @@ function drawLobby(){
   $('#names').innerHTML = TEAMS.map((t, i) => `<label class="nm ${i < S.n ? '' : 'off'}" style="--c:${t.c};--l:${t.l}"><span class="dot"></span>
     <input data-name="${i}" maxlength="8" list="pastNames" value="${esc(S.names[i] || '')}" placeholder="${t[S.mode]}" ${i < S.n ? '' : 'disabled'}></label>`).join('');
   $('#pastNames').innerHTML = S.pastNames.map(n => `<option value="${esc(n)}">`).join('');
-  $('#warn').textContent = tabs.length ? '' : '請至少選一個乘法';
+  $('#warn').textContent = tabs.length ? '' : concept ? '請至少選一個被乘數' : '請至少選一個乘法';
   $('#startBtn').textContent = isTeam() && S.seats ? '下一步：輸入座號 ▶' : '開始比賽 ▶';
   $('#title').textContent = tp.name; $('#tag').textContent = tp.tag;
   $('#backBtn').href = tp.back;
@@ -674,6 +746,7 @@ function drawLobby(){
 }
 $('#lobby').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.help) return showHelp(b.dataset.help);
   if (b.dataset.g) S.game = b.dataset.g;
   else if (b.dataset.mode) S.mode = b.dataset.mode;
   else if (b.dataset.n) S.n = +b.dataset.n;
@@ -757,6 +830,7 @@ $('#members').addEventListener('click', e => {
   if (b.dataset.rm){ const [i, k] = b.dataset.rm.split(':').map(Number); S.members[i].splice(k, 1); save(); drawSeats(i); }
   else if (b.dataset.clr != null){ S.members[+b.dataset.clr] = []; save(); drawSeats(+b.dataset.clr); }
   else if (b.dataset.mix != null){ shuffle(S.members[+b.dataset.mix]); save(); drawSeats(+b.dataset.mix); }
+  else if (b.dataset.help) showHelp(b.dataset.help);
   else if (b.id === 'mGroup') showGroup();
   else if (b.id === 'mSkip') go(true);
   else if (b.id === 'mStart') go(false);
@@ -832,7 +906,7 @@ function newQ(prev){
   for (let k = 0; k < 30; k++){
     if (G.weak) { const o = pick(G.weak); q = makeQ(o.a, o.b, G.topic); }   // 精熟練習：只出比較不熟的題目
     else if (G.topic === 'concept'){
-      const a = pick(CA), b = ri(CB_MIN, CB_MAX);
+      const a = pick(S.ctables), b = ri(CB_MIN, CB_MAX);
       if (a === b && k < 25) continue;                  // 被乘數和乘數一樣，就看不出前後有沒有放對
       q = makeQ(a, b, 'concept');
     } else q = makeQ(pick(S.tables), ri(1, 9), 'calc');
@@ -907,7 +981,8 @@ const SECTIONS = ['lobby', 'members', 'review', 'game', 'result', 'hist'];
 const show = id => { SECTIONS.forEach(s => $('#' + s).hidden = s !== id);
   const playing = id === 'game';
   $('#timer').hidden = !playing; $('#pauseBtn').hidden = !playing; $('#endBtn').hidden = !playing;
-  $('#backBtn').hidden = id !== 'lobby'; $('#histBtn').hidden = id !== 'lobby'; };
+  $('#backBtn').hidden = id !== 'lobby'; $('#histBtn').hidden = id !== 'lobby'; $('#tourBtn').hidden = id !== 'lobby';
+  if (window.Tour) Tour.close(); };
 
 function start(skipSeats){
   stop();
@@ -1375,6 +1450,8 @@ function landM(z, m){
 
 /* ---------- 結果 ---------- */
 const medal = (r, cls = '') => `<span class="medal m${r} ${cls}">第 ${r} 名</span>`;
+/* 結果畫面的大獎牌：金 1、銀 2、銅 3（掛在卡片上方，遠遠就看得到） */
+const bigMedal = r => `<div class="bmedal b${r}" aria-label="第 ${r} 名"><span class="rib"></span><span class="disc">${r}</span></div>`;
 const perChips = (per, members) => {
   const keys = [...new Set([...(members || []), ...Object.keys(per).map(Number)])].filter(k => per[k]);
   return keys.map(k => `<span class="pc"><b>${k} 號</b> 對 ${per[k].r}${per[k].w ? `・錯 ${per[k].w}` : ''}</span>`).join('');
@@ -1398,30 +1475,41 @@ function finish(){
   const unit = {race:'答對題數', stack:'疊了幾塊', mole:'敲到幾隻', meteor:'擊碎流星'}[G.kind];
 
   /* 存進比賽紀錄 */
-  H.unshift({at:Date.now(), game:G.kind, topic:G.topic, tables:[...(G.topic === 'concept' ? CA : S.tables)], weak:!!G.weak, same:!!G.same,
+  H.unshift({at:Date.now(), game:G.kind, topic:G.topic, tables:[...(G.topic === 'concept' ? S.ctables : S.tables)], weak:!!G.weak, same:!!G.same,
     qs:Object.values(Z.reduce((m, z) => { for (const k in z.qs){ const o = m[k] || (m[k] = [z.qs[k][0], z.qs[k][1], 0, 0]); o[2] += z.qs[k][2]; o[3] += z.qs[k][3]; } return m; }, {})), time:G.time, goal:G.goal, manual:!!G.manual, played:Math.round(G.t),
     teams:order.map(({z, rank}) => ({name:z.name, color:z.i, rank, score:z.score, right:z.right, wrong:z.wrong, members:z.members, per:z.per}))});
   if (H.length > MAX_HIST) H.length = MAX_HIST;
   saveH();
 
+  /* 卡片留在比賽時的位置（學生站哪裡，卡片就在哪裡），名次用卡片上方的大獎牌表示；
+     最醒目的是「答對比例」：先看自己答對多少，比快慢是其次 */
+  const accOf = z => { const t = z.right + z.wrong; return t ? Math.round(z.right / t * 100) : -1; };
+  const bestAcc = Math.max(...Z.map(accOf));
   $('#result').innerHTML = `
     <h2 class="rhead">🏆 ${head}<small>${why}</small></h2>
-    <div class="rcards" style="--n:${Z.length}">${order.map(({z, rank}) => {
+    <div class="rcards" style="--n:${Z.length}">${Z.map(z => {
+      const rank = order.find(o => o.z === z).rank;
       const tot = z.right + z.wrong, acc = tot ? Math.round(z.right / tot * 100) : 0;
       const avg = z.times.length ? (z.times.reduce((a, b) => a + b, 0) / z.times.length).toFixed(1) : '–';
       const ms = misses(z), pc = perChips(z.per, z.members);
-      return `<div class="rcard" style="--c:${z.c};--l:${z.l}">
-        <div class="top"><span class="who ${rank === 1 ? 'win' : ''}">${critter(z.c)}</span><b>${esc(z.name)}</b>${medal(rank)}</div>
+      const careful = tot && accOf(z) === bestAcc && Z.length > 1;
+      return `<div class="rcol">${bigMedal(rank)}<div class="rcard ${rank === 1 ? 'first' : ''}" style="--c:${z.c};--l:${z.l}">
+        <div class="top"><span class="who ${rank === 1 ? 'win' : ''}">${critter(z.c)}</span><b>${esc(z.name)}</b></div>
         <div class="body">
+          <div class="acc">
+            <div class="acch"><span>答對比例</span>${careful ? '<em>👍 最細心</em>' : ''}</div>
+            <div class="accrow"><b>${tot ? acc : '–'}<small>${tot ? '%' : ''}</small></b>
+              <div class="accbar"><i style="width:${tot ? acc : 0}%"></i></div></div>
+            <div class="acct">答對 <b>${z.right}</b> 題・答錯 <b>${z.wrong}</b> 次</div>
+          </div>
           <div class="stats">
             <div class="stat"><b>${z.score}</b><span>${unit}</span></div>
-            <div class="stat"><b>${tot ? acc + '%' : '–'}</b><span>答對比例</span></div>
             <div class="stat"><b>${G.kind === 'meteor' ? z.misses.length : avg}</b><span>${G.kind === 'meteor' ? '掉到地上' : '每題秒數'}</span></div>
           </div>
           ${pc ? `<div class="miss"><h4>每一位同學</h4><div class="pcs">${pc}</div></div>` : ''}
           <div class="miss"><h4>${G.kind === 'meteor' ? '沒打到、要再練習的題目' : '答錯、要再練習的題目'}</h4>
             ${!tot && !ms.length ? '<div class="none" style="color:var(--ink-soft)">這一局還沒有作答</div>' : ms.length ? `<div class="chips">${ms.map(q => `<span>${q.label}</span>`).join('')}</div>` : '<div class="none">全部都對，太棒了！</div>'}</div>
-        </div></div>`; }).join('')}</div>
+        </div></div></div>`; }).join('')}</div>
     <div class="rbtns"><button class="btn primary big" type="button" id="againBtn">再玩一次</button><button class="btn big" type="button" id="setBtn">回到設定</button></div>`;
   G.lastSkip = !Z.some(z => z.members.length);
   show('result'); SND.win();
@@ -1468,12 +1556,49 @@ function toggleFS(){
 }
 $('#fsBtn').addEventListener('click', toggleFS);
 addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
+  if (e.target.tagName === 'INPUT' || (window.Tour && Tour.isOpen())) return;
   if (e.code === 'Space'){ e.preventDefault(); if (G && !G.ended && !$('#game').hidden) pause(); }
   else if (e.key === 'f' || e.key === 'F') toggleFS();
 });
 
+/* ---------- 說明（設定旁的小問號）和第一次打開的導覽 ----------
+   只說明比較特別、猜不到的設定；會自動記住的、一看就懂的不說明 */
+const DEMO = {
+  group:`<div class="dm dm-group"><div class="dm-class">${[1,2,3,4,5,6,7,8].map(k => `<b class="${k === 3 || k === 6 ? 'away' : ''}">${k}</b>`).join('')}</div>
+    <div class="dm-arrow">▼</div>
+    <div class="dm-teams"><div class="dm-t" style="--c:#E5484D;--l:#FDE3E4"><i>紅隊</i>${[7,1,5].map((k, j) => `<b style="--d:${j}">${k}</b>`).join('')}</div>
+      <div class="dm-t" style="--c:#3A9FEF;--l:#DDF0FF"><i>藍隊</i>${[2,8,4].map((k, j) => `<b style="--d:${j}">${k}</b>`).join('')}</div></div></div>`,
+  swap:`<div class="dm dm-swap"><div class="dm-z" style="--c:#E5484D;--l:#FDE3E4"><div class="dm-h">紅隊<span>7 號作答中</span></div>
+    <div class="dm-q">4 × 3 = <u>12</u></div><div class="dm-pop"><b>換人囉！</b>請 <em>12</em> 號上場<span>準備好了</span></div></div></div>`,
+  same:`<div class="dm dm-same">${[['紅隊','#E5484D','#FDE3E4',1],['藍隊','#3A9FEF','#DDF0FF',0]].map(([n, c, l, w]) => `<div class="dm-z ${w ? 'win' : 'lose'}" style="--c:${c};--l:${l}">
+    <div class="dm-h">${n}</div><div class="dm-q">4 × 3</div><div class="dm-r">${w ? '答對！＋1' : '紅隊搶先答對！'}</div></div>`).join('')}</div>`,
+  weak:`<div class="dm dm-weak"><div class="dm-wl">${['8×7','6×9','7×4'].map(t => `<span>${t}</span>`).join('')}</div>
+    <div class="dm-steps"><b>① 一起複習</b><i>▶</i><b>② 只用這些題目比賽</b></div></div>`,
+  ca:`<div class="dm dm-ca"><div class="dm-plates">${[0,1,2].map(() => `<span>${'<i></i>'.repeat(4)}</span>`).join('')}</div>
+    <div class="dm-eq"><b>4<small>被乘數<br>1 盤有幾個</small></b>×<b>3<small>乘數<br>有幾盤</small></b></div></div>`,
+  keys:`<div class="dm dm-keys"><p><kbd>空白鍵</kbd> 暫停／繼續</p><p><kbd>F</kbd> 全螢幕</p></div>`,
+};
+const HELP = {
+  group:{title:'成員座號', demo:DEMO.group, text:'選「要輸入」，開始前各隊輸入座號（上場的順序）。下一頁的「🎲 全班自動分組」：點掉請假的同學，電腦自動平均分隊。'},
+  swap:{title:'換人提醒', demo:DEMO.swap, text:'每一隊答完幾題，那一隊的畫面會跳出「換人囉！請 X 號上場」，按「準備好了」才繼續。'},
+  same:{title:'同步搶答', demo:DEMO.same, text:'每一隊同時看到同一題，最快答對的那一隊得分，再一起換下一題。「各自作答」則是各隊做自己的題目。'},
+  weak:{title:'精熟練習', demo:DEMO.weak, text:'玩過幾局以後，最近 10 局答錯比較多的題目會列在這裡。選「進行精熟練習」，先一起複習，再只用這些題目比賽。'},
+  ca:{title:'被乘數和乘數', demo:DEMO.ca, text:`被乘數是「1 份有幾個」，可以自己選；乘數（有幾份）固定 ${CB_MIN}～${CB_MAX}。被乘數和乘數一樣的題目不出（看不出前後有沒有放對）。`},
+  keys:{title:'老師鍵盤', demo:DEMO.keys, text:'比賽中可以用電腦鍵盤操作。'},
+};
+const TOUR_OPT = {root:'#stage', size:30};
+const TOUR_STEPS = () => [
+  Object.assign({el:'#seatRow', tap:'.opt'}, HELP.group),
+  Object.assign({el:'#swapRow', tap:'.opt+.opt'}, HELP.swap),
+  Object.assign({el:'#sameRow', tap:'.opt+.opt'}, HELP.same),
+  Object.assign({el:'#srcRow'}, HELP.weak),
+  {el:'#tourBtn', title:'想再看一次', text:'按「導覽」可以重看；設定旁邊的 <b class="qm">?</b> 也有說明。'},
+];
+function showHelp(k){ if (window.Tour && HELP[k]) Tour.help(HELP[k], TOUR_OPT); }
+$('#tourBtn').addEventListener('click', () => { if (window.Tour) Tour.run('big-mul', TOUR_STEPS(), TOUR_OPT); });
+
 soundLabel(); drawLobby(); show('lobby');
+if (window.Tour) Tour.auto('big-mul', TOUR_STEPS(), TOUR_OPT);
 </script>
 </body>
 </html>
